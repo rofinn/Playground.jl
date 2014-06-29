@@ -22,7 +22,7 @@ To create a new playground with a specific git revision of julia.
 playground /path/of/new/playground create --julia 9effcb3
 ```
 NOTES:
-* The last to examples involve rebuilding julia from source and will take a long time.
+* The last two examples involve rebuilding julia from source and will take a long time.
 * When creating a new playground you can pass a `--clean` which will delete any existing files in the playground directory if it is an existing playground.
 
 #### Activate ####
@@ -30,3 +30,10 @@ To activate a given playground simply run.
 ```shell
 playground /path/to/your/playground activate
 ```
+
+#### TODOs ####
+* Tests
+* Logging
+* travis config
+* untested on non-linux platforms!
+* Add to METADATA.jl
