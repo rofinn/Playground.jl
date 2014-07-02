@@ -1,5 +1,5 @@
 #!/usr/bin/env julia
 
 using Playground
-Playground.main()
+manage_playground()
 

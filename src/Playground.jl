@@ -7,7 +7,7 @@ JULIA_GIT_ADDRESS = "https://github.com/JuliaLang/julia.git"
 ACTIVATED_PROMPT = "playground> "
 
 
-function main()
+function manage_playground()
     parse_settings = ArgParseSettings()
 
     @add_arg_table parse_settings begin
@@ -81,7 +81,7 @@ function activate(directory)
     Logging.configure(level=DEBUG, filename=joinpath(log_path, "playground.log"))
 
     info("Setting PATH variable to using to look in playground bin directory first")
-    ENV["PATH"] = "$(bin_path):", ENV["PATH"]
+    ENV["PATH"] = "$(bin_path):" * ENV["PATH"]
     info("Setting the JULIA_PKGDIR variable to using the playground packages directory")
     ENV["JULIA_PKGDIR"] = pkg_path
 
