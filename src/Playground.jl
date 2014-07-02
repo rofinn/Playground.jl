@@ -44,30 +44,44 @@ end
 
 
 function create(directory, julia, clear)
-    root_path = abspath(directory)
-    bin_path = joinpath(root_path, "bin")
-    log_path = joinpath(root_path, "log")
-    pkg_path = joinpath(root_path, "packages")
-    julia_path = joinpath(bin_path, "julia")
-    julia_src_path = joinpath(root_path, "julia_src")
+    if julia == "" || ispath(julia) ||
+        '.' in julia || ismatch(r"\b([a-f0-9]{40})\b", julia)
 
-    mkpath(root_path)
-    mkpath(bin_path)
-    mkpath(log_path)
-    mkpath(pkg_path)
+        root_path = abspath(directory)
+        bin_path = joinpath(root_path, "bin")
+        log_path = joinpath(root_path, "log")
+        pkg_path = joinpath(root_path, "packages")
+        julia_path = joinpath(bin_path, "julia")
+        julia_src_path = joinpath(root_path, "julia_src")
+        gitlog = joinpath(log_path, "git.log")
 
-    Logging.configure(level=DEBUG, filename=joinpath(log_path, "playground.log"))
-    info("Playground folders created")
+        mkpath(root_path)
+        mkpath(bin_path)
+        mkpath(log_path)
+        mkpath(pkg_path)
 
-    if julia != ""
-        if ispath(julia)
-            info("Linking supplied julia binary to bin/julia")
-            mklink(julia, julia_path)
-        else
-            info("Cloning the julia repository into the playground")
-            run(`git clone $(JULIA_GIT_ADDRESS) $(julia_src_path)`)
-            cd(build_julia(julia), julia_path)
+        Logging.configure(level=DEBUG, filename=joinpath(log_path, "playground.log"))
+        info("Playground folders created")
+
+        if julia != ""
+            if ispath(julia)
+                info("Linking supplied julia binary to bin/julia")
+                mklink(julia, julia_path)
+            else
+                info("Cloning the julia repository into the playground")
+                run(`git clone $(JULIA_GIT_ADDRESS) $(julia_src_path)` |> gitlog)
+
+                # Handle the cd into and out of src directory cause cd() in base
+                # seems to be broken.
+                cwd = pwd()
+                cd(julia_src_path)
+                build_julia(julia, root_path, log_path)
+                cd(cwd)
+            end
         end
+    else
+        error("Invalid julia input please ensure you are " *
+            "passing either a valid julia path, version or SHA1")
     end
 end
 
@@ -101,30 +115,25 @@ function run_nix_shell()
 end
 
 
-function build_julia(target, prefix)
+function build_julia(target, root_path, log_path)
     println("Building julia ( $(target) )...")
-    # target is a julia version
-    if '.' in target
-        run(`git checkout -b $(target) $(target)`)
-        info("checking out julia version $(target)")
-    # target is a sha1
-    # regex from http://stackoverflow.com/questions/468370/a-regex-to-match-a-sha1
-    elseif ismatch(r"/\b([a-f0-9]{40})\b/", target)
-        info("checking out julia revision $(target)")
-        run(`git checkout -b $target -- .`)
-    end
+    gitlog = joinpath(log_path, "git.log")
+    buildlog = joinpath(log_path, "build.log")
+
+    run(`git checkout $(target)` >> gitlog)
+    info("checking out $(target)")
 
     # Write the different prefix to the Make.user file before
     # building and installing.
     info("setting prefix in Make.user")
-    fstrm = open(joinpath(julia_src_path, "Make.user"),"w")
-    write(fstrm, "prefix=$(root_path)/")
+    fstrm = open("Make.user","w")
+    write(fstrm, "prefix=$(root_path)")
 
     info("Building julia")
     # Build and install.
     # TODO: log the build output properly in root_dir/log
-    #run(`make`)
-    #run(`make install`)
+    run(`make` |> buildlog)
+    run(`make install` >> buildlog)
     println("Julia has been built and installed.")
 end
 
