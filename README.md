@@ -4,6 +4,21 @@ Playground.jl
 
 A package for managing julia sandboxes like python's virtualenv.
 
+### Installation ###
+Install the julia package
+```shell
+julia>Pkg.add("Playground")
+```
+Running the playground script
+```shell
+~/.julia/v0.3/Playground/deps/usr/bin/playground
+```
+Optional: add the playground script to your path by editing your 
+~/.bashrc, ~/.zshrc, ~/.tcshrc, etc.
+```shell
+echo "PATH=$PATH:~/.julia/v0.3/Playground/deps/usr/bin/" >> ~/.bashrc
+```
+
 ### Usage ###
 #### Create ####
 To create a new playground using your existing julia install.
