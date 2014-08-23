@@ -1,5 +1,6 @@
 Playground.jl
 =============
+[![Build Status](https://travis-ci.org/Rory-Finnegan/Playground.jl.svg)](https://travis-ci.org/Rory-Finnegan/Playground.jl)
 
 A package for managing julia sandboxes like python's virtualenv.
 
