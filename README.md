@@ -49,7 +49,4 @@ playground /path/to/your/playground activate
 
 #### TODOs ####
 * Tests
-* Logging
-* travis config
 * untested on non-linux platforms!
-* Add to METADATA.jl
