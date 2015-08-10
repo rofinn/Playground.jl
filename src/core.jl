@@ -61,14 +61,14 @@ function create(directory, julia, clear)
         mkpath(pkg_path)
 
         Logging.configure(level=DEBUG, filename=joinpath(log_path, "playground.log"))
-        info("Playground folders created")
+        Logging.info("Playground folders created")
 
         if julia != ""
             if ispath(julia)
-                info("Linking supplied julia binary to bin/julia")
+                Logging.info("Linking supplied julia binary to bin/julia")
                 mklink(julia, julia_path)
             else
-                info("Cloning the julia repository into the playground")
+                Logging.info("Cloning the julia repository into the playground")
                 run(`git clone $(JULIA_GIT_ADDRESS) $(julia_src_path)` |> gitlog)
 
                 # Handle the cd into and out of src directory cause cd() in base
@@ -94,12 +94,12 @@ function activate(directory)
 
     Logging.configure(level=DEBUG, filename=joinpath(log_path, "playground.log"))
 
-    info("Setting PATH variable to using to look in playground bin directory first")
+    Logging.info("Setting PATH variable to using to look in playground bin directory first")
     ENV["PATH"] = "$(bin_path):" * ENV["PATH"]
-    info("Setting the JULIA_PKGDIR variable to using the playground packages directory")
+    Logging.info("Setting the JULIA_PKGDIR variable to using the playground packages directory")
     ENV["JULIA_PKGDIR"] = pkg_path
 
-    info("Executing a playground shell")
+    Logging.info("Executing a playground shell")
     @windows? run_windows_shell() : run_nix_shell()
 end
 
@@ -116,20 +116,20 @@ end
 
 
 function build_julia(target, root_path, log_path)
-    println("Building julia ( $(target) )...")
+    Logging.info("Building julia ( $(target) )...")
     gitlog = joinpath(log_path, "git.log")
     buildlog = joinpath(log_path, "build.log")
 
     run(`git checkout $(target)` >> gitlog)
-    info("checking out $(target)")
+    Logging.info("checking out $(target)")
 
     # Write the different prefix to the Make.user file before
     # building and installing.
-    info("setting prefix in Make.user")
+    Logging.info("setting prefix in Make.user")
     fstrm = open("Make.user","w")
     write(fstrm, "prefix=$(root_path)")
 
-    info("Building julia")
+    Logging.info("Building julia")
     # Build and install.
     # TODO: log the build output properly in root_dir/log
     run(`make` |> buildlog)
