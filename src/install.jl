@@ -157,7 +157,7 @@ end
         bin_path = joinpath(config.dir.bin, binfiles[version_key])
 
         if !ispath(src_path)
-            run(`tar -xvjf $src -C $src_path`)
+            run(`tar -xvzf $src -C $src_path`)
         end
 
         mklink(src_path, bin_path)
