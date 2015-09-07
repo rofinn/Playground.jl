@@ -3,7 +3,7 @@ DEFAULT_CONFIG = """
 ---
 # This is just default location to store a new playground.
 # This is used by create and activate if no --name or --path.
-default_playground_path: ./.playground
+default_playground_path: .playground
 
 # Default shell prompt when you activate a playground.
 activated_prompt: \"playground> \"

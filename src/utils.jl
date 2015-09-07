@@ -45,10 +45,32 @@ function copy(src::AbstractString, dest::AbstractString; soft=true, overwrite=tr
 end
 
 
+@doc doc"""
+    We overload download for our tests in order to make sure we're just download. The
+    julia builds once.
+""" ->
+function Base.download(src::ASCIIString, dest::UTF8String; overwrite=false)
+    if !ispath(dest) || overwrite
+        download(src, ASCIIString(dest))
+    end
+    return dest
+end
+
+
 function msg(exc::Exception)
     if isa(exc, ErrorException)
        return exc.msg
     else
        return string(exc)
+    end
+end
+
+function get_playground_dir(config::Config, dir::AbstractString, name::AbstractString)
+    if dir == "" && name == ""
+        return abspath(joinpath(pwd(), config.default_playground_path))
+    elseif dir == "" && name != ""
+        return abspath(joinpath(config.dir.store, name))
+    elseif dir != ""
+        return abspath(dir)
     end
 end

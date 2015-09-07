@@ -1,7 +1,7 @@
 module Playground
 
 using ArgParse
-using Logging
+import Logging
 
 include("constants.jl")
 include("config.jl")
@@ -9,9 +9,23 @@ include("install.jl")
 include("utils.jl")
 include("create.jl")
 include("activate.jl")
+include("list.jl")
 
 
-export main, Config, init, install, dirinstall, gitinstall, binurls
+export
+    # methods
+    main,
+    load_config,
+    install,
+    dirinstall,
+    gitinstall,
+    create,
+    activate,
+    list,
+
+    # Constants
+    binurls,
+    DEFAULT_CONFIG
 
 
 function main()
@@ -66,7 +80,7 @@ function main()
             help = "The version(s) of julia available to use. If multiple versions are provided the first entry will be the one used by `julia`. By default the user/system level version is used."
             nargs = '*'
             action = :store_arg
-            default = ""
+            default = []
     end
 
     @add_arg_table parse_settings["activate"] begin
@@ -81,14 +95,15 @@ function main()
     end
 
     @add_arg_table parse_settings["list"] begin
+        "--show-links", "-s"
+            help = "Display the source path if julia-versions or playgrounds are just symlinks."
+            action = :store_true
         "--julia-versions", "-j"
-            help = "Display julia versions avaiable."
+            help = "Display julia versions avaiable. NOT IMPLEMENTED."
             action = :store_true
-            default = ""
         "--playgrounds", "-p"
-            help = "Display playgrounds."
+            help = "Display playgrounds. NOT IMPLEMENTED"
             action = :store_true
-            default = ""
     end
 
     @add_arg_table parse_settings["install"]["download"] begin
@@ -105,7 +120,7 @@ function main()
 
     @add_arg_table parse_settings["install"]["build"] begin
         "url"
-            help = "The git url to clone the julialang source from. Defaults to https://github.com/JuliaLang/julia.git"
+            help = "The git url to clone the julialang source from. Defaults to https://github.com/JuliaLang/julia.git. NOT IMPLEMENTED"
             action = :store_arg
             default = ""
         "revision"
@@ -126,14 +141,14 @@ function main()
 
         if install_cmd == "download"
             install(
-                VersionNumber(args[cmd][install_cmd]["version"]),
-                config;
+                config,
+                VersionNumber(args[cmd][install_cmd]["version"]);
                 labels=args[cmd]["labels"]
             )
         elseif install_cmd == "link"
             dirinstall(
-                abspath(args[cmd][install_cmd]["dir"]),
-                config;
+                config,
+                abspath(args[cmd][install_cmd]["dir"]);
                 labels=args[cmd]["labels"]
             )
         elseif install_cmd == "build"
@@ -141,11 +156,16 @@ function main()
         end
     elseif cmd == "create"
         create(
-            args[cmd]["dir"], args[cmd]["julia-versions"],
-            args[cmd]["name"], args[cmd]["requirements"], config
+            config;
+            dir=args[cmd]["dir"],
+            name=args[cmd]["name"],
+            julia=args[cmd]["julia-versions"],
+            reqs=args[cmd]["requirements"]
         )
     elseif cmd == "activate"
-        activate(args[cmd]["dir"], args[cmd]["name"], config)
+        activate(config; dir=args[cmd]["dir"], name=args[cmd]["name"])
+    elseif cmd == "list"
+        list(config; show_links=args[cmd]["show-links"])
     end
 end
 

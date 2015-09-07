@@ -6,7 +6,7 @@
     binary version for your platform, or downloads and builds
     it from source if `src` is true.
 """ ->
-function install(version::VersionNumber, config::Config=Config(); labels::Array{ASCIIString,1}=[])
+function install(config::Config, version::VersionNumber; labels::Array{ASCIIString,1}=[])
     init(config)
 
     # download the julia version
@@ -28,7 +28,7 @@ end
     This option simply creates symlinks from an existing julia
     install.
 """ ->
-function dirinstall(executable::AbstractString, config::Config=Config(); labels::Array{ASCIIString, 1}=[])
+function dirinstall(config::Config, executable::AbstractString; labels::Array{ASCIIString, 1}=[])
     if ispath(executable)
         init(config)
 
@@ -54,20 +54,19 @@ end
         2. checks out the supplied revision into the local branch_name.
         3. attempts to build julia from scratch.
 """ ->
-function gitinstall(url::ASCIIString=JULIA_GIT_ADDRESS, directory::AbstractString, config::Config=Config(); revision="master",
-    branch_name="master", labels=[])
+function gitinstall(config::Config; url::ASCIIString="", dir::AbstractString="", revision="", labels=[])
 
     error("Installing from a git repo isn't implemented yet.")
 
-    Logging.info("Cloning the julia repository into the playground")
-    run(`git clone $(url) $(name)` |> gitlog)
+    # Logging.info("Cloning the julia repository into the playground")
+    # run(`git clone $(url) $(name)` |> gitlog)
 
-    # Handle the cd into and out of src directory cause cd() in base
-    # seems to be broken.
-    cwd = pwd()
-    cd(dest)
-    build_julia(julia, , log_path)
-    cd(cwd)
+    # # Handle the cd into and out of src directory cause cd() in base
+    # # seems to be broken.
+    # cwd = pwd()
+    # cd(dest)
+    # build_julia(julia, , log_path)
+    # cd(cwd)
 end
 
 
@@ -89,27 +88,27 @@ function link_julia(bin_path::AbstractString, config::Config, labels=[])
 end
 
 
-function build_julia(target, root_path, log_path)
-    Logging.info("Building julia ( $(target) )...")
-    gitlog = joinpath(log_path, "git.log")
-    buildlog = joinpath(log_path, "build.log")
+# function build_julia(target, root_path, log_path)
+#     Logging.info("Building julia ( $(target) )...")
+#     gitlog = joinpath(log_path, "git.log")
+#     buildlog = joinpath(log_path, "build.log")
 
-    run(`git checkout $(target)` >> gitlog)
-    Logging.info("checking out $(target)")
+#     run(`git checkout $(target)` >> gitlog)
+#     Logging.info("checking out $(target)")
 
-    # Write the different prefix to the Make.user file before
-    # building and installing.
-    Logging.info("setting prefix in Make.user")
-    fstrm = open("Make.user","w")
-    write(fstrm, "prefix=$(root_path)")
+#     # Write the different prefix to the Make.user file before
+#     # building and installing.
+#     Logging.info("setting prefix in Make.user")
+#     fstrm = open("Make.user","w")
+#     write(fstrm, "prefix=$(root_path)")
 
-    Logging.info("Building julia")
-    # Build and install.
-    # TODO: log the build output properly in root_dir/log
-    run(`make` |> buildlog)
-    run(`make install` >> buildlog)
-    println("Julia has been built and installed.")
-end
+#     Logging.info("Building julia")
+#     # Build and install.
+#     # TODO: log the build output properly in root_dir/log
+#     run(`make` |> buildlog)
+#     run(`make install` >> buildlog)
+#     println("Julia has been built and installed.")
+# end
 
 
 @osx_only begin

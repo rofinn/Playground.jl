@@ -1,27 +1,3 @@
-test_bin_dir = joinpath(TEST_TMP_DIR, "bin")
-mkpath(test_bin_dir)
-
-test_binurls = Dict(
-    binurls[v"0.4"] => joinpath(test_bin_dir, basename(binurls[v"0.4"])),
-    binurls[v"0.3"] => joinpath(test_bin_dir, basename(binurls[v"0.3"])),
-)
-
-
-@doc doc"""
-    We overload download for our tests in order to make sure we're just download. The
-    julia builds once.
-""" ->
-function Base.download(src::ASCIIString, dest::UTF8String)
-    if !isfile(test_binurls[src])
-        # We cast dest to ASCIIString to make sure we
-        # call the general download method
-        download(src, ASCIIString(test_binurls[src]))
-    end
-
-    if !ispath(dest)
-        cp(test_binurls[src], dest)
-    end
-end
 
 @doc doc"""
     Lets us use wget to check that all the binurls are still valid.
@@ -34,14 +10,30 @@ function check_url(url::AbstractString)
     end
 end
 
-
-for key in keys(binurls)
-    check_url(binurls[key])
+function test_urls()
+    for key in keys(binurls)
+        check_url(binurls[key])
+    end
 end
 
-install(v"0.3.11", TEST_CONFIG; labels=["julia-bin", "julia-stable-bin"])
-install(v"0.4.0", TEST_CONFIG; labels=["julia-nightly-bin"])
+function test_install()
+    install(TEST_CONFIG, v"0.3.11"; labels=["julia-bin", "julia-stable-bin"])
+    install(TEST_CONFIG, v"0.4.0"; labels=["julia-nightly-bin"])
+end
 
-dirinstall(joinpath(TEST_CONFIG.dir.bin, "julia-nightly-bin"), TEST_CONFIG; labels=["julia-nightly-dir"])
-dirinstall(joinpath(TEST_CONFIG.dir.bin, "julia-stable-bin"), TEST_CONFIG; labels=["julia-stable-dir"])
+function test_dirinstall()
+    dirinstall(
+        TEST_CONFIG,
+        joinpath(TEST_CONFIG.dir.bin, "julia-nightly-bin");
+        labels=["julia-nightly-dir"]
+    )
+    dirinstall(
+        TEST_CONFIG,
+        joinpath(TEST_CONFIG.dir.bin, "julia-stable-bin");
+        labels=["julia-stable-dir"]
+    )
+end
 
+test_urls()
+test_install()
+test_dirinstall()
