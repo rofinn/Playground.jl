@@ -62,9 +62,9 @@ end
     We overload download for our tests in order to make sure we're just download. The
     julia builds once.
 """ ->
-function Base.download(src::ASCIIString, dest::AbstractString; overwrite=false)
+function Base.download(src::ASCIIString, dest::AbstractString, overwrite)
     if !ispath(dest) || overwrite
-        download(src, ASCIIString(dest))
+        download(src, dest)
     end
     return dest
 end

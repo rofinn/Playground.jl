@@ -12,7 +12,7 @@ function install(config::Config, version::VersionNumber; labels::Array{ASCIIStri
     # download the julia version
     key = VersionNumber(version.major, version.minor)
     tmp_dest = joinpath(config.dir.tmp, basename(binurls[key]))
-    download(binurls[key], tmp_dest; overwrite=false)
+    download(binurls[key], tmp_dest, false)
     bin_path = install_julia_bin(tmp_dest, config, key)
     link_julia(bin_path, config, labels)
 
@@ -131,6 +131,7 @@ end
                     chmod(exe_path, 00755)
                 end
             finally
+                sleep(1)
                 run(`hdiutil detach $mountdir`)
             end
         end
