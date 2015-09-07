@@ -10,7 +10,7 @@ function install(config::Config, version::VersionNumber; labels::Array{ASCIIStri
     init(config)
 
     # download the julia version
-    key = VersionNumber("$(version.major).$(version.minor)")
+    key = VersionNumber(version.major, version.minor)
     tmp_dest = joinpath(config.dir.tmp, basename(binurls[key]))
     download(binurls[key], tmp_dest)
     bin_path = install_julia_bin(tmp_dest, config, key)
@@ -157,10 +157,21 @@ end
         bin_path = joinpath(config.dir.bin, binfiles[version_key])
 
         if !ispath(src_path)
-            run(`tar -xvzf $src -C $src_path`)
+            mkpath(src_path)
+            try
+                run(`tar -xzf $src -C $src_path`)
+            catch
+                rm(src_path, recursive=true)
+            end
         end
 
-        mklink(src_path, bin_path)
+        julia_bin_path = joinpath(
+            src_path,
+            readdir(src_path)[1],
+            "bin/julia"
+        )
+        chmod(julia_bin_path, 00755)
+        mklink(julia_bin_path, bin_path)
 
         return bin_path
     end

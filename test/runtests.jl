@@ -1,4 +1,7 @@
+using Compat
 using Base.Test
+
+VERSION < v"0.4-" && using Docile
 
 
 include("../src/Playground.jl")

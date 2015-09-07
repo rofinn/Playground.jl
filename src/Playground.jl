@@ -1,5 +1,8 @@
 module Playground
 
+VERSION < v"0.4-" && using Docile
+
+using Compat
 using ArgParse
 import Logging
 
