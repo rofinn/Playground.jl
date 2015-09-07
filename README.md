@@ -16,8 +16,9 @@ Running the playground script
 Optional: add the playground script to your path by editing your 
 ~/.bashrc, ~/.zshrc, ~/.tcshrc, etc.
 ```shell
-echo "PATH=$PATH:~/.julia/v0.3/Playground/deps/usr/bin/" >> ~/.bashrc
+echo "PATH=$PATH:~/.playground/bin/" >> ~/.bashrc
 ```
+
 
 ### Usage ###
 #### Create ####
@@ -47,6 +48,52 @@ To activate a given playground simply run.
 playground /path/to/your/playground activate
 ```
 
-#### TODOs ####
+### TODOs ###
 * Tests
 * untested on non-linux platforms!
+
+### Configuration ###
+By default Playground.jl creates its own config folder in `~/.playgournd`. This folder is structured as follows.
+```
+|-- .playground/
+    |-- config.yml
+    |-- bin/
+        |-- playground
+        |-- julia
+        |-- julia-stable
+        |-- julia-nightly
+        |-- julia-0.3
+        |-- julia-0.4
+        ...
+    |-- share/
+        |-- myproject
+        |-- testing
+        |-- research
+    |-- src/
+        |-- julia-038-osx10
+            ...
+    |-- tmp/
+        |-- julia-0.3.8-osx10.7+.dmg
+```
+
+#### config.yml ####
+The config.yml file provides a mechanism for configuring default behaviour. This file is setup during installation.
+
+[Full description of options]
+```
+# This is just default location to store a new playground.
+# This is used by create and activate if no --name or --path.
+default_playground_path: ./.playground
+
+# Default shell prompt when you activate a playground.
+activated_prompt: "playground> "
+
+# Default git settings when using install build
+default_git_address: "https://github.com/JuliaLang/julia.git"
+default_git_revision: master
+
+# Allows you to isolate shell and julia history to each playground.
+isolated_shell_history: true
+isolated_julia_history: true
+```
+

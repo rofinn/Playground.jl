@@ -1,5 +1,6 @@
-#!/usr/bin/env julia
+#!/usr/bin/env julia --depwarn=no
 
+include("../../../src/Playground.jl")
 using Playground
-manage_playground()
+main()
 
