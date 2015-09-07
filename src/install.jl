@@ -12,7 +12,7 @@ function install(config::Config, version::VersionNumber; labels::Array{ASCIIStri
     # download the julia version
     key = VersionNumber(version.major, version.minor)
     tmp_dest = joinpath(config.dir.tmp, basename(binurls[key]))
-    download(binurls[key], tmp_dest)
+    download(binurls[key], tmp_dest; overwrite=false)
     bin_path = install_julia_bin(tmp_dest, config, key)
     link_julia(bin_path, config, labels)
 

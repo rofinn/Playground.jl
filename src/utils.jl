@@ -1,5 +1,18 @@
 # A set of utility function that might be able
 # to get merged into base julia.
+if VERSION < v"0.4-"
+    function Base.mktempdir(parent::ASCIIString)
+        randtmp = string(char((rand(10) * 25) + 97 )...)
+        dir = joinpath(parent, "tmp$(randtmp)")
+        mkpath(dir)
+        return dir
+    end
+
+    function readlink(link)
+        return strip(readall(`readlink -f $link`), '\n')
+    end
+end
+
 
 # currently only creates a symlink
 function mklink(src::AbstractString, dest::AbstractString; soft=true, overwrite=true)
@@ -49,7 +62,7 @@ end
     We overload download for our tests in order to make sure we're just download. The
     julia builds once.
 """ ->
-function Base.download(src::ASCIIString, dest::UTF8String; overwrite=false)
+function Base.download(src::ASCIIString, dest::AbstractString; overwrite=false)
     if !ispath(dest) || overwrite
         download(src, ASCIIString(dest))
     end
