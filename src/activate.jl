@@ -18,7 +18,21 @@ function activate(config::Config; dir::AbstractString="", name::AbstractString="
     end
 
     Logging.info("Executing a playground shell")
-    run_shell(config.activated_prompt)
+    for p in readdir(config.dir.store)
+        file_path = joinpath(config.dir.store, p)
+        if islink(file_path)
+            if abspath(readlink(file_path)) == root_path
+                name = p
+                break
+            end
+        end
+    end
+
+    prompt = config.default_prompt
+    if name != ""
+        prompt = replace(prompt, "playground", name)
+    end
+    run_shell(config.default_prompt)
 end
 
 

@@ -23,7 +23,7 @@ end
 type Config
     dir::DirectoryStructure
     default_playground_path::AbstractString
-    activated_prompt::AbstractString
+    default_prompt::AbstractString
     default_git_address::AbstractString
     default_git_revision::AbstractString
     isolated_shell_history::Bool
@@ -33,7 +33,7 @@ type Config
         new(
             DirectoryStructure(kwargs["root"]),
             abspath(kwargs["default_playground_path"]),
-            kwargs["activated_prompt"],
+            kwargs["default_prompt"],
             kwargs["default_git_address"],
             kwargs["default_git_revision"],
             kwargs["isolated_shell_history"],

@@ -71,7 +71,7 @@ function main()
         "--requirements", "-r"
             help = "A REQUIRE or DECLARE file of dependencies to install into the playground."
             action = :store_arg
-            default =""
+            default = ""
         "--name", "-n"
             help = "A global name to allow activating the playground from anywhere."
             action = :store_arg
@@ -81,6 +81,9 @@ function main()
             nargs = '*'
             action = :store_arg
             default = []
+        "--req-type", "-t"
+            help = "If --requirments isn't being passed a path ending in REQUIRE or DECLARE file, please specify which type is it \"REQUIRE\" or \"DECLARE\""
+            default = "REQUIRE"
     end
 
     @add_arg_table parse_settings["activate"] begin
@@ -133,8 +136,6 @@ function main()
     cmd = args["%COMMAND%"]
 
     config = load_config(joinpath(homedir(), ".playground/config.yml"))
-
-    # Should handle proper loading of config from here.
 
     if cmd == "install"
         install_cmd = args[cmd]["%COMMAND%"]

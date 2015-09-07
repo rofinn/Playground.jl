@@ -1,5 +1,5 @@
 function create(config::Config; dir::AbstractString="", name::AbstractString="",
-    julia::AbstractString="", reqs::AbstractString="")
+    julia::AbstractString="", reqs_file::AbstractString="", reqs_type::Symbol=:REQUIRE)
 
     init(config)
 
@@ -26,24 +26,31 @@ function create(config::Config; dir::AbstractString="", name::AbstractString="",
         mklink(sys_julia_path, julia_path)
     end
 
-    run(`$julia_path -e Pkg.init()`)
-
-    if reqs != "" && ispath(reqs)
-        if basename(reqs) == "REQUIRE"
+    if reqs_file != "" && ispath(reqs_file)
+        if basename(reqs) == "REQUIRE" || reqs_type == :REQUIRE
             for pkg_subdir in readdir(pkg_path)
                 if isdir(pkg_subdir)
                     copy(reqs, joinpath(pkg_path, pkg_subdir))
                     run(`$julia_path -e Pkg.resolve()`)
                 end
             end
-        elseif basename(reqs) == "DECLARE"
-            Logging.warn("DECLARE files aren't supported yet")
-            # DeclarativePackages.jl seems a little awkwardly laid out
-            # so I'll come back to this.
+        elseif basename(reqs) == "DECLARE" || reqs_type == :DECLARE
+            dp_path = Pkg.dir("DeclarativePackages")
+            pkg_dir = joinpath(Pkg.dir(), "REQUIRE")
+            if ispath(dp_path)
+                if !ispath(pkg_dir)
+                    run(`DECLARE=$reqs_file $julia_path $dp_path/src/installpackages.jl`)
+                else
+                    Logging.warn("DeclarativePackages can only be run on fresh pkg directories.")
+                end
+            else
+                Logging.warn("DeclarativePackages isn't installed")
+            end
         end
     end
 
     if dir != "" && name != ""
         mklink(root_path, abspath(joinpath(config.dir.store, name)))
     end
+    run(`$julia_path -e Pkg.init()`)
 end

@@ -1,4 +1,5 @@
 CONFIG_PATH = joinpath(homedir(), ".playground")
+DEFAULT_PROMPT = "\\e[0;35m\\u@\\h (playground)> \\e[m"
 DEFAULT_CONFIG = """
 ---
 # This is just default location to store a new playground.
@@ -6,7 +7,7 @@ DEFAULT_CONFIG = """
 default_playground_path: .playground
 
 # Default shell prompt when you activate a playground.
-activated_prompt: \"playground> \"
+default_prompt: \"$(escape_string(DEFAULT_PROMPT))\"
 
 # Default git settings when using install build
 default_git_address: \"https://github.com/JuliaLang/julia.git\"
