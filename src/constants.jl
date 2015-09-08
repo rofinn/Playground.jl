@@ -1,5 +1,5 @@
 CONFIG_PATH = joinpath(homedir(), ".playground")
-DEFAULT_PROMPT = "\\e[0;35m\\u@\\h (playground)> \\e[m"
+DEFAULT_PROMPT = "\\e[0;35m\\u@\\h:\\W (playground)> \\e[m"
 DEFAULT_CONFIG = """
 ---
 # This is just default location to store a new playground.

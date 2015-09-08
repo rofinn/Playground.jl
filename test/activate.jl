@@ -10,4 +10,5 @@ function test_activate()
     activate(TEST_CONFIG)
 end
 
+
 test_activate()

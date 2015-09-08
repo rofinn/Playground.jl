@@ -8,11 +8,12 @@ import Logging
 
 include("constants.jl")
 include("config.jl")
-include("install.jl")
 include("utils.jl")
+include("install.jl")
 include("create.jl")
 include("activate.jl")
 include("list.jl")
+include("clean.jl")
 
 
 export
@@ -47,6 +48,9 @@ function main()
         "list"
             action = :command
             help = "Lists available julia versions and playgrounds"
+        "clean"
+            action = :command
+            help = "Cleans up old julia-version links and playgrounds"
     end
 
     @add_arg_table parse_settings["install"] begin
@@ -59,11 +63,6 @@ function main()
         "build"
             action = :command
             help = "The git url to clone the julia source from"
-        "--labels", "-l"
-            help = "Extra labels to apply to the new julia verions."
-            nargs = '*'
-            action = :store_arg
-            default = []
     end
 
     @add_arg_table parse_settings["create"] begin
@@ -111,15 +110,36 @@ function main()
             action = :store_true
     end
 
+    @add_arg_table parse_settings["clean"] begin
+        "links"
+            help = "Deletes any dead julia-version or playground links, in case you've deleted the original folders."
+            action = :command
+        "rm"
+            help = "Deletes the specifid julia-version or playground."
+            action = :command
+    end
+
     @add_arg_table parse_settings["install"]["download"] begin
         "version"
             help = "The release version available to download at http://julialang.org/downloads/"
             required = true
+        "--labels", "-l"
+            help = "Extra labels to apply to the new julia verions."
+            nargs = '*'
+            action = :store_arg
+            default = []
     end
 
     @add_arg_table parse_settings["install"]["link"] begin
         "dir"
             help = "The path to a julia executable you'd like to be made available to playgrounds."
+            action = :store_arg
+            default = ""
+        "--labels", "-l"
+            help = "Extra labels to apply to the new julia verions."
+            nargs = '*'
+            action = :store_arg
+            default = []
     end
 
     @add_arg_table parse_settings["install"]["build"] begin
@@ -129,6 +149,22 @@ function main()
             default = ""
         "revision"
             help = "The revision to checkout prior to building julia. Defaults to origin/master"
+            default = ""
+        "--labels", "-l"
+            help = "Extra labels to apply to the new julia verions."
+            nargs = '*'
+            action = :store_arg
+            default = []
+    end
+
+    @add_arg_table parse_settings["clean"]["rm"] begin
+        "name"
+            help = "Deletes the playground directory with the given name and the link to it."
+            action = :store_arg
+            default = ""
+        "--dir"
+            help = "Deletes the provided playground directory and the link to it."
+            action = :store_arg
             default = ""
     end
 
@@ -140,19 +176,18 @@ function main()
 
     if cmd == "install"
         install_cmd = args[cmd]["%COMMAND%"]
-        println(install_cmd)
 
         if install_cmd == "download"
             install(
                 config,
                 VersionNumber(args[cmd][install_cmd]["version"]);
-                labels=args[cmd]["labels"]
+                labels=args[cmd][install_cmd]["labels"]
             )
         elseif install_cmd == "link"
             dirinstall(
                 config,
                 abspath(args[cmd][install_cmd]["dir"]);
-                labels=args[cmd]["labels"]
+                labels=args[cmd][install_cmd]["labels"]
             )
         elseif install_cmd == "build"
             error("Building from source isn't supported yet.")
@@ -170,6 +205,18 @@ function main()
         activate(config; dir=args[cmd]["dir"], name=args[cmd]["name"])
     elseif cmd == "list"
         list(config; show_links=args[cmd]["show-links"])
+    elseif cmd == "clean"
+        clean_cmd = args[cmd]["%COMMAND%"]
+
+        if clean_cmd == "links"
+            clean_links(config)
+        elseif clean_cmd == "rm"
+            clean_rm(
+                config;
+                name=args[cmd][clean_cmd]["name"],
+                dir=args[cmd][clean_cmd]["dir"]
+            )
+        end
     end
 end
 

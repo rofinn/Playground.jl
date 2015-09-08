@@ -26,6 +26,8 @@ function create(config::Config; dir::AbstractString="", name::AbstractString="",
         mklink(sys_julia_path, julia_path)
     end
 
+    ENV["JULIA_PKGDIR"] = pkg_path
+
     if reqs_file != "" && ispath(reqs_file)
         if basename(reqs) == "REQUIRE" || reqs_type == :REQUIRE
             for pkg_subdir in readdir(pkg_path)
@@ -52,5 +54,6 @@ function create(config::Config; dir::AbstractString="", name::AbstractString="",
     if dir != "" && name != ""
         mklink(root_path, abspath(joinpath(config.dir.store, name)))
     end
+
     run(`$julia_path -e Pkg.init()`)
 end

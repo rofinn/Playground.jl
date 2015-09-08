@@ -21,22 +21,19 @@ function activate(config::Config; dir::AbstractString="", name::AbstractString="
         ENV["HISTFILE"] = joinpath(root_path, ".shell_history")
     end
 
+    prompt = config.default_prompt
+
     Logging.info("Executing a playground shell")
-    for p in readdir(config.dir.store)
-        file_path = joinpath(config.dir.store, p)
-        if islink(file_path)
-            if abspath(readlink(file_path)) == root_path
-                name = p
-                break
-            end
+    if name != ""
+        prompt = replace(prompt, "playground", name)
+    else
+        found = get_playground_name(config, root_path)
+        if found != ""
+            prompt = replace(prompt, "playground", found)
         end
     end
 
-    prompt = config.default_prompt
-    if name != ""
-        prompt = replace(prompt, "playground", name)
-    end
-    run_shell(config.default_prompt)
+    run_shell(prompt)
 end
 
 

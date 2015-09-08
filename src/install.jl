@@ -6,7 +6,7 @@
     binary version for your platform, or downloads and builds
     it from source if `src` is true.
 """ ->
-function install(config::Config, version::VersionNumber; labels::Array{ASCIIString,1}=[])
+function install(config::Config, version::VersionNumber; labels=[])
     init(config)
 
     # download the julia version
@@ -28,15 +28,16 @@ end
     This option simply creates symlinks from an existing julia
     install.
 """ ->
-function dirinstall(config::Config, executable::AbstractString; labels::Array{ASCIIString, 1}=[])
+function dirinstall(config::Config, executable::AbstractString; labels=[])
     if ispath(executable)
         init(config)
 
-        exe = executable
+        exe = abspath(executable)
         while islink(exe)
-            exe = readlink(exe)
+            exe = joinpath(dirname(exe), readlink(exe))
         end
 
+        exe = abspath(exe)
         if isexecutable(exe)
             link_julia(exe, config, labels)
         else
@@ -131,7 +132,6 @@ end
                     chmod(exe_path, 00755)
                 end
             finally
-                sleep(1)
                 run(`hdiutil detach $mountdir`)
             end
         end
