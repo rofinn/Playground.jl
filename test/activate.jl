@@ -10,5 +10,6 @@ function test_activate()
     activate(TEST_CONFIG)
 end
 
-
-test_activate()
+if VERSION >= v"0.4-"
+    test_activate()
+end
