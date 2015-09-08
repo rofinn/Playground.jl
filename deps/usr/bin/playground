@@ -1,6 +1,8 @@
 #!/usr/bin/env julia --depwarn=no
 
-include("../../../src/Playground.jl")
+pg_dir = Pkg.dir("Playground")
+
+include(joinpath(pg_dir, "src/Playground.jl"))
 using Playground
 main()
 

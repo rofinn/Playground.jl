@@ -79,11 +79,10 @@ function main()
             help = "A global name to allow activating the playground from anywhere."
             action = :store_arg
             default = ""
-        "--julia-versions", "-j"
+        "--julia-version", "-j"
             help = "The version(s) of julia available to use. If multiple versions are provided the first entry will be the one used by `julia`. By default the user/system level version is used."
-            nargs = '*'
             action = :store_arg
-            default = []
+            default = ""
         "--req-type", "-t"
             help = "If --requirments isn't being passed a path ending in REQUIRE or DECLARE file, please specify which type is it \"REQUIRE\" or \"DECLARE\""
             default = "REQUIRE"
@@ -121,7 +120,6 @@ function main()
     @add_arg_table parse_settings["install"]["link"] begin
         "dir"
             help = "The path to a julia executable you'd like to be made available to playgrounds."
-            required = true
     end
 
     @add_arg_table parse_settings["install"]["build"] begin
@@ -142,6 +140,7 @@ function main()
 
     if cmd == "install"
         install_cmd = args[cmd]["%COMMAND%"]
+        println(install_cmd)
 
         if install_cmd == "download"
             install(
@@ -163,8 +162,9 @@ function main()
             config;
             dir=args[cmd]["dir"],
             name=args[cmd]["name"],
-            julia=args[cmd]["julia-versions"],
-            reqs=args[cmd]["requirements"]
+            julia=args[cmd]["julia-version"],
+            reqs_file=args[cmd]["requirements"],
+            reqs_type=symbol(args[cmd]["req-type"])
         )
     elseif cmd == "activate"
         activate(config; dir=args[cmd]["dir"], name=args[cmd]["name"])
