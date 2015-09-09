@@ -63,7 +63,7 @@ NOTE: If both a directory and a `--name` are supplied the playground will be cre
 
 To create a playground with a default julia-version. The julia version supplied must already be installed with methods listed above.
 ```shell
-playground /path/of/new/playground create --name nightly-playground --julia-version julia-nightly
+playground create /path/of/new/playground --name nightly-playground --julia-version julia-nightly
 ```
 
 To create a new playground with pre-existing requirements using REQUIRE or DECLARE files.
