@@ -1,5 +1,11 @@
 CONFIG_PATH = joinpath(homedir(), ".playground")
-DEFAULT_PROMPT = "\\e[0;35m\\u@\\h:\\W (playground)> \\e[m"
+@unix_only begin
+    DEFAULT_PROMPT = "\\e[0;35m\\u@\\h:\\W (playground)> \\e[m"
+end
+@windos_only begin
+    DEFAULT_PROMPT = "playground>"
+end
+
 DEFAULT_CONFIG = """
 ---
 # This is just default location to store a new playground.
