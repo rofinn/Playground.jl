@@ -2,7 +2,7 @@ CONFIG_PATH = joinpath(homedir(), ".playground")
 @unix_only begin
     DEFAULT_PROMPT = "\\e[0;35m\\u@\\h:\\W (playground)> \\e[m"
 end
-@windos_only begin
+@windows_only begin
     DEFAULT_PROMPT = "playground>"
 end
 
