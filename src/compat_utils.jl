@@ -1,7 +1,5 @@
-@doc doc"""
-    This file provides some missing methods from julia v0.3. When we deprecate 0.3
-    we can just delete this file.
-""" ->
+# This file provides some missing methods from julia v0.3. When we deprecate 0.3
+# we can just delete this file.
 if VERSION < v"0.4-"
     const VERSION_REGEX = r"^
         v?                                      # prefix        (optional)
