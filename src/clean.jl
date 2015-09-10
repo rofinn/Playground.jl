@@ -1,4 +1,4 @@
-function clean_links(config::Config)
+function clean(config::Config)
     for p in readdir(config.dir.store)
         file_path = abspath(joinpath(config.dir.store, p))
         if islink(file_path)
@@ -12,9 +12,7 @@ function clean_links(config::Config)
 end
 
 
-function clean_rm(config::Config; name::AbstractString="", dir::AbstractString="")
-    julia-version = ""
-
+function Base.rm(config::Config; name::AbstractString="", dir::AbstractString="")
     if name != "" && dir == ""
         # If we find the name in the bin folder then we should just delete the julia symlink
         if name in readdir(abspath(config.dir.bin)) && name != "playground"
@@ -47,6 +45,6 @@ function clean_rm(config::Config; name::AbstractString="", dir::AbstractString="
     rm(abspath(dir), recursive=true)
 
     # Just to be safe run clean_links
-    clean_links(config)
+    clean(config)
     return true
 end

@@ -17,11 +17,14 @@ TEST_CONFIG = load_config(DEFAULT_CONFIG; root=TEST_PLAYGROUND_DIR)
 mkpath(TEST_TMP_DIR)
 mkpath(TEST_PLAYGROUND_DIR)
 
+# Order matters.
 tests = [
-   "install",
-   "create",
-   "activate",
-   "list"
+    "parsing",
+    #"install",
+    #"create",
+    #"activate",
+    #"list",
+    #"clean"
 ]
 
 

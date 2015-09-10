@@ -61,7 +61,7 @@ end
                     pkg_dir = ENV["JULIA_PKGDIR"]
 
                     write(fstream, "export PATH=$path\n")
-                    write(fstream, "export PS1=\"$(ps1)\"\n")
+                    write(fstream, "export PS1=\"$(prompt)\"\n")
                     write(fstream, "export JULIA_PKGDIR=$pkg_dir\n")
 
                     if haskey(ENV, "HISTFILE")

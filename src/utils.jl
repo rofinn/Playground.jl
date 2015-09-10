@@ -1,6 +1,18 @@
 # A set of utility function that might be able
 # to get merged into base julia.
 if VERSION < v"0.4-"
+    const VERSION_REGEX = r"^
+        v?                                      # prefix        (optional)
+        (\d+)                                   # major         (required)
+        (?:\.(\d+))?                            # minor         (optional)
+        (?:\.(\d+))?                            # patch         (optional)
+        (?:(-)|                                 # pre-release   (optional)
+        ([a-z][0-9a-z-]*(?:\.[0-9a-z-]+)*|-(?:[0-9a-z-]+\.)*[0-9a-z-]+)?
+        (?:(\+)|
+        (?:\+((?:[0-9a-z-]+\.)*[0-9a-z-]+))?    # build         (optional)
+        ))
+    $"ix
+
     function Base.mktempdir(parent::ASCIIString)
         randtmp = string(char((rand(10) * 25) + 97 )...)
         dir = joinpath(parent, "tmp$(randtmp)")

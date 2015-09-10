@@ -29,14 +29,14 @@ function create(config::Config; dir::AbstractString="", name::AbstractString="",
     ENV["JULIA_PKGDIR"] = pkg_path
 
     if reqs_file != "" && ispath(reqs_file)
-        if basename(reqs) == "REQUIRE" || reqs_type == :REQUIRE
+        if basename(reqs_file) == "REQUIRE" || reqs_type == :REQUIRE
             for pkg_subdir in readdir(pkg_path)
                 if isdir(pkg_subdir)
-                    copy(reqs, joinpath(pkg_path, pkg_subdir))
+                    copy(reqs_file, joinpath(pkg_path, pkg_subdir))
                     run(`$julia_path -e Pkg.resolve()`)
                 end
             end
-        elseif basename(reqs) == "DECLARE" || reqs_type == :DECLARE
+        elseif basename(reqs_file) == "DECLARE" || reqs_type == :DECLARE
             dp_path = Pkg.dir("DeclarativePackages")
             pkg_dir = joinpath(Pkg.dir(), "REQUIRE")
             if ispath(dp_path)

@@ -22,19 +22,19 @@ This will make the playground script and all managed julia versions easily acces
 
 ### Usage ###
 #### Install (Unix only) ####
-To install a binary julia version from http://julialang.org/downloads/
+To install a binary julia version from http://julialang.org/downloads/.
 ```shell
 # playground install download <version> --labels label1 label2
 playground install download 0.3 --labels julia-0.3
 ```
 
-To make an existing build available to playgrounds
+To make an existing build available to playgrounds.
 ```shell
 # playground install link <path> --labels label1 label2
 playground install link /path/to/julia/binary --labels julia-src
 ```
 
-[TODO] To build and install a julia version from source
+[TODO] To build and install a julia version from source.
 ```shell
 playground install build --url https://github.com/MyUser/julia.git --rev dev --labels julia-wip
 ```
@@ -70,7 +70,7 @@ To create a new playground with pre-existing requirements using REQUIRE or DECLA
 ```shell
 playground create --requirements /path/to/REQUIRE/or/DECLARE/file
 ```
-If the basename of the file is not `REQUIRE` or `DECLARE` you can still specify the requirement type
+If the basename of the file is not `REQUIRE` or `DECLARE` you can still specify the requirement type.
 ```shell
 playground create --requirements /path/to/requirements/file --req-type DECLARE
 ```
@@ -97,20 +97,20 @@ playground list
 
 
 #### Clear ####
-If you've removed some a source julia-version or have deleted playground folders and would like playground to clean up any broken symlinks simply run
+If you've removed some a source julia-version or have deleted playground folders and would like playground to clean up any broken symlinks.
 ```shell
-playground clear links
+playground clean
 ```
 
 Alternatively, if you'd like to remove a julia-version or playground you can run.
 ```shell
-playground clear rm [playground-name|julia-version] --dir /path/to/playgrounds
+playground rm [playground-name|julia-version] --dir /path/to/playgrounds
 ```
 which will delete the specified playground or julia-version and make sure that all related links have been cleaned up.
 
 
 ### Configuration ###
-For the most part, Playground.jl provide its virtualized environments by simply manipulating environment variables and symlinks to julia binaries/playgrounds. However, in order to do this it needs to create its own folder for managing these symlinks. By default Playground.jl creates its own config folder in `~/.playgournd`. This folder is structured as follows.
+For the most part, Playground.jl provide its virtualized environments by simply manipulating environment variables and symlinks to julia binaries/playgrounds. However, in order to do this it needs to create its own folder for managing these symlinks. By default Playground.jl creates its own config folder in `~/.playground`. This folder is structured as follows.
 ```
 |-- .playground/
     |-- config.yml
@@ -141,7 +141,6 @@ For the most part, Playground.jl provide its virtualized environments by simply 
 
 #### config.yml ####
 The config.yml file provides a mechanism for configuring default behaviour. This file is setup during installation.
-
 ```
 ---
 # This is just default location to store a new playground.

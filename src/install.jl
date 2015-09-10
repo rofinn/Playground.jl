@@ -49,26 +49,26 @@ function dirinstall(config::Config, executable::AbstractString; labels=[])
 end
 
 
-@doc doc"""
-   This option
-        1. clones the git repo from the provided url.
-        2. checks out the supplied revision into the local branch_name.
-        3. attempts to build julia from scratch.
-""" ->
-function gitinstall(config::Config; url::ASCIIString="", dir::AbstractString="", revision="", labels=[])
+# @doc doc"""
+#    This option
+#         1. clones the git repo from the provided url.
+#         2. checks out the supplied revision into the local branch_name.
+#         3. attempts to build julia from scratch.
+# """ ->
+# function gitinstall(config::Config; url::ASCIIString="", dir::AbstractString="", revision="", labels=[])
 
-    error("Installing from a git repo isn't implemented yet.")
+#     error("Installing from a git repo isn't implemented yet.")
 
-    # Logging.info("Cloning the julia repository into the playground")
-    # run(`git clone $(url) $(name)` |> gitlog)
+#     Logging.info("Cloning the julia repository into the playground")
+#     run(`git clone $(url) $(name)` |> gitlog)
 
-    # # Handle the cd into and out of src directory cause cd() in base
-    # # seems to be broken.
-    # cwd = pwd()
-    # cd(dest)
-    # build_julia(julia, , log_path)
-    # cd(cwd)
-end
+#     # Handle the cd into and out of src directory cause cd() in base
+#     # seems to be broken.
+#     cwd = pwd()
+#     cd(dest)
+#     build_julia(julia, , log_path)
+#     cd(cwd)
+# end
 
 
 function link_julia(bin_path::AbstractString, config::Config, labels=[])
