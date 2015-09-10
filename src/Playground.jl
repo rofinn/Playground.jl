@@ -11,6 +11,7 @@ import Logging
 include("constants.jl")
 include("config.jl")
 include("parsing.jl")
+include("compat_utils.jl")
 include("utils.jl")
 include("install.jl")
 include("create.jl")

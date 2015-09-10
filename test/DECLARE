@@ -1,0 +1,9 @@
+BinDeps 0.3.15
+Compat 0.7.0
+HttpCommon 0.2.3
+JSON 0.4.5
+SHA 4eeff02a744c56bb2bb6b5a421b17fd4b98ee264
+URIParser 0.1.0
+https://github.com/rened/HDF5.jl.git 0.4.5
+https://github.com/JuliaLang/METADATA.jl.git 6c686d294bea0ca81639c0183f69f81739133da2
+@osx Homebrew 0.1.16

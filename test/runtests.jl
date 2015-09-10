@@ -7,12 +7,6 @@ using Lint
 include("../src/Playground.jl")
 using Playground
 
-# Run lint Playground.jl for Error or Critical level message
-msgs = lintpkg("Playground", returnMsgs=true)
-for m in msgs
-    @test m.level < 2
-end
-
 TEST_DIR = pwd()
 
 #TEST_TMP_DIR = mktempdir("../test/")
@@ -25,6 +19,7 @@ mkpath(TEST_PLAYGROUND_DIR)
 
 # Order matters.
 tests = [
+    "lint",
     "parsing",
     "install",
     "create",
