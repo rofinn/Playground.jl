@@ -1,6 +1,3 @@
-VERSION < v"0.4-" && using Docile
-
-using Compat
 using Base.Test
 using Lint
 

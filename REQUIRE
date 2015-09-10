@@ -1,6 +1,4 @@
-julia 0.3-
+julia 0.4-
 ArgParse
 Logging
 YAML
-Compat
-Docile

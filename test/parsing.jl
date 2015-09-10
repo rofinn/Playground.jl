@@ -1,7 +1,7 @@
 
 function test_argparse()
     install_download_args = argparse(["install", "download", "0.3", "--labels", "julia-0.3"])
-    @compat @test install_download_args == Dict(
+    @test install_download_args == Dict(
         "%COMMAND%" => "install",
         "install" => Dict(
             "%COMMAND%" => "download",
@@ -13,7 +13,7 @@ function test_argparse()
     )
 
     install_link_args = argparse(["install", "link", "/path/to/julia", "--labels", "julia-src"])
-    @compat @test install_link_args == Dict(
+    @test install_link_args == Dict(
         "%COMMAND%" => "install",
         "install" => Dict(
             "%COMMAND%" => "link",
@@ -25,7 +25,7 @@ function test_argparse()
     )
 
     create_args1 = argparse(["create"])
-    @compat @test create_args1 == Dict(
+    @test create_args1 == Dict(
         "%COMMAND%" => "create",
         "create" => Dict(
             "dir" => "",
@@ -45,7 +45,7 @@ function test_argparse()
             "--req-type", "DECLARE"
         ]
     )
-    @compat @test create_args2 == Dict(
+    @test create_args2 == Dict(
         "%COMMAND%" => "create",
         "create" => Dict(
             "dir" => "/path/to/playground",
@@ -57,7 +57,7 @@ function test_argparse()
     )
 
     activate_args1 = argparse(["activate"])
-    @compat @test activate_args1 == Dict(
+    @test activate_args1 == Dict(
         "%COMMAND%" => "activate",
         "activate" => Dict(
             "dir" => "",
@@ -66,7 +66,7 @@ function test_argparse()
     )
 
     activate_args2 = argparse(["activate", "--name", "myplayground"])
-    @compat @test activate_args2 == Dict(
+    @test activate_args2 == Dict(
         "%COMMAND%" => "activate",
         "activate" => Dict(
             "dir" => "",
@@ -75,7 +75,7 @@ function test_argparse()
     )
 
     list_args = argparse(["list", "--show-links"])
-    @compat @test list_args == Dict(
+    @test list_args == Dict(
         "%COMMAND%" => "list",
         "list" => Dict(
             "show-links" => true
@@ -83,13 +83,13 @@ function test_argparse()
     )
 
     clean_args = argparse(["clean"])
-    @compat @test clean_args == Dict(
+    @test clean_args == Dict(
         "%COMMAND%" => "clean",
         "clean" => Dict()
     )
 
     rm_args = argparse(["rm", "myplayground"])
-    @compat @test rm_args == Dict(
+    @test rm_args == Dict(
         "%COMMAND%" => "rm",
         "rm" => Dict(
             "dir" => "",

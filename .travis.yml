@@ -4,12 +4,7 @@ os:
   - osx
   - linux
 julia:
-  - release
   - nightly
-matrix:
-  exclude:
-    - julia: release
-      os: osx
 notifications:
   email: false
 script:

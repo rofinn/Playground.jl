@@ -2,8 +2,6 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module Playground
 
-VERSION < v"0.4-" && using Docile
-
 using Compat
 using ArgParse
 import Logging
@@ -11,7 +9,6 @@ import Logging
 include("constants.jl")
 include("config.jl")
 include("parsing.jl")
-include("compat_utils.jl")
 include("utils.jl")
 include("install.jl")
 include("create.jl")

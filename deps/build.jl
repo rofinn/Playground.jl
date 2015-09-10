@@ -1,5 +1,3 @@
-#Pkg.add("DeclarativePackages")
-#symlink(Pkg.dir("DeclarativePackages")*"/bin/jdp",  "$(homedir())/local/bin/jdp")
 BUILDFILE_PATH = @__FILE__
 DEPS_PATH = dirname(BUILDFILE_PATH)
 

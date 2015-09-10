@@ -35,11 +35,7 @@ function copy(src::AbstractString, dest::AbstractString; soft=true, overwrite=tr
             # Shell out to copy directories cause this isn't supported
             # in v0.3 and I don't feel like copying all of that code into this
             # project. This if should be deleted when 0.3 is deprecated
-            if VERSION < v"0.4-" && isdir(src)
-                run(`cp $src -R $dest`)
-            else
-                cp(src, dest)
-            end
+            cp(src, dest)
         elseif !soft
             error("$(dest) already exists.")
         end
