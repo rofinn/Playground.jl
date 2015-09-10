@@ -57,14 +57,6 @@ function Base.download(src::ASCIIString, dest::AbstractString, overwrite)
 end
 
 
-function msg(exc::Exception)
-    if isa(exc, ErrorException)
-       return exc.msg
-    else
-       return string(exc)
-    end
-end
-
 function get_playground_dir(config::Config, dir::AbstractString, name::AbstractString)
     if dir == "" && name == ""
         return abspath(joinpath(pwd(), config.default_playground_path))
