@@ -1,7 +1,6 @@
-
-@doc doc"""
-    Lets us use wget to check that all the binurls are still valid.
-""" ->
+# @doc doc"""
+#     Lets us use wget to check that all the binurls are still valid.
+# """ ->
 function check_url(url::AbstractString)
     try
         run(`wget -q --spider $url`)

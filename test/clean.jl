@@ -1,13 +1,13 @@
 function test_clean()
     rm(joinpath(TEST_TMP_DIR, "test-playground"), recursive=true)
-    @test !ispapth(joinpath(TEST_TMP_DIR, "test-playground"))
-    @test ispath(joinpath(TEST_CONFIG.dir.bin, "julia-bin")
-    @test ispath(joinpath(TEST_CONFIG.dir.store, "myproject"))
+    @test !ispath(joinpath(TEST_TMP_DIR, "test-playground"))
+    @test islink(joinpath(TEST_CONFIG.dir.bin, "julia-bin"))
+    @test islink(joinpath(TEST_CONFIG.dir.store, "myproject"))
 
     clean(TEST_CONFIG)
-    @test !ispapth(joinpath(TEST_TMP_DIR, "test-playground"))
-    @test ispath(joinpath(TEST_CONFIG.dir.bin, "julia-bin")
-    @test !ispath(joinpath(TEST_CONFIG.dir.store, "myproject"))
+    @test !ispath(joinpath(TEST_TMP_DIR, "test-playground"))
+    @test islink(joinpath(TEST_CONFIG.dir.bin, "julia-bin"))
+    @test !islink(joinpath(TEST_CONFIG.dir.store, "myproject"))
 end
 
 

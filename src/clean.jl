@@ -1,14 +1,21 @@
 function clean(config::Config)
-    for p in readdir(config.dir.store)
-        file_path = abspath(joinpath(config.dir.store, p))
-        if islink(file_path)
-            try
-                readlink(file_path)
-            catch
+    function rm_deadlinks(dir)
+        for f in readdir(dir)
+            file_path = abspath(joinpath(dir, f))
+            src = file_path
+
+            while islink(src)
+                src = joinpath(dirname(src), readlink(src))
+            end
+
+            src = abspath(src)
+            if !ispath(src)
                 rm(file_path)
             end
         end
     end
+    rm_deadlinks(config.dir.store)
+    rm_deadlinks(config.dir.bin)
 end
 
 

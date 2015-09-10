@@ -71,12 +71,7 @@ function argparse(cmd_args=ARGS)
         "--show-links", "-s"
             help = "Display the source path if julia-versions or playgrounds are just symlinks."
             action = :store_true
-        "--julia-versions", "-j"
-            help = "Display julia versions avaiable. NOT IMPLEMENTED."
-            action = :store_true
-        "--playgrounds", "-p"
-            help = "Display playgrounds. NOT IMPLEMENTED"
-            action = :store_true
+            default = false
     end
 
     @add_arg_table parse_settings["clean"]

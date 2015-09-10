@@ -114,9 +114,9 @@ end
 
 @osx_only begin
     function install_julia_bin(src::AbstractString, config::Config, version_key)
-        src_path = joinpath(config.dir.src, binfiles[version_key])
-        bin_path = joinpath(config.dir.bin, binfiles[version_key])
-        exe_path = joinpath(src_path, "Contents/Resources/julia/bin/julia")
+        src_path = abspath(joinpath(config.dir.src, binfiles[version_key]))
+        bin_path = abspath(joinpath(config.dir.bin, binfiles[version_key]))
+        exe_path = abspath(joinpath(src_path, "Contents/Resources/julia/bin/julia"))
 
         function install_from_dmg(mountdir::AbstractString)
             app_path = nothing
@@ -154,8 +154,8 @@ end
 
 @linux_only begin
     function install_julia_bin(src::AbstractString, config::Config, version_key)
-        src_path = joinpath(config.dir.src, binfiles[version_key])
-        bin_path = joinpath(config.dir.bin, binfiles[version_key])
+        src_path = abspath(joinpath(config.dir.src, binfiles[version_key]))
+        bin_path = abspath(joinpath(config.dir.bin, binfiles[version_key]))
 
         if !ispath(src_path)
             mkpath(src_path)

@@ -1,3 +1,5 @@
+VERSION >= v"0.4.0-dev+6521" && __precompile__()
+
 module Playground
 
 VERSION < v"0.4-" && using Docile
@@ -8,6 +10,7 @@ import Logging
 
 include("constants.jl")
 include("config.jl")
+include("parsing.jl")
 include("utils.jl")
 include("install.jl")
 include("create.jl")
@@ -19,6 +22,7 @@ include("clean.jl")
 export
     # methods
     main,
+    argparse,
     load_config,
     install,
     dirinstall,
@@ -26,6 +30,7 @@ export
     create,
     activate,
     list,
+    clean,
 
     # Constants
     binurls,
