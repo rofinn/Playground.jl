@@ -74,6 +74,16 @@ function test_argparse()
         )
     )
 
+    exec_args = argparse(["exec", "ls -al", "--name", "myplayground"])
+    @test exec_args == Dict(
+        "%COMMAND%" => "exec",
+        "exec" => Dict(
+            "cmd" => "ls -al",
+            "dir" => "",
+            "name" => "myplayground"
+        )
+    )
+
     list_args = argparse(["list", "--show-links"])
     @test list_args == Dict(
         "%COMMAND%" => "list",

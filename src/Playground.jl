@@ -37,11 +37,12 @@ export
     DEFAULT_CONFIG
 
 
-function main()
-    args = argparse()
+
+function main(cmd_args=ARGS, config="$(CONFIG_PATH)/config.yml", root=CONFIG_PATH)
+    args = argparse(cmd_args)
     cmd = args["%COMMAND%"]
 
-    config = load_config(joinpath(homedir(), ".playground/config.yml"))
+    config = load_config(config, root)
 
     if cmd == "install"
         install_cmd = args[cmd]["%COMMAND%"]
@@ -73,7 +74,9 @@ function main()
     elseif cmd == "activate"
         activate(config; dir=args[cmd]["dir"], name=args[cmd]["name"])
     elseif cmd == "exec"
-        execute(config, `$(args[cmd]["cmd"])`; dir=args[cmd]["dir"], name=args[cmd]["name"])
+        execute(config, `$(Base.shell_split(args[cmd]["cmd"]))`; 
+            dir=args[cmd]["dir"], name=args[cmd]["name"]
+        )
     elseif cmd == "list"
         list(config; show_links=args[cmd]["show-links"])
     elseif cmd == "clean"

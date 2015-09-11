@@ -1,5 +1,5 @@
 function argparse(cmd_args=ARGS)
-    parse_settings = ArgParseSettings()
+    parse_settings = ArgParseSettings(suppress_warnings=true)
 
     @add_arg_table parse_settings begin
         "install"
@@ -20,7 +20,7 @@ function argparse(cmd_args=ARGS)
         "rm"
             help = "Deletes the specifid julia-version or playground."
             action = :command
-        "--exec", "-e"
+        "exec"
             action = :command
             help = "Execute a cmd inside a playground and exit."
     end

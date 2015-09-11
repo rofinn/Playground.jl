@@ -75,7 +75,7 @@ function init(config::Config)
 end
 
 
-function load_config(config::AbstractString; root::AbstractString="$(homedir())/.playground")
+function load_config(config::AbstractString, root::AbstractString)
     is_path = false
 
     try
