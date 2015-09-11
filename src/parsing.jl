@@ -20,6 +20,9 @@ function argparse(cmd_args=ARGS)
         "rm"
             help = "Deletes the specifid julia-version or playground."
             action = :command
+        "--exec", "-e"
+            action = :command
+            help = "Execute a cmd inside a playground and exit."
     end
 
     @add_arg_table parse_settings["install"] begin
@@ -57,6 +60,21 @@ function argparse(cmd_args=ARGS)
     end
 
     @add_arg_table parse_settings["activate"] begin
+        "dir"
+            help = "The path to the playground to use. This takes priority over --name."
+            action = :store_arg
+            default = ""
+        "--name", "-n"
+            help = "A global name to allow activating the playground from anywhere."
+            action = :store_arg
+            default = ""
+    end
+
+    @add_arg_table parse_settings["exec"] begin
+        "cmd"
+            help = "The command you would like to run inside the playground."
+            action = :store_arg
+            required = true
         "dir"
             help = "The path to the playground to use. This takes priority over --name."
             action = :store_arg

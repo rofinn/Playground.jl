@@ -13,6 +13,7 @@ include("utils.jl")
 include("install.jl")
 include("create.jl")
 include("activate.jl")
+include("execute.jl")
 include("list.jl")
 include("clean.jl")
 
@@ -27,6 +28,7 @@ export
     #gitinstall,
     create,
     activate,
+    execute,
     list,
     clean,
 
@@ -70,6 +72,8 @@ function main()
         )
     elseif cmd == "activate"
         activate(config; dir=args[cmd]["dir"], name=args[cmd]["name"])
+    elseif cmd == "exec"
+        execute(config, `$(args[cmd]["cmd"])`; dir=args[cmd]["dir"], name=args[cmd]["name"])
     elseif cmd == "list"
         list(config; show_links=args[cmd]["show-links"])
     elseif cmd == "clean"

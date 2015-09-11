@@ -21,6 +21,7 @@ tests = [
     "install",
     "create",
     "activate",
+    "execute",
     "list",
     "clean"
 ]
