@@ -49,7 +49,7 @@ end
     We overload download for our tests in order to make sure we're just download. The
     julia builds once.
 """ ->
-function Base.download(src::ASCIIString, dest::AbstractString, overwrite)
+function Base.download(src::AbstractString, dest::AbstractString, overwrite)
     if !ispath(dest) || overwrite
         download(src, dest)
     end
@@ -83,4 +83,53 @@ function get_playground_name(config::Config, dir::AbstractString)
     end
 
     return name
+end
+
+
+function get_julia_dl_url(version::VersionNumber, config::Config)
+    tmp_download_page = joinpath(config.dir.tmp, "julia-downloads.html")
+
+    if isfile(tmp_download_page)
+        delta = Dates.today() - Dates.Date(Dates.unix2datetime(stat(tmp_download_page).mtime))
+        if delta.value > 0
+            rm(tmp_download_page)
+            download(JULIA_DOWNLOADS_URL, tmp_download_page)
+        end
+    else
+        download(JULIA_DOWNLOADS_URL, tmp_download_page)
+    end
+
+    txt = open(readall, tmp_download_page)
+    lines = split(txt, "\n")
+
+    platform = "N/A"
+    if OS_NAME===:Windows
+        platform = "win"
+    elseif OS_NAME===:Linux
+        platform = "linux"
+    elseif OS_NAME===:Darwin
+        platform = "osx"
+    end
+
+    links = []
+
+    for line in lines
+        m = match(r"(?i)<a href=\"([^>]+)\">(.+?)</a>", line)
+        if m != nothing && contains(m.captures[1], platform)
+            link = m.captures[1]
+            if version < NIGHTLY
+                if contains(link, "$(version.major).$(version.minor)")
+                    push!(links, link)
+                end
+            else
+                if contains(link, "status.julialang.org")
+                    push!(links, link)
+                end
+            end
+        end
+    end
+
+    @assert length(links) == 1
+
+    return links[1]
 end

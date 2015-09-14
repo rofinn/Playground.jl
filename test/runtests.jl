@@ -14,6 +14,8 @@ TEST_CONFIG = load_config(DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
 mkpath(TEST_TMP_DIR)
 mkpath(TEST_PLAYGROUND_DIR)
 
+Playground.init(TEST_CONFIG)
+
 # Order matters.
 tests = [
     "lint",

@@ -8,8 +8,8 @@ import Logging
 
 include("constants.jl")
 include("config.jl")
-include("parsing.jl")
 include("utils.jl")
+include("parsing.jl")
 include("install.jl")
 include("create.jl")
 include("activate.jl")
@@ -33,7 +33,6 @@ export
     clean,
 
     # Constants
-    binurls,
     DEFAULT_CONFIG
 
 

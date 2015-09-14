@@ -9,9 +9,13 @@ function check_url(url::AbstractString)
     end
 end
 
-function test_urls()
-    for key in keys(binurls)
-        check_url(binurls[key])
+function test_url_parsing()
+    os_name = OS_NAME
+    for v in [v"0.3", v"0.4", v"0.5"]
+        for platform in [:Darwin, :Linux, :Windows]
+            OS_NAME = platform
+            Playground.get_julia_dl_url(v, TEST_CONFIG)
+        end
     end
 end
 
@@ -33,6 +37,6 @@ function test_dirinstall()
     )
 end
 
-test_urls()
+test_url_parsing()
 test_install()
 test_dirinstall()

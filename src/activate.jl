@@ -6,7 +6,6 @@ function activate(config::Config; dir::AbstractString="", name::AbstractString="
 
     prompt = config.default_prompt
 
-    Logging.info("Executing a playground shell")
     if name != ""
         prompt = replace(prompt, "playground", name)
     else
