@@ -153,7 +153,7 @@ end
 end
 
 @linux_only begin
-    function install_julia_bin(src::AbstractString, config::Config, version, force)
+    function install_julia_bin(src::AbstractString, config::Config, base_name, force)
         src_path = abspath(joinpath(config.dir.src, base_name))
         bin_path = abspath(joinpath(config.dir.bin, base_name))
 
