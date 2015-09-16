@@ -104,9 +104,9 @@ function get_julia_dl_url(version::VersionNumber, config::Config)
 
     platform = "N/A"
     if OS_NAME===:Windows
-        platform = "win"
+        platform = "win64"
     elseif OS_NAME===:Linux
-        platform = "linux"
+        platform = "linux-x86_64"
     elseif OS_NAME===:Darwin
         platform = "osx"
     end
@@ -129,7 +129,9 @@ function get_julia_dl_url(version::VersionNumber, config::Config)
         end
     end
 
-    @assert length(links) == 1
+    if length(links) != 1
+        error("Expected 1 valid link, got $(length(links)). $links")
+    end
 
     return links[1]
 end
