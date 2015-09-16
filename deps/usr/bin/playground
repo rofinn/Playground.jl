@@ -1,4 +1,4 @@
-#!/usr/bin/env julia --depwarn=no
+#!/usr/bin/env julia
 
 pg_dir = Pkg.dir("Playground")
 

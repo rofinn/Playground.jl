@@ -68,7 +68,7 @@ function main(cmd_args=ARGS, config="$(CONFIG_PATH)/config.yml", root=CONFIG_PAT
             name=args[cmd]["name"],
             julia=args[cmd]["julia-version"],
             reqs_file=args[cmd]["requirements"],
-            reqs_type=symbol(args[cmd]["req-type"])
+            reqs_type=Symbol(args[cmd]["req-type"])
         )
     elseif cmd == "activate"
         activate(config; dir=args[cmd]["dir"], name=args[cmd]["name"])
