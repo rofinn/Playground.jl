@@ -1,0 +1,1 @@
+list(TEST_CONFIG)

@@ -1,8 +1,92 @@
+VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module Playground
 
-export manage_playground
+using Compat
+using ArgParse
+import Logging
 
-include("core.jl")
+include("constants.jl")
+include("config.jl")
+include("utils.jl")
+include("parsing.jl")
+include("install.jl")
+include("create.jl")
+include("activate.jl")
+include("execute.jl")
+include("list.jl")
+include("clean.jl")
+
+
+export
+    # methods
+    main,
+    argparse,
+    load_config,
+    install,
+    dirinstall,
+    #gitinstall,
+    create,
+    activate,
+    execute,
+    list,
+    clean,
+
+    # Constants
+    DEFAULT_CONFIG
+
+
+
+function main(cmd_args=ARGS, config="$(CONFIG_PATH)/config.yml", root=CONFIG_PATH)
+    args = argparse(cmd_args)
+    cmd = args["%COMMAND%"]
+
+    config = load_config(config, root)
+
+    if cmd == "install"
+        install_cmd = args[cmd]["%COMMAND%"]
+
+        if install_cmd == "download"
+            install(
+                config,
+                VersionNumber(args[cmd][install_cmd]["version"]);
+                labels=args[cmd][install_cmd]["labels"]
+            )
+        elseif install_cmd == "link"
+            dirinstall(
+                config,
+                abspath(args[cmd][install_cmd]["dir"]);
+                labels=args[cmd][install_cmd]["labels"]
+            )
+        elseif install_cmd == "build"
+            error("Building from source isn't supported yet.")
+        end
+    elseif cmd == "create"
+        create(
+            config;
+            dir=args[cmd]["dir"],
+            name=args[cmd]["name"],
+            julia=args[cmd]["julia-version"],
+            reqs_file=args[cmd]["requirements"],
+            reqs_type=Symbol(args[cmd]["req-type"])
+        )
+    elseif cmd == "activate"
+        activate(config; dir=args[cmd]["dir"], name=args[cmd]["name"])
+    elseif cmd == "exec"
+        execute(config, `$(Base.shell_split(args[cmd]["cmd"]))`; 
+            dir=args[cmd]["dir"], name=args[cmd]["name"]
+        )
+    elseif cmd == "list"
+        list(config; show_links=args[cmd]["show-links"])
+    elseif cmd == "clean"
+            clean(config)
+    elseif cmd == "rm"
+        rm(
+            config;
+            name=args[cmd]["name"],
+            dir=args[cmd]["dir"]
+        )
+    end
+end
 
 end

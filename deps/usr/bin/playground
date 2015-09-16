@@ -1,5 +1,11 @@
 #!/usr/bin/env julia
 
+pg_dir = Pkg.dir("Playground")
+
+include(joinpath(pg_dir, "src/Playground.jl"))
 using Playground
-manage_playground()
+
+Logging.configure(level=Logging.INFO)
+
+main()
 
