@@ -5,15 +5,18 @@ Playground.jl
 
 A package for managing julia sandboxes like python's virtualenv (with a little influence from pyenv and virtualenvwrapper)
 
-### Installation ###
+
+## Installation ##
 Install the julia package
 ```shell
-julia>Pkg.add("Playground")
+julia> Pkg.add("Playground")
 ```
+
 Running the playground script
 ```shell
 ~/.playground/bin/playground
 ```
+
 Recommended: add the playground bin directory to your path 
 by editing your ~/.bashrc, ~/.zshrc, ~/.tcshrc, etc.
 ```shell
@@ -21,8 +24,10 @@ echo "PATH=~/.playground/bin/:$PATH" >> ~/.bashrc
 ```
 This will make the playground script and all managed julia versions easily accessible.
 
-### Usage ###
-#### Install (Unix only) ####
+Currently, some of the dependencies in Playground.jl such as Options.jl and ArgParse.jl throw deprecation warnings. If you'd like to ignore these warnings until new versions of these packages are release just add `--depwarn=no` to the shebang in `~/.playground/bin/playground`. If you're running linux you'll need to change this line to `#!/usr/bin/julia --depwarn=no` as `env` in linux can only take 1 argument otherwise the process will stall.
+
+## Usage (subcommands)##
+### install (Unix only) ###
 To install a binary julia version from http://julialang.org/downloads/.
 ```shell
 # playground install download <version> --labels label1 label2
@@ -35,7 +40,7 @@ To make an existing build available to playgrounds.
 playground install link /path/to/julia/binary --labels julia-src
 ```
 
-[TODO] To build and install a julia version from source.
+**[TODO]** To build and install a julia version from source.
 ```shell
 playground install build --url https://github.com/MyUser/julia.git --rev dev --labels julia-wip
 ```
@@ -44,11 +49,12 @@ This is less of a priority as most individuals can just manual build from source
 NOTE: Along with the provided labels, all install cmds will automatically create symlinks for the full version and commit eg: `julia-0.3.11` and `julia-128797f`.
 
 
-#### Create ####
+### create ###
 To create a new playground using your existing julia install in your current working directory.
 ```shell
 playground create
 ```
+
 This will automatically create a `.playground` folder (default specified in `~/.playground/config.yml`)
 
 To create a new playground in a specific directory.
@@ -60,6 +66,7 @@ Alternatively, you can name your playgrounds to make them available without reme
 ```shell
 playground create --name research-playground
 ```
+
 NOTE: If both a directory and a `--name` are supplied the playground will be created in the provided directory and linked to `~/.playground/share/<name>`. Otherwise, the playground will be created directly in `~/.playground/share/<name>`.
 
 To create a playground with a default julia-version. The julia version supplied must already be installed with methods listed above.
@@ -71,14 +78,16 @@ To create a new playground with pre-existing requirements using REQUIRE or DECLA
 ```shell
 playground create --requirements /path/to/REQUIRE/or/DECLARE/file
 ```
+
 If the basename of the file is not `REQUIRE` or `DECLARE` you can still specify the requirement type.
 ```shell
 playground create --requirements /path/to/requirements/file --req-type DECLARE
 ```
+
 If using DECLARE files you should make sure that `DeclarativePackages.jl` is already installed.
 
 
-#### Activate ####
+### activate ###
 To activate a given playground simply run.
 ```shell
 playground activate /path/to/your/playground
@@ -90,27 +99,30 @@ playground activate --name myproject
 
 NOTE: On Unix systems, activate will try and open a new shell using you SHELL environment variable and a modified copy of your `~/.<shell>rc` file. Otherwise, it will fall back to using `sh -i`.
 
-#### List ####
+
+### list ###
 To see what install julia-versions and playgrounds (named ones) are available.
 ```shell
 playground list
 ```
 
 
-#### Clear ####
+### clear ###
 If you've removed some a source julia-version or have deleted playground folders and would like playground to clean up any broken symlinks.
 ```shell
 playground clean
 ```
 
-Alternatively, if you'd like to remove a julia-version or playground you can run.
+### rm ###
+If you'd like to remove a julia-version or playground you can run.
 ```shell
 playground rm [playground-name|julia-version] --dir /path/to/playgrounds
 ```
 which will delete the specified playground or julia-version and make sure that all related links have been cleaned up.
+**Warning**: Deleting julia versions may break playgrounds that depend on that version. If this occurs you can either manually recreate the julia symlink with `ln -s ~/.playground/bin/<julia-version> /path/to/playground/bin/julia` or better yet recreate the playground.
 
 
-### Configuration ###
+## Configuration ##
 For the most part, Playground.jl provide its virtualized environments by simply manipulating environment variables and symlinks to julia binaries/playgrounds. However, in order to do this it needs to create its own folder for managing these symlinks. By default Playground.jl creates its own config folder in `~/.playground`. This folder is structured as follows.
 ```
 |-- .playground/
@@ -140,7 +152,7 @@ For the most part, Playground.jl provide its virtualized environments by simply 
 * tmp: just contains the raw julia binary downloads
 
 
-#### config.yml ####
+### config.yml ###
 The config.yml file provides a mechanism for configuring default behaviour. This file is setup during installation.
 ```
 ---
@@ -160,8 +172,8 @@ isolated_shell_history: true
 isolated_julia_history: true
 ```
 
-### TODOs ###
-* Setup coveralls
+
+## TODOs ##
 * More thorough test coverage
 * Full windows support including `install`
 * `install build` support.
