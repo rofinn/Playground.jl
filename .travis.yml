@@ -11,7 +11,7 @@ notifications:
   email: false
 script:
   - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-  - julia -e --depwarn=no 'Pkg.init(); Pkg.clone(pwd()); Pkg.add("Lint"); Pkg.add("DeclarativePackages"); Pkg.test("Playground";  coverage=true)'
+  - julia --depwarn=no -e 'Pkg.init(); Pkg.clone(pwd()); Pkg.add("Lint"); Pkg.add("DeclarativePackages"); Pkg.test("Playground";  coverage=true)'
 after_success:
   - julia -e 'cd(Pkg.dir("Playground")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
   - julia -e 'cd(Pkg.dir("Playground")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
