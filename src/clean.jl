@@ -49,6 +49,9 @@ function Base.rm(config::Config; name::AbstractString="", dir::AbstractString=""
     end
 
     # By this point dir should be valid or the function should have already exited.
+    # DeclarativePackages creates a read-only directory so in case we run into that
+    # during deletion we recursively chmod the path with write permissions.
+    run(`chmod -R u+w $(abspath(dir))`)
     rm(abspath(dir), recursive=true)
 
     # Just to be safe run clean_links
