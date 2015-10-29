@@ -39,7 +39,7 @@ for t in tests
 end
 
 
-main(["install", "download", "0.3", "--labels", "julia-0.3"], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
+main(["install", "download", "0.4", "--labels", "julia-0.3"], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
 main(["install", "link", joinpath(TEST_CONFIG.dir.bin, "julia-0.3"), "--labels", "julia-stable-dir"], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
 main(["create"], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
 main(["exec", "ls -al", joinpath(TEST_DIR, ".playground")], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
