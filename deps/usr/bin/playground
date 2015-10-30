@@ -1,5 +1,3 @@
-#!/usr/bin/env julia
-
 pg_dir = Pkg.dir("Playground")
 
 include(joinpath(pg_dir, "src/Playground.jl"))
