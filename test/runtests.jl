@@ -1,5 +1,6 @@
 using Base.Test
 using Lint
+using Mocking
 
 include("../src/Playground.jl")
 using Playground
