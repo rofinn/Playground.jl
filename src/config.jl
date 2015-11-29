@@ -24,6 +24,7 @@ type Config
     dir::DirectoryStructure
     default_playground_path::AbstractString
     default_prompt::AbstractString
+    default_shell::AbstractString
     default_git_address::AbstractString
     default_git_revision::AbstractString
     isolated_shell_history::Bool
@@ -34,6 +35,7 @@ type Config
             DirectoryStructure(kwargs["root"]),
             abspath(kwargs["default_playground_path"]),
             kwargs["default_prompt"],
+            haskey(kwargs, "default_shell") ? kwargs["default_shell"] : "",
             kwargs["default_git_address"],
             kwargs["default_git_revision"],
             kwargs["isolated_shell_history"],
@@ -44,22 +46,26 @@ end
 
 
 type PlaygroundConfig
+    name::AbstractString
     root_path::AbstractString
     log_path::AbstractString
     bin_path::AbstractString
     pkg_path::AbstractString
     julia_path::AbstractString
+    default_shell::AbstractString
     isolated_shell_history::Bool
     isolated_julia_history::Bool
 
     function PlaygroundConfig(config::Config, dir::AbstractString, name)
         root_path = get_playground_dir(config, dir, name)
         new(
+            name,
             root_path,
             joinpath(root_path, "log"),
             joinpath(root_path, "bin"),
             joinpath(root_path, "packages"),
             joinpath(root_path, "bin", "julia"),
+            config.default_shell,
             config.isolated_shell_history,
             config.isolated_julia_history
         )
@@ -104,7 +110,12 @@ end
 
 function set_envs(pg::PlaygroundConfig)
     ENV["PATH"] = "$(pg.bin_path):" * ENV["PATH"]
+    ENV["PLAYGROUND_ENV"] = pg.name == "" ? basename(pg.root_path) : pg.name
     ENV["JULIA_PKGDIR"] = pg.pkg_path
+
+    if pg.default_shell != ""
+        ENV["SHELL"] = pg.default_shell
+    end
 
     if pg.isolated_julia_history
         ENV["JULIA_HISTORY"] = joinpath(pg.root_path, ".julia_history")
