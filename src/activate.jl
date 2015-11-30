@@ -2,7 +2,6 @@ function activate(config::Config; dir::AbstractString="", name::AbstractString="
     init(config)
 
     pg = PlaygroundConfig(config, dir, name)
-    set_envs(pg)
 
     prompt = config.default_prompt
 
@@ -12,24 +11,28 @@ function activate(config::Config; dir::AbstractString="", name::AbstractString="
         found = get_playground_name(config, pg.root_path)
         if found != ""
             prompt = replace(prompt, "playground", found)
+            pg.name = found
         end
     end
 
-    run_shell(prompt)
+    set_envs(pg)
+    run_shell(pg, prompt)
 end
 
 
 @windows_only begin
-    function run_shell(prompt)
+    function run_shell(config, prompt)
         run(`cmd /K prompt $(prompt)`)
     end
 end
 
 
 @unix_only begin
-    function run_shell(prompt)
+    function run_shell(config, prompt)
         ENV["PS1"] = prompt
-        if haskey(ENV, "SHELL")
+        if haskey(ENV, "SHELL") && contains(ENV["SHELL"], "fish")
+            run(`$(ENV["SHELL"]) -i`)
+        elseif haskey(ENV, "SHELL")
             # Try and setup the new shell as close to the user's default shell as possible.
             usr_rc = joinpath(homedir(), "." * basename(ENV["SHELL"]) * "rc")
             pg_rc = joinpath(dirname(ENV["JULIA_PKGDIR"]), basename(ENV["SHELL"]) * "rc")

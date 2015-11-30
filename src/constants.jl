@@ -18,6 +18,10 @@ default_playground_path: .playground
 # Default shell prompt when you activate a playground.
 default_prompt: \"$(escape_string(DEFAULT_PROMPT))\"
 
+# Uncomment below to change the default shell. Otherwise the SHELL
+# Environment variable will be used.
+# default_shell: /usr/local/bin/fish
+
 # Default git settings when using install build
 default_git_address: \"https://github.com/JuliaLang/julia.git\"
 default_git_revision: master
