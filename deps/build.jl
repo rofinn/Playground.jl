@@ -1,10 +1,18 @@
 using Logging
 
-Logging.configure(level=Logging.INFO)
+Logging.configure(output=STDOUT, level=Logging.INFO)
 
 BUILDFILE_PATH = @__FILE__
 DEPS_PATH = dirname(BUILDFILE_PATH)
-JULIA_PATH = ENV["_"]
+JULIA_PATH = "#!/usr/bin/env julia"
+
+if haskey(ENV, "_")
+    JULIA_PATH = ENV["_"]
+else
+    try
+        JULIA_PATH = strip(readall(`which julia`))
+    end
+end
 
 include(joinpath(DEPS_PATH, "../src/Playground.jl"))
 
@@ -38,7 +46,7 @@ end
 #=
 Dynamically set the shebang in the playground script.
 This is necessary for several reasons:
-    1. /usr/bin/env will stall if we want to include the `--depwarn=noe`
+    1. /usr/bin/env will stall if we want to include the `--depwarn=no`
     2. people may have their default julia version installed in weird locations
     3. chances are that people will want playground to use the same julia environment that they installed it from.
 =#

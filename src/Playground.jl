@@ -1,4 +1,4 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__()
+#VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module Playground
 
@@ -73,7 +73,7 @@ function main(cmd_args=ARGS, config="$(CONFIG_PATH)/config.yml", root=CONFIG_PAT
     elseif cmd == "activate"
         activate(config; dir=args[cmd]["dir"], name=args[cmd]["name"])
     elseif cmd == "exec"
-        execute(config, `$(Base.shell_split(args[cmd]["cmd"]))`; 
+        execute(config, `$(Base.shell_split(args[cmd]["cmd"]))`;
             dir=args[cmd]["dir"], name=args[cmd]["name"]
         )
     elseif cmd == "list"
