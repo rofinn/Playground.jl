@@ -1,4 +1,6 @@
 function list(config::Config; show_links=false)
+	init(config)
+
     println("Julia Versions:")
     for j in readdir(config.dir.bin)
         if j != "playground"
