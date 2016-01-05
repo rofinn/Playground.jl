@@ -3,7 +3,7 @@ pg_dir = Pkg.dir("Playground")
 include(joinpath(pg_dir, "src/Playground.jl"))
 using Playground
 
-Logging.configure(level=Logging.INFO)
+Logging.configure(output=STDOUT, level=Logging.INFO)
 
 main()
 
