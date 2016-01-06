@@ -4,7 +4,6 @@ module Playground
 
 using Compat
 using ArgParse
-import Logging
 
 include("constants.jl")
 include("config.jl")

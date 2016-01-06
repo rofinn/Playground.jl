@@ -1,5 +1,3 @@
 julia 0.4
 ArgParse
-Logging
 YAML
-Mocking

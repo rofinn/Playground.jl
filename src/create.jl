@@ -6,7 +6,7 @@ function create(config::Config; dir::AbstractString="", name::AbstractString="",
     pg = PlaygroundConfig(config, dir, name)
     create_paths(pg)
 
-    Logging.info("Playground folders created")
+    info("Playground folders created")
 
     if julia != ""
         mklink(joinpath(config.dir.bin, julia), pg.julia_path)
@@ -30,14 +30,14 @@ function create(config::Config; dir::AbstractString="", name::AbstractString="",
                 copy(reqs_file, joinpath(ENV["JULIA_PKGDIR"], "DECLARE"))
 
                 old_folders = readdir(pg.pkg_path)
-                Logging.info("Installing packages from DECLARE file $reqs_file...")
+                info("Installing packages from DECLARE file $reqs_file...")
                 passed = false
                 try
                     run(`$(pg.julia_path) $(DECLARATIVE_PACKAGES_DIR)/src/installpackages.jl`)
                     passed = true
                 catch
                     passed = false
-                    Logging.warn("Failed to install from DECLARE file. Perhaps there is something wrong with your DECLARE file or you need to update DeclarativePackages.jl")
+                    warn("Failed to install from DECLARE file. Perhaps there is something wrong with your DECLARE file or you need to update DeclarativePackages.jl")
                 end
 
                 if passed
@@ -72,17 +72,17 @@ function create(config::Config; dir::AbstractString="", name::AbstractString="",
                     end
                 end
             else
-                Logging.warn("DeclarativePackages isn't installed")
+                warn("DeclarativePackages isn't installed")
             end
         elseif basename(reqs_file) == "REQUIRE" || reqs_type == :REQUIRE
-            Logging.info("Installing packages from REQUIRE file $reqs_file...")
+            info("Installing packages from REQUIRE file $reqs_file...")
             run(`$(pg.julia_path) -e Pkg.init()`)
             for v in readdir(pg.pkg_path)
                 copy(reqs_file, joinpath(pg.pkg_path, v, "REQUIRE"))
                 try
                     run(`$(pg.julia_path) -e Pkg.resolve()`)
                 catch
-                    Logging.warn("Failed to resolve requirements. Perhaps there is something wrong with your REQUIRE file.")
+                    warn("Failed to resolve requirements. Perhaps there is something wrong with your REQUIRE file.")
                 end
             end
         else
