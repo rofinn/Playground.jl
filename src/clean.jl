@@ -52,7 +52,7 @@ function Base.rm(config::Config; name::AbstractString="", dir::AbstractString=""
     # DeclarativePackages creates a read-only directory so in case we run into that
     # during deletion we recursively chmod the path with write permissions.
     run(`chmod -R +w $(abspath(dir))`)
-    Logging.warn("Recusively deleting $(abspath(dir))...")
+    warn("Recusively deleting $(abspath(dir))...")
     rm(abspath(dir), recursive=true)
 
     # Just to be safe run clean_links

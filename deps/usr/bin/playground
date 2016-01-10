@@ -1,9 +1,7 @@
 pg_dir = Pkg.dir("Playground")
 
 include(joinpath(pg_dir, "src/Playground.jl"))
-using Playground
+import Playground
 
-Logging.configure(output=STDOUT, level=Logging.INFO)
-
-main()
-
+main() = Playground.main(ARGS)
+# Playground.main()

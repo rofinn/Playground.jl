@@ -14,7 +14,7 @@ function install(config::Config, version::VersionNumber; labels=[])
     base_name = "julia-$(version.major).$(version.minor)_$(Dates.today())"
     tmp_dest = joinpath(config.dir.tmp, base_name)
 
-    Logging.info("Downloading julia $(version.major).$(version.minor) from $download_url ...")
+    info("Downloading julia $(version.major).$(version.minor) from $download_url ...")
     Playground.download(download_url, tmp_dest, false)
     bin_path = Playground.install_julia_bin(tmp_dest, config, base_name, false)
     Playground.link_julia(bin_path, config, labels)
@@ -28,7 +28,7 @@ end
     install.
 """ ->
 function dirinstall(config::Config, executable::AbstractString; labels=[])
-    Logging.info("Adding julia labels $labels to $executable")
+    info("Adding julia labels $labels to $executable")
     if ispath(executable)
         init(config)
 
@@ -59,7 +59,7 @@ end
 
 #     error("Installing from a git repo isn't implemented yet.")
 
-#     Logging.info("Cloning the julia repository into the playground")
+#     info("Cloning the julia repository into the playground")
 #     run(`git clone $(url) $(name)` |> gitlog)
 
 #     # Handle the cd into and out of src directory cause cd() in base
@@ -90,20 +90,20 @@ end
 
 
 # function build_julia(target, root_path, log_path)
-#     Logging.info("Building julia ( $(target) )...")
+#     info("Building julia ( $(target) )...")
 #     gitlog = joinpath(log_path, "git.log")
 #     buildlog = joinpath(log_path, "build.log")
 
 #     run(`git checkout $(target)` >> gitlog)
-#     Logging.info("checking out $(target)")
+#     info("checking out $(target)")
 
 #     # Write the different prefix to the Make.user file before
 #     # building and installing.
-#     Logging.info("setting prefix in Make.user")
+#     info("setting prefix in Make.user")
 #     fstrm = open("Make.user","w")
 #     write(fstrm, "prefix=$(root_path)")
 
-#     Logging.info("Building julia")
+#     info("Building julia")
 #     # Build and install.
 #     # TODO: log the build output properly in root_dir/log
 #     run(`make` |> buildlog)
