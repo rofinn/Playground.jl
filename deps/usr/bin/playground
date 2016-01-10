@@ -3,5 +3,5 @@ pg_dir = Pkg.dir("Playground")
 include(joinpath(pg_dir, "src/Playground.jl"))
 import Playground
 
-# main() = Playground.main(ARGS)
-Playground.main()
+main() = Playground.main(ARGS)
+# Playground.main()
