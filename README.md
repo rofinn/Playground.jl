@@ -12,6 +12,12 @@ Install the julia package
 julia> Pkg.add("Playground")
 ```
 
+NOTE: As of v0.0.6 you will need to run
+```shell
+julia> ENV["PLAYGROUND_INSTALL"] = true
+```
+prior to running `Pkg.add` or `Pkg.build` if you'd like the compiled playground executable to be installed into the common `~/.playground/bin/` path.
+
 Running the playground script
 ```shell
 ~/.playground/bin/playground
