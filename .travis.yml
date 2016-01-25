@@ -26,20 +26,20 @@ script:
 # symlink in the pwd
 - ln -s "$PWD" "$HOME/.julia/v$TRAVIS_JULIA_VERSION/Playground"
 # now build playground
-- julia --depwarn=no -e 'ENV["PLAYGROUND_INSTALL"] = true; Pkg.build("Playground")'
-#  Pkg.test("Playground";  coverage=true)'
+- julia --depwarn=no -e 'ENV["PLAYGROUND_INSTALL"] = true; Pkg.build("Playground");
+  Pkg.test("Playground";  coverage=true)'
 - ~/.playground/bin/playground list
-#after_success:
-#- julia -e 'cd(Pkg.dir("Playground")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
-#- julia -e 'cd(Pkg.dir("Playground")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
+after_success:
+- julia -e 'cd(Pkg.dir("Playground")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
+- julia -e 'cd(Pkg.dir("Playground")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
 before_deploy:
 # Assuming skip_cleanup works the README.md and the build directory we want should be under the pwd
 - echo "Attempting to bundle playground..."
-- ls "$PWD"
-- ls "$PWD/deps/usr/build"
-- cp ./README.md ./deps/usr/build/README.md
-- cp ./LICENSE ./deps/usr/build/LICENSE
-- tar -czvf "playground-$TRAVIS_OS_NAME.tar.gz" ./deps/usr/build
+- mkdir -p playground
+- cp -r ./deps/usr/build/* ./playground/
+- cp ./README.md ./playground/README.md
+- cp ./LICENSE ./playground/LICENSE
+- tar -czvf "playground-$TRAVIS_OS_NAME.tar.gz" ./playground
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then shasum -a 256 --binary "playground-osx.tar.gz" > "SHA256SUM-osx.asc"; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sha256sum --binary "playground-linux.tar.gz" > "SHA256SUM-linux.asc"; fi
 deploy:
