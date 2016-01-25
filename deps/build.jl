@@ -27,11 +27,12 @@ BUILD_PATH = joinpath(DEPS_PATH, "usr/build/")
 mkpath(BUILD_PATH)
 
 # Actually build the playground executable
+info("Trying to build playground executable in $(BUILD_PATH) ...")
 build_executable(
     "playground",
     PLAYGROUND_SCRIPT,
     BUILD_PATH,
-    "core2"; force=true
+    "generic"; force=true
 )
 
 config_file = joinpath(Playground.CONFIG_PATH, "config.yml")

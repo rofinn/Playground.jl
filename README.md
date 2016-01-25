@@ -7,7 +7,10 @@ A package for managing julia sandboxes like python's virtualenv (with a little i
 
 
 ## Installation ##
-Install the julia package
+### With Julia ###
+The ideal way to install playground is via the registered julia package. However, this requires that you already have julia installed on your system.
+
+Installing the julia package
 ```shell
 julia> Pkg.add("Playground")
 ```
@@ -31,6 +34,19 @@ echo "PATH=~/.playground/bin/:$PATH" >> ~/.bashrc
 This will make the playground script and all managed julia versions easily accessible.
 
 Currently, some of the dependencies in Playground.jl such as Options.jl and ArgParse.jl throw deprecation warnings. If you'd like to ignore these warnings until new versions of these packages are release just add `--depwarn=no` to the shebang in `~/.playground/bin/playground`. If you're running linux you'll need to change this line to `#!/usr/bin/julia --depwarn=no` as `env` in linux can only take 1 argument otherwise the process will stall.
+
+### Without Julia ###
+As of v0.0.6 and up binary releases of playground are available for download [here](https://github.com/Rory-Finnegan/Playground.jl/releases), which will allow you to run playground without having an existing julia install.
+
+Steps:
+
+1. Download the tar.gz file for your platform into your desired install location (ie: `~/bin`)
+1. Go to that directory (`cd ~/bin`)
+1. Extract the build (`tar -xvzf ~/bin/playground-osx.tar.gz`)
+1. Create an alias that sets the `LD_LIBRARY_PATH` and calls the script. This should be placed in your shell rc file, so if your default shell is bash then you'd add `alias playground="LD_LIBRARY_PATH=~/bin/playground ~/bin/playground/playground"` to your `~/.bashrc` file.
+
+NOTE: This alias hack with `LD_LIBRARY_PATH` is only necessary due to an issue in the binaries created with [BuildExecutable.jl](https://github.com/dhoegh/BuildExecutable.jl). In future releases it should only be necessary for `~/bin/playground` to be on your search path (ie: in your `PATH` variable).
+
 
 ## Usage (subcommands)##
 ### install (Unix only) ###
