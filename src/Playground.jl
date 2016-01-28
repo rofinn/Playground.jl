@@ -30,13 +30,19 @@ export
     execute,
     list,
     clean,
+    config_path,
 
     # Constants
     DEFAULT_CONFIG
 
 
 
-function main(cmd_args=ARGS, config="$(CONFIG_PATH)/config.yml", root=CONFIG_PATH)
+function main(cmd_args=ARGS, config="", root="")
+    if config == "" && root == ""
+        config = joinpath(config_path(), "config.yml")
+        root = config_path()
+    end
+
     args = argparse(cmd_args)
     cmd = args["%COMMAND%"]
 

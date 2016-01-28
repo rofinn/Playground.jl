@@ -74,6 +74,7 @@ end
 
 
 function init(config::Config)
+    mkpath(config.dir.root)
     mkpath(config.dir.tmp)
     mkpath(config.dir.src)
     mkpath(config.dir.bin)
@@ -125,3 +126,5 @@ function set_envs(pg::PlaygroundConfig)
         ENV["HISTFILE"] = joinpath(pg.root_path, ".shell_history")
     end
 end
+
+config_path() = joinpath(homedir(), ".playground")
