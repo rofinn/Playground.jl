@@ -1,5 +1,4 @@
 DECLARATIVE_PACKAGES_DIR = Pkg.dir("DeclarativePackages")
-CONFIG_PATH = joinpath(homedir(), ".playground")
 @unix_only begin
     DEFAULT_PROMPT = "\\e[0;35m\\u@\\h:\\W (playground)> \\e[m"
 end

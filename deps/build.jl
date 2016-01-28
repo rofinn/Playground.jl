@@ -2,81 +2,88 @@ using BuildExecutable
 
 
 # Get our current working path
-BUILDFILE_PATH = @__FILE__
-DEPS_PATH = dirname(BUILDFILE_PATH)
+buildfile_path = @__FILE__
+deps_path = dirname(buildfile_path)
+
+include(joinpath(deps_path, "../src/Playground.jl"))
+
+# Get the playground script path
+playground_script = joinpath(deps_path, "usr/bin/playground")
+build_path = joinpath(deps_path, "usr/build/")
+config_file = joinpath(build_path, "config.yml")
+mkpath(build_path)
+
+# Actually build the playground executable
+info("Trying to build playground executable in $(build_path) ...")
+build_executable(
+    "playground",
+    playground_script,
+    build_path,
+    "generic"; force=true
+)
+
+info("Writing default config to $config_file.")
+if ispath(config_file)
+    backup_file = joinpath(build_path, ".config.yml_$(Dates.today()).bak")
+    info("Backing up existing config file to $backup_file")
+    Playground.copy(config_file, backup_file)
+end
+
+fstream = open(config_file, "w+")
+write(fstream, Playground.DEFAULT_CONFIG)
+close(fstream)
+
+@unix_only begin
+    Playground.copy(joinpath(deps_path, "usr/bin/INSTALL.sh"), joinpath(build_path, "INSTALL.sh"))
+end
+
+Playground.copy(joinpath(deps_path, "../LICENSE"), joinpath(build_path, "LICENSE"))
+Playground.copy(joinpath(deps_path, "../README.md"), joinpath(build_path, "README.md"))
 
 # Only install the config and executable if the
 # PLAYGROUND_INSTALL env variable has been set.
 # This is just cause there isn't a `Pkg.install` or
 # `Pkg.build("Pkg", install=true)`
-INSTALL = haskey(ENV, "PLAYGROUND_INSTALL")
-
-include(joinpath(DEPS_PATH, "../src/Playground.jl"))
-
+install = haskey(ENV, "PLAYGROUND_INSTALL")
 # Store our install paths
-INSTALL_CONFIG = joinpath(Playground.CONFIG_PATH, "config.yml")
-INSTALL_PLAYGROUND_EXEC = joinpath(Playground.CONFIG_PATH, "bin/playground")
+install_path = Playground.config_path()
+install_config = joinpath(install_path, "config.yml")
+install_playground_exec = joinpath(install_path, "bin", "playground")
 
-# Set up the user level playground directory
-mkpath(Playground.CONFIG_PATH)
-mkpath(joinpath(Playground.CONFIG_PATH, "bin"))
+if install
+    # Set up the user level playground directory
+    info("Setting up user playground directory...")
+    mkpath(install_path)
+    mkpath(joinpath(install_path, "bin"))
 
-# Get the playground script path
-PLAYGROUND_SCRIPT = joinpath(DEPS_PATH, "usr/bin/playground")
-BUILD_PATH = joinpath(DEPS_PATH, "usr/build/")
-mkpath(BUILD_PATH)
+    info("Linking playground config to $install_path/config.yml.")
 
-# Actually build the playground executable
-info("Trying to build playground executable in $(BUILD_PATH) ...")
-build_executable(
-    "playground",
-    PLAYGROUND_SCRIPT,
-    BUILD_PATH,
-    "generic"; force=true
-)
-
-config_file = joinpath(Playground.CONFIG_PATH, "config.yml")
-
-if INSTALL
-    info("Writing default config to $(Playground.CONFIG_PATH)/config.yml.")
-    config_file = joinpath(Playground.CONFIG_PATH, "config.yml")
-
-    if ispath(config_file)
-        backup_file = joinpath(Playground.CONFIG_PATH, ".config.yml_$(Dates.today()).bak")
-        info("Backing up existing config file to $backup_file")
-        Playground.copy(config_file, backup_file)
+    if ispath(install_config)
+        info("~/.playground/config.yml already exists. Skipping.")
+        info("Please see $config_file if you have any problems with your existing config.yml file.")
+    else
+        Playground.mklink(config_file, install_config)
     end
 
-    fstream = open(joinpath(Playground.CONFIG_PATH, "config.yml"), "w+")
-    write(fstream, Playground.DEFAULT_CONFIG)
-    close(fstream)
+    info("Linking playground executable to $install_playground_exec")
 
-    info("Linking playground executable to $INSTALL_PLAYGROUND_EXEC")
-
-    if ispath(INSTALL_PLAYGROUND_EXEC)
-        backup_file = joinpath(Playground.CONFIG_PATH, "bin", ".playground_$(Dates.today()).bak")
+    if ispath(install_playground_exec)
+        backup_file = joinpath(install_path, "bin", ".playground_$(Dates.today()).bak")
         info("Backing up existing playground executable to $backup_file")
-        Playground.copy(INSTALL_PLAYGROUND_EXEC, backup_file)
+        Playground.copy(install_playground_exec, backup_file)
     end
 
-    Playground.mklink(joinpath(BUILD_PATH, "playground"), INSTALL_PLAYGROUND_EXEC)
+    Playground.mklink(joinpath(build_path, "playground"), install_playground_exec)
 
     info(string(
-        "Adding $(Playground.CONFIG_PATH)/bin to your PATH ",
+        "Adding $install_path/bin to your PATH ",
         "variable will make `playground` and any julia versions installed via",
         "Playground.jl available on your search path."
     ))
 else
-    if !ispath(config_file)
-        info("Writing default config to $(Playground.CONFIG_PATH)/config.yml.")
-        fstream = open(joinpath(Playground.CONFIG_PATH, "config.yml"), "w+")
-        write(fstream, Playground.DEFAULT_CONFIG)
-        close(fstream)
-    end
-
     warn(string(
-        "Compiled playground executable $(BUILD_PATH)/playground ",
-        "not installed to $INSTALL_PLAYGROUND_EXEC"
+        "Compiled playground executable $(build_path)/playground ",
+        "not installed to $install_playground_exec"
     ))
 end
 
