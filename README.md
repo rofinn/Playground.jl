@@ -1,7 +1,9 @@
 Playground.jl
 =============
+
 [![Build Status](https://travis-ci.org/Rory-Finnegan/Playground.jl.svg)](https://travis-ci.org/Rory-Finnegan/Playground.jl)
 [![codecov.io](http://codecov.io/github/Rory-Finnegan/Playground.jl/coverage.svg)](http://codecov.io/github/Rory-Finnegan/Playground.jl)
+[![Join the chat at https://gitter.im/Rory-Finnegan/Playground.jl](https://badges.gitter.im/Rory-Finnegan/Playground.jl.svg)](https://gitter.im/Rory-Finnegan/Playground.jl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 A package for managing julia sandboxes like python's virtualenv (with a little influence from pyenv and virtualenvwrapper)
 
