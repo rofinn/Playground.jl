@@ -57,8 +57,11 @@ end
                     close(fstream)
                 end
             end
-
-            run(`$(ENV["SHELL"]) --rcfile $pg_rc`)
+            if contains(ENV["SHELL"],"zsh")
+                run(`$(ENV["SHELL"]) -c "source $pg_rc; $(ENV["SHELL"])"`)
+            else
+                run(`$(ENV["SHELL"]) --rcfile $pg_rc`)
+            end
         else
             run(`sh -i`)
         end
