@@ -1,25 +1,24 @@
-function list(config::Config; show_links=false)
-	init(config)
-
+function list(show_links=false)
+    # TODO: In what cases are Julia version not links?
     println("Julia Versions:")
-    for j in readdir(config.dir.bin)
-        if j != "playground"
-            file_path = joinpath(config.dir.bin, j)
-            if islink(file_path) && show_links
-                println("\t$(j) -> $(readlink(file_path))")
+    for file in readdir(CORE.bin_dir)
+        if file != "playground"
+            julia = joinpath(CORE.bin_dir, file)
+            if show_links && islink(julia)
+                println("    $julia -> $(readlink(julia))")
             else
-                println("\t$(j)")
+                println("    $julia")
             end
         end
     end
 
-    println("\nPlaygrounds:")
-    for p in readdir(config.dir.store)
-        file_path = joinpath(config.dir.store, p)
-        if islink(file_path) && show_links
-            println("\t$(p) -> $(readlink(file_path))")
+    println("\nNamed Playgrounds:")
+    for name in readdir(CORE.share_dir)
+        if show_links
+            root = realpath(joinpath(CORE.share_dir, name))
+            println("    $name -> $root")
         else
-            println("\t$(p)")
+            println("    $name")
         end
     end
 end

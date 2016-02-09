@@ -1,26 +1,19 @@
-function test_clean()
-    rm(joinpath(TEST_TMP_DIR, "test-playground"), recursive=true)
-    @test !ispath(joinpath(TEST_TMP_DIR, "test-playground"))
-    @test islink(joinpath(TEST_CONFIG.dir.bin, "julia-bin"))
-    @test islink(joinpath(TEST_CONFIG.dir.store, "myproject"))
+let name = "orphan", root_dir = joinpath(TMP_DIR, "playground")
+    playground = Playground.create_playground(
+        root=root_dir,
+        name=name,
+    )
 
-    clean(TEST_CONFIG)
-    @test !ispath(joinpath(TEST_TMP_DIR, "test-playground"))
-    @test islink(joinpath(TEST_CONFIG.dir.bin, "julia-bin"))
-    @test !islink(joinpath(TEST_CONFIG.dir.store, "myproject"))
+    link = joinpath(Playground.CORE.share_dir, name)
+
+    # Delete the playground directory improperly leaving the global name pointing to nothing
+    rm(root_dir, recursive=true)
+
+    @test !isdir(root_dir)
+    @test islink(link)
+    @test readlink(link) == root_dir
+
+    Playground.clean()
+
+    @test !islink(link)
 end
-
-
-function test_rm()
-    rm(TEST_CONFIG, name="otherproject")
-    @test !ispath(joinpath(TEST_CONFIG.dir.store, "otherproject"))
-
-    rm(TEST_CONFIG, dir=joinpath(TEST_DIR, ".playground"))
-    @test !ispath(joinpath(TEST_DIR, ".playground"))
-
-    rm(TEST_CONFIG, name="julia-nightly-dir")
-    @test !ispath(joinpath(TEST_CONFIG.dir.bin, "julia-nightly-dir"))
-end
-
-test_clean()
-test_rm()

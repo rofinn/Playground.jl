@@ -1,1 +1,1 @@
-list(TEST_CONFIG)
+Playground.list()

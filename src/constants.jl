@@ -6,6 +6,7 @@ const DEFAULT_SHELL = ""
 const DEFAULT_ISOLATE_SHELL_HISTORY = true
 const DEFAULT_ISOLATE_JULIA_HISTORY = true
 
+PLAYGROUND_HOME = joinpath(homedir(), ".playground")
 DECLARATIVE_PACKAGES_DIR = Pkg.dir("DeclarativePackages")
 NIGHTLY = v"0.5-"
 
@@ -30,3 +31,5 @@ default_git_revision: $DEFAULT_GIT_REVISION
 isolated_shell_history: $DEFAULT_ISOLATE_SHELL_HISTORY
 isolated_julia_history: $DEFAULT_ISOLATE_JULIA_HISTORY
 """
+
+# TODO: DEFAULT_PROMPT = @windows ? "playground>" : "(playground)\n\$PS1"

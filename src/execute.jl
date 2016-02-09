@@ -1,8 +1,15 @@
-function execute(config::Config, cmd::Cmd; dir::AbstractString="", name::AbstractString="")
-    init(config)
+import Base: run, readall, readchomp, chomp!
 
-    pg = PlaygroundConfig(config, dir, name)
-    set_envs(pg)
-
-    run(cmd)
+function run(pg::PlaygroundConfig, cmd::Cmd)
+    withenv(pg) do
+        run(cmd)
+    end
 end
+
+function readall(pg::PlaygroundConfig, cmd::Cmd)
+    withenv(pg) do
+        readall(cmd)
+    end
+end
+
+readchomp(pg::PlaygroundConfig, cmd::Cmd) = chomp!(readall(pg, cmd))
