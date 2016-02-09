@@ -128,7 +128,7 @@ end
             end
             if app_path != nothing
                 copy(app_path, src_path)
-                chmod(exe_path, 00755)
+                chmod(exe_path, 0o755)
             end
         finally
             run(`hdiutil detach $mountdir`)
@@ -168,7 +168,7 @@ end
         readdir(src_path)[1],
         "bin/julia"
     )
-    chmod(julia_bin_path, 00755)
+    chmod(julia_bin_path, 0o755)
     mklink(julia_bin_path, bin_path)
 
     return bin_path
