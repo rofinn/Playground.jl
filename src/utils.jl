@@ -135,3 +135,42 @@ function get_julia_dl_url(version::VersionNumber, config::Config)
 
     return links[1]
 end
+
+
+function julia_url(version::VersionNumber, os::Symbol=OS_NAME, arch::Integer=WORD_SIZE)
+    # Cannibalized from https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/script/julia.rb
+
+    if os === :Linux && arch == 64
+        os_arch = "linux/x64"
+        ext = "linux-x86_64.tar.gz"
+        # nightly_ext = "linux64.tar.gz"
+    elseif os === :Linux && arch == 32
+        os_arch = "linux/x32"
+        ext = "linux-i686.tar.gz"
+        # nightly_ext = "linux32.tar.gz"
+    elseif os === :Darwin && arch == 64
+        os_arch = "osx/x64"
+        ext = "osx10.7+.dmg"
+        # nightly_ext = "osx.dmg"
+    elseif os === :Windows && arch == 64
+        os_arch = "winnt/x64"
+        ext = "win64.exe"
+    elseif os === :Windows && arch == 32
+        os_arch = "winnt/x86"
+        ext = "win32.exe"
+    else
+        error("Julia does not support $arch-bit $os")
+    end
+
+    major_minor = "$(version.major).$(version.minor)"
+    if version.patch == 0
+        url = "s3.amazonaws.com/julialang/bin/$os_arch/$major_minor/julia-$major_minor-latest-$ext"
+    else
+        url = "s3.amazonaws.com/julialang/bin/$os_arch/$major_minor/julia-$version-$ext"
+    end
+
+    # Nightly url:
+    # url = "s3.amazonaws.com/julianightlies/bin/$os_arch/julia-latest-$nightly_ext"
+
+    return "https://$url"
+end
