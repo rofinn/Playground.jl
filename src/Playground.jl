@@ -54,7 +54,7 @@ function main(cmd_args=ARGS, config="", root="")
         if install_cmd == "download"
             install(
                 config,
-                VersionNumber(args[cmd][install_cmd]["version"]);
+                args[cmd][install_cmd]["version"];
                 labels=args[cmd][install_cmd]["labels"]
             )
         elseif install_cmd == "link"
@@ -73,7 +73,7 @@ function main(cmd_args=ARGS, config="", root="")
             name=args[cmd]["name"],
             julia=args[cmd]["julia-version"],
             reqs_file=args[cmd]["requirements"],
-            reqs_type=Symbol(args[cmd]["req-type"])
+            reqs_type=args[cmd]["req-type"],
         )
     elseif cmd == "activate"
         activate(config; dir=args[cmd]["dir"], name=args[cmd]["name"])
@@ -84,7 +84,7 @@ function main(cmd_args=ARGS, config="", root="")
     elseif cmd == "list"
         list(config; show_links=args[cmd]["show-links"])
     elseif cmd == "clean"
-            clean(config)
+        clean(config)
     elseif cmd == "rm"
         rm(
             config;
