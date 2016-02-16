@@ -66,8 +66,8 @@ function main(cmd_args=ARGS, config="", root="")
                 abspath(args["dir"]);
                 labels=args["labels"],
             )
-        elseif install_cmd == "build"
-            error("Building from source isn't supported yet.")
+        # elseif install_cmd == "build"
+        #     error("Building from source isn't supported yet.")
         end
     elseif cmd == "create"
         create(
