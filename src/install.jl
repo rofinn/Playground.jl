@@ -6,7 +6,7 @@
     binary version for your platform, or downloads and builds
     it from source if `src` is true.
 """ ->
-function install(config::Config, version::VersionNumber; labels=[])
+function install{S<:AbstractString}(config::Config, version::VersionNumber; labels::Array{S}=[])
     init(config)
 
     # download the julia version
@@ -27,7 +27,7 @@ end
     This option simply creates symlinks from an existing julia
     install.
 """ ->
-function dirinstall(config::Config, executable::AbstractString; labels=[])
+function dirinstall{S<:AbstractString}(config::Config, executable::AbstractString; labels::Array{S}=[])
     info("Adding julia labels $labels to $executable")
     if ispath(executable)
         init(config)
@@ -71,7 +71,7 @@ end
 # end
 
 
-function link_julia(bin_path::AbstractString, config::Config, labels=[])
+function link_julia{S<:AbstractString}(bin_path::AbstractString, config::Config, labels::Array{S}=[])
     for label in labels
         mklink(bin_path, joinpath(config.dir.bin, label))
     end
