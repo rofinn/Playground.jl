@@ -86,57 +86,6 @@ function get_playground_name(config::Config, dir::AbstractString)
 end
 
 
-function get_julia_dl_url(version::VersionNumber, config::Config)
-    tmp_download_page = joinpath(config.dir.tmp, "julia-downloads.html")
-
-    if isfile(tmp_download_page)
-        delta = Dates.today() - Dates.Date(Dates.unix2datetime(stat(tmp_download_page).mtime))
-        if delta.value > 0
-            rm(tmp_download_page)
-            download(JULIA_DOWNLOADS_URL, tmp_download_page)
-        end
-    else
-        download(JULIA_DOWNLOADS_URL, tmp_download_page)
-    end
-
-    txt = open(readall, tmp_download_page)
-    lines = split(txt, "\n")
-
-    platform = "N/A"
-    if OS_NAME===:Windows
-        platform = "win64"
-    elseif OS_NAME===:Linux
-        platform = "linux-x86_64"
-    elseif OS_NAME===:Darwin
-        platform = "osx"
-    end
-
-    links = []
-
-    for line in lines
-        m = match(r"(?i)<a href=\"([^>]+)\">(.+?)</a>", line)
-        if m != nothing && contains(m.captures[1], platform)
-            link = m.captures[1]
-            if version < NIGHTLY
-                if contains(link, "$(version.major).$(version.minor)")
-                    push!(links, link)
-                end
-            else
-                if contains(link, "status.julialang.org")
-                    push!(links, link)
-                end
-            end
-        end
-    end
-
-    if length(links) != 1
-        error("Expected 1 valid link, got $(length(links)). $links")
-    end
-
-    return links[1]
-end
-
-
 function julia_url(version::VersionNumber, os::Symbol=OS_NAME, arch::Integer=WORD_SIZE)
     # Cannibalized from https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/script/julia.rb
 

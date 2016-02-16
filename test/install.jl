@@ -10,16 +10,8 @@ function check_url(url::AbstractString)
 end
 
 function test_url_parsing()
-    os_name = OS_NAME
-    for v in [v"0.4", v"0.5"]
-        for platform in [:Darwin, :Linux, :Windows]
-            OS_NAME = platform
-            try
-                Playground.get_julia_dl_url(v, TEST_CONFIG)
-            catch e
-                error("Failed to parse julia download url for $v on $OS_NAME")
-            end
-        end
+    for v in (v"0.4", v"0.5"), os in (:Darwin, :Linux, :Windows)
+        @test !isempty(Playground.julia_url(v, os))
     end
 end
 
