@@ -44,24 +44,27 @@ function main(cmd_args=ARGS, config="", root="")
     end
 
     args = argparse(cmd_args)
+
     cmd = args["%COMMAND%"]
+    args = args[cmd]
 
     config = load_config(config, root)
 
     if cmd == "install"
-        install_cmd = args[cmd]["%COMMAND%"]
+        install_cmd = args["%COMMAND%"]
+        args = args[install_cmd]
 
         if install_cmd == "download"
             install(
                 config,
-                args[cmd][install_cmd]["version"];
-                labels=args[cmd][install_cmd]["labels"]
+                args["version"];
+                labels=args["labels"],
             )
         elseif install_cmd == "link"
             dirinstall(
                 config,
-                abspath(args[cmd][install_cmd]["dir"]);
-                labels=args[cmd][install_cmd]["labels"]
+                abspath(args["dir"]);
+                labels=args["labels"],
             )
         elseif install_cmd == "build"
             error("Building from source isn't supported yet.")
@@ -69,27 +72,37 @@ function main(cmd_args=ARGS, config="", root="")
     elseif cmd == "create"
         create(
             config;
-            dir=args[cmd]["dir"],
-            name=args[cmd]["name"],
-            julia=args[cmd]["julia-version"],
-            reqs_file=args[cmd]["requirements"],
-            reqs_type=args[cmd]["req-type"],
+            dir=args["dir"],
+            name=args["name"],
+            julia=args["julia-version"],
+            reqs_file=args["requirements"],
+            reqs_type=args["req-type"],
         )
     elseif cmd == "activate"
-        activate(config; dir=args[cmd]["dir"], name=args[cmd]["name"])
+        activate(
+            config;
+            dir=args["dir"],
+            name=args["name"],
+        )
     elseif cmd == "exec"
-        execute(config, `$(Base.shell_split(args[cmd]["cmd"]))`;
-            dir=args[cmd]["dir"], name=args[cmd]["name"]
+        execute(
+            config,
+            `$(Base.shell_split(args["cmd"]))`;
+            dir=args["dir"],
+            name=args["name"],
         )
     elseif cmd == "list"
-        list(config; show_links=args[cmd]["show-links"])
+        list(
+            config;
+            show_links=args["show-links"],
+        )
     elseif cmd == "clean"
         clean(config)
     elseif cmd == "rm"
         rm(
             config;
-            name=args[cmd]["name"],
-            dir=args[cmd]["dir"]
+            name=args["name"],
+            dir=args["dir"],
         )
     end
 end
