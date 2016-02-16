@@ -10,7 +10,7 @@ function install{S<:AbstractString}(config::Config, version::VersionNumber; labe
     init(config)
 
     # download the julia version
-    download_url = get_julia_dl_url(version, config)
+    download_url = julia_url(version)
     base_name = "julia-$(version.major).$(version.minor)_$(Dates.today())"
     tmp_dest = joinpath(config.dir.tmp, base_name)
 
