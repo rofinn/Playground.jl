@@ -8,7 +8,7 @@ deps_dir = dirname(@__FILE__)
 build_dir = joinpath(deps_dir, "usr", "build")
 mkpath(build_dir)
 
-build_script = joinpath(deps_dir, "usr", "bin", "playground")
+build_script = "script.jl"
 
 # Actually build the playground executable
 info("Trying to build playground executable in $build_dir ...")
