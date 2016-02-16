@@ -35,9 +35,9 @@ function argparse(cmd_args=ARGS)
         "link"
             action = :command
             help = "Path to an existing julia build you'd like to use with playgrounds."
-        "build"
-            action = :command
-            help = "The git url to clone the julia source from"
+        # "build"
+        #     action = :command
+        #     help = "The git url to clone the julia source from"
     end
 
     @add_arg_table parse_settings["create"] begin
@@ -119,18 +119,18 @@ function argparse(cmd_args=ARGS)
             nargs = '*'
     end
 
-    @add_arg_table parse_settings["install"]["build"] begin
-        "url"
-            help = "The git url to clone the julialang source from. Defaults to https://github.com/JuliaLang/julia.git. NOT IMPLEMENTED"
-            default = ""
-        "revision"
-            help = "The revision to checkout prior to building julia. Defaults to origin/master"
-            default = ""
-        "--labels", "-l"
-            help = "Extra labels to apply to the new julia verions."
-            arg_type = AbstractString
-            nargs = '*'
-    end
+    # @add_arg_table parse_settings["install"]["build"] begin
+    #     "url"
+    #         help = "The git url to clone the julialang source from. Defaults to https://github.com/JuliaLang/julia.git"
+    #         default = ""
+    #     "revision"
+    #         help = "The revision to checkout prior to building julia. Defaults to origin/master"
+    #         default = ""
+    #     "--labels", "-l"
+    #         help = "Extra labels to apply to the new julia verions."
+    #         arg_type = AbstractString
+    #         nargs = '*'
+    # end
 
     return parse_args(cmd_args, parse_settings)
 end
