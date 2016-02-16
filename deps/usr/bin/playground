@@ -1,7 +1,4 @@
-pg_dir = Pkg.dir("Playground")
+#!/usr/bin/env julia
 
-include(joinpath(pg_dir, "src/Playground.jl"))
 import Playground
-
-main() = Playground.main(ARGS)
-# Playground.main()
+Playground.main(ARGS)
