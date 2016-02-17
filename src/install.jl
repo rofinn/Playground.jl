@@ -16,6 +16,21 @@ function install{S<:AbstractString}(config::Config, version::VersionNumber; labe
 
     info("Downloading julia $(version.major).$(version.minor) from $download_url ...")
     Playground.download(download_url, tmp_dest, false)
+
+    # Perform some verification on the download
+    if stat(tmp_dest).size < 1024
+        # S3 responds with an error message when a URL doesn't exist
+        unavailable = open(tmp_dest, "r") do f
+            contains(readall(f), "key does not exist")
+        end
+
+        if unavailable
+            error("Julia version $version does not exist")
+        else
+            error("Aborting install. Download appears corrupt")
+        end
+    end
+
     bin_path = Playground.install_julia_bin(tmp_dest, config, base_name, false)
     Playground.link_julia(bin_path, config, labels)
 
