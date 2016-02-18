@@ -1,11 +1,5 @@
 DECLARATIVE_PACKAGES_DIR = Pkg.dir("DeclarativePackages")
-@unix_only begin
-    DEFAULT_PROMPT = "\\e[0;35m\\u@\\h:\\W (playground)> \\e[m"
-end
-@windows_only begin
-    DEFAULT_PROMPT = "playground>"
-end
-
+DEFAULT_PROMPT = @windows ? "playground>" : "\\e[0;35m\\u@\\h:\\W (playground)> \\e[m"
 JULIA_DOWNLOADS_URL = "http://julialang.org/downloads/"
 NIGHTLY = v"0.5"
 DEFAULT_CONFIG = """

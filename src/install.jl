@@ -112,76 +112,70 @@ end
 # end
 
 
-@osx_only begin
-    function install_julia_bin(src::AbstractString, config::Config, base_name, force)
-        src_path = abspath(joinpath(config.dir.src, base_name))
-        bin_path = abspath(joinpath(config.dir.bin, base_name))
-        exe_path = abspath(joinpath(src_path, "Contents/Resources/julia/bin/julia"))
+@osx_only function install_julia_bin(src::AbstractString, config::Config, base_name, force)
+    src_path = abspath(joinpath(config.dir.src, base_name))
+    bin_path = abspath(joinpath(config.dir.bin, base_name))
+    exe_path = abspath(joinpath(src_path, "Contents/Resources/julia/bin/julia"))
 
-        function install_from_dmg(mountdir::AbstractString)
-            app_path = nothing
-            try
-                run(`hdiutil attach -mountpoint $mountdir $src`)
-                for f in readdir(mountdir)
-                   if endswith(f, ".app")
-                        app_path = joinpath(mountdir, f)
-                   end
-                end
-                if app_path != nothing
-                    copy(app_path, src_path)
-                    chmod(exe_path, 00755)
-                end
-            finally
-                run(`hdiutil detach $mountdir`)
-            end
-        end
-
-        dmg_tmp_dir = mktempdir(config.dir.tmp)
+    function install_from_dmg(mountdir::AbstractString)
+        app_path = nothing
         try
-            # Don't bother running this if src_path already exists
-            if !ispath(src_path) || force
-                install_from_dmg(dmg_tmp_dir)
+            run(`hdiutil attach -mountpoint $mountdir $src`)
+            for f in readdir(mountdir)
+               if endswith(f, ".app")
+                    app_path = joinpath(mountdir, f)
+               end
             end
-
-            mklink(exe_path, bin_path)
+            if app_path != nothing
+                copy(app_path, src_path)
+                chmod(exe_path, 00755)
+            end
         finally
-            rm(dmg_tmp_dir)
+            run(`hdiutil detach $mountdir`)
         end
-
-        return bin_path
     end
-end
 
-@linux_only begin
-    function install_julia_bin(src::AbstractString, config::Config, base_name, force)
-        src_path = abspath(joinpath(config.dir.src, base_name))
-        bin_path = abspath(joinpath(config.dir.bin, base_name))
-
+    dmg_tmp_dir = mktempdir(config.dir.tmp)
+    try
+        # Don't bother running this if src_path already exists
         if !ispath(src_path) || force
-            mkpath(src_path)
-            try
-                run(`tar -xzf $src -C $src_path`)
-            catch
-                rm(src_path, recursive=true)
-            end
+            install_from_dmg(dmg_tmp_dir)
         end
 
-        julia_bin_path = joinpath(
-            src_path,
-            readdir(src_path)[1],
-            "bin/julia"
-        )
-        chmod(julia_bin_path, 00755)
-        mklink(julia_bin_path, bin_path)
-
-        return bin_path
+        mklink(exe_path, bin_path)
+    finally
+        rm(dmg_tmp_dir)
     end
+
+    return bin_path
 end
 
-@windows_only begin
-    function install_julia_bin(src::AbstractString, config::Config)
-        # not sure what to do here yet.
-        error("installing Julia EXEs on Windows not implemented yet.")
+@linux_only function install_julia_bin(src::AbstractString, config::Config, base_name, force)
+    src_path = abspath(joinpath(config.dir.src, base_name))
+    bin_path = abspath(joinpath(config.dir.bin, base_name))
+
+    if !ispath(src_path) || force
+        mkpath(src_path)
+        try
+            run(`tar -xzf $src -C $src_path`)
+        catch
+            rm(src_path, recursive=true)
+        end
     end
+
+    julia_bin_path = joinpath(
+        src_path,
+        readdir(src_path)[1],
+        "bin/julia"
+    )
+    chmod(julia_bin_path, 00755)
+    mklink(julia_bin_path, bin_path)
+
+    return bin_path
+end
+
+@windows_only function install_julia_bin(src::AbstractString, config::Config)
+    # not sure what to do here yet.
+    error("installing Julia EXEs on Windows not implemented yet.")
 end
 

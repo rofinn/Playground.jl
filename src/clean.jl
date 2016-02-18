@@ -45,7 +45,7 @@ function Base.rm(config::Config; name::AbstractString="", dir::AbstractString=""
             error("Unknown name $name")
         end
     elseif dir == "" && name == ""
-        error("No juli-version, playground name or directory provided.")
+        error("No julia-version, playground name or directory provided.")
     end
 
     # By this point dir should be valid or the function should have already exited.
