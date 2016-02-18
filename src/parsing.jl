@@ -104,7 +104,7 @@ function argparse(cmd_args=ARGS)
             arg_type = VersionNumber
             required = true
         "--labels", "-l"
-            help = "Extra labels to apply to the new julia verions."
+            help = "Extra labels to apply to the new julia versions."
             arg_type = AbstractString
             nargs = '*'
     end
@@ -114,7 +114,7 @@ function argparse(cmd_args=ARGS)
             help = "The path to a julia executable you'd like to be made available to playgrounds."
             default = ""
         "--labels", "-l"
-            help = "Extra labels to apply to the new julia verions."
+            help = "Extra labels to apply to the new julia versions."
             arg_type = AbstractString
             nargs = '*'
     end
@@ -127,7 +127,7 @@ function argparse(cmd_args=ARGS)
     #         help = "The revision to checkout prior to building julia. Defaults to origin/master"
     #         default = ""
     #     "--labels", "-l"
-    #         help = "Extra labels to apply to the new julia verions."
+    #         help = "Extra labels to apply to the new julia versions."
     #         arg_type = AbstractString
     #         nargs = '*'
     # end
