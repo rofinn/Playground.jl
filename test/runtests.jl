@@ -22,10 +22,10 @@ tests = [
     "lint",
     "utils",
     "list",
-    "parsing",
+    "args",
     "install",
     "create",
-    "activate",
+    # "activate",
     "execute",
     "clean"
 ]

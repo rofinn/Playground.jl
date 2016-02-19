@@ -8,7 +8,7 @@ using ArgParse
 include("constants.jl")
 include("config.jl")
 include("utils.jl")
-include("parsing.jl")
+include("args.jl")
 include("install.jl")
 include("create.jl")
 include("activate.jl")
