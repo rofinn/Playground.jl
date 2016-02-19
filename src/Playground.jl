@@ -20,7 +20,6 @@ include("clean.jl")
 export
     # methods
     main,
-    argparse,
     load_config,
     install,
     dirinstall,
@@ -63,11 +62,9 @@ function main(cmd_args=ARGS, config="", root="")
         elseif install_cmd == "link"
             dirinstall(
                 config,
-                abspath(args["dir"]);
+                args["exec"];
                 labels=args["labels"],
             )
-        # elseif install_cmd == "build"
-        #     error("Building from source isn't supported yet.")
         end
     elseif cmd == "create"
         create(

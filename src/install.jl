@@ -43,6 +43,8 @@ end
     install.
 """ ->
 function dirinstall{S<:AbstractString}(config::Config, executable::AbstractString; labels::Array{S}=[])
+    executable = abspath(executable)
+
     info("Adding julia labels $labels to $executable")
     if ispath(executable)
         init(config)

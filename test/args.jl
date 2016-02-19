@@ -1,111 +1,150 @@
-
-function test_argparse()
-    install_download_args = argparse(["install", "download", "0.3"])
-    @test install_download_args == Dict(
+let args = Playground.argparse(["install", "download", "0.3"])
+    @test args == Dict(
         "%COMMAND%" => "install",
         "install" => Dict(
             "%COMMAND%" => "download",
             "download" => Dict(
-                "labels" => AbstractString[],
                 "version" => v"0.3",
+                "labels" => AbstractString[],
             )
-        )
-    )
-
-    install_link_args = argparse(["install", "link", "/path/to/julia", "--labels", "julia-src"])
-    @test install_link_args == Dict(
-        "%COMMAND%" => "install",
-        "install" => Dict(
-            "%COMMAND%" => "link",
-            "link" => Dict(
-                "labels" => AbstractString["julia-src"],
-                "dir" => "/path/to/julia"
-            )
-        )
-    )
-
-    create_args1 = argparse(["create"])
-    @test create_args1 == Dict(
-        "%COMMAND%" => "create",
-        "create" => Dict(
-            "dir" => "",
-            "requirements" => "",
-            "name" => "",
-            "julia-version" => "",
-            "req-type" => :REQUIRE,
-        )
-    )
-
-    create_args2 = argparse(
-        [
-            "create", "/path/to/playground",
-            "--name", "myplayground",
-            "--julia-version", "julia-0.3",
-            "--requirements", "/path/to/requirements",
-            "--req-type", "DECLARE"
-        ]
-    )
-    @test create_args2 == Dict(
-        "%COMMAND%" => "create",
-        "create" => Dict(
-            "dir" => "/path/to/playground",
-            "requirements" => "/path/to/requirements",
-            "name" => "myplayground",
-            "julia-version" => "julia-0.3",
-            "req-type" => :DECLARE,
-        )
-    )
-
-    activate_args1 = argparse(["activate"])
-    @test activate_args1 == Dict(
-        "%COMMAND%" => "activate",
-        "activate" => Dict(
-            "dir" => "",
-            "name" => ""
-        )
-    )
-
-    activate_args2 = argparse(["activate", "--name", "myplayground"])
-    @test activate_args2 == Dict(
-        "%COMMAND%" => "activate",
-        "activate" => Dict(
-            "dir" => "",
-            "name" => "myplayground"
-        )
-    )
-
-    exec_args = argparse(["exec", "ls -al", "--name", "myplayground"])
-    @test exec_args == Dict(
-        "%COMMAND%" => "exec",
-        "exec" => Dict(
-            "cmd" => "ls -al",
-            "dir" => "",
-            "name" => "myplayground"
-        )
-    )
-
-    list_args = argparse(["list", "--show-links"])
-    @test list_args == Dict(
-        "%COMMAND%" => "list",
-        "list" => Dict(
-            "show-links" => true
-        )
-    )
-
-    clean_args = argparse(["clean"])
-    @test clean_args == Dict(
-        "%COMMAND%" => "clean",
-        "clean" => Dict()
-    )
-
-    rm_args = argparse(["rm", "myplayground"])
-    @test rm_args == Dict(
-        "%COMMAND%" => "rm",
-        "rm" => Dict(
-            "dir" => "",
-            "name" => "myplayground"
         )
     )
 end
 
-test_argparse()
+let args = Playground.argparse(["install", "link", "/path/to/julia", "--labels", "julia-src"])
+    @test args == Dict(
+        "%COMMAND%" => "install",
+        "install" => Dict(
+            "%COMMAND%" => "link",
+            "link" => Dict(
+                "exec" => "/path/to/julia",
+                "labels" => AbstractString["julia-src"],
+            )
+        )
+    )
+end
+
+let args = Playground.argparse(["create"])
+    @test args == Dict(
+        "%COMMAND%" => "create",
+        "create" => Dict{AbstractString,Any}(
+            "name" => "",
+            "dir" => "",
+            "julia-version" => "",
+            "requirements" => "",
+            "req-type" => :REQUIRE,
+        )
+    )
+end
+
+let args = Playground.argparse(["create", "./myplayground"])
+    @test args == Dict(
+        "%COMMAND%" => "create",
+        "create" => Dict(
+            "name" => "",
+            "dir" => "./myplayground",
+            "julia-version" => "",
+            "requirements" => "",
+            "req-type" => :REQUIRE,
+        )
+    )
+end
+
+let args = Playground.argparse(["create", "myplayground"])
+    @test args == Dict(
+        "%COMMAND%" => "create",
+        "create" => Dict(
+            "name" => "myplayground",
+            "dir" => "",
+            "julia-version" => "",
+            "requirements" => "",
+            "req-type" => :REQUIRE,
+        )
+    )
+end
+
+let args = Playground.argparse([
+        "create", "myplayground", "/path/to/playground",
+        "--julia-version", "julia-0.3",
+        "--requirements", "/path/to/requirements",
+        "--req-type", "DECLARE",
+    ])
+
+    @test args == Dict(
+        "%COMMAND%" => "create",
+        "create" => Dict(
+            "name" => "myplayground",
+            "dir" => "/path/to/playground",
+            "julia-version" => "julia-0.3",
+            "requirements" => "/path/to/requirements",
+            "req-type" => :DECLARE,
+        )
+    )
+end
+
+let args = Playground.argparse(["activate"])
+    @test args == Dict(
+        "%COMMAND%" => "activate",
+        "activate" => Dict(
+            "dir" => "",
+            "name" => "",
+        )
+    )
+end
+
+let args = Playground.argparse(["activate", "./myplayground"])
+    @test args == Dict(
+        "%COMMAND%" => "activate",
+        "activate" => Dict(
+            "dir" => "./myplayground",
+            "name" => "",
+        )
+    )
+end
+
+let args = Playground.argparse(["activate", "myplayground"])
+    @test args == Dict(
+        "%COMMAND%" => "activate",
+        "activate" => Dict(
+            "dir" => "",
+            "name" => "myplayground",
+        )
+    )
+end
+
+let args = Playground.argparse(["exec", "myplayground", "ls -la"])
+    @test args == Dict(
+        "%COMMAND%" => "exec",
+        "exec" => Dict(
+            "name" => "myplayground",
+            "dir" => "",
+            "cmd" => "ls -la",
+        )
+    )
+end
+
+let args = Playground.argparse(["list", "--show-links"])
+    @test args == Dict(
+        "%COMMAND%" => "list",
+        "list" => Dict(
+            "show-links" => true,
+        )
+    )
+end
+
+let args = Playground.argparse(["clean"])
+    @test args == Dict(
+        "%COMMAND%" => "clean",
+        "clean" => Dict(),
+    )
+end
+
+let args = Playground.argparse(["rm", "myplayground"])
+    @test args == Dict(
+        "%COMMAND%" => "rm",
+        "rm" => Dict(
+            "name" => "myplayground",
+            "dir" => "",
+        )
+    )
+end
