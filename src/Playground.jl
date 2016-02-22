@@ -6,7 +6,8 @@ using Compat
 using ArgParse
 
 include("constants.jl")
-include("config.jl")
+include("core.jl")
+include("playgroundconfig.jl")
 include("utils.jl")
 include("args.jl")
 include("install.jl")
