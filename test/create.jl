@@ -99,7 +99,6 @@ let name = "require", root_dir = joinpath(TMP_DIR, "playground")
 
     version_str = "v0.4"
     @test isfile(joinpath(playground.pkg_dir, version_str, "REQUIRE"))
-    @test isdir(joinpath(playground.pkg_dir, version_str, "Lint"))
     @test isdir(joinpath(playground.pkg_dir, version_str, "DeclarativePackages"))
     @test isdir(joinpath(playground.pkg_dir, version_str, "Mocking"))
 

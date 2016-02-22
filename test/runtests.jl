@@ -24,7 +24,6 @@ Playground.set_core(Playground.init!(Playground.PlaygroundCore(core_dir)))
 
 # Order matters.
 tests = [
-    "lint",
     "utils",
     "list",
     "args",
