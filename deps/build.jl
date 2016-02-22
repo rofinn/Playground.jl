@@ -78,7 +78,7 @@ if install
 
     info(
         "Adding $(joinpath(install_dir, "bin")) to your PATH " *
-        "variable will make `playground` and any julia versions installed via" *
+        "variable will make `playground` and any julia versions installed via " *
         "Playground.jl available on your search path."
     )
 else
