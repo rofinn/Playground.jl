@@ -22,6 +22,10 @@ let exec, vi
     @test !ispath(link)
     Playground.julia_aliases(exec, vi)
     @test islink(link)
+
+    # Ensure that downloading the same version twice works
+    exec, vi = Playground.install(v"0.4.0")
+    @test islink(exec)
 end
 
 let exec, vi

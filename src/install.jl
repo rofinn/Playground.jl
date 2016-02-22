@@ -38,10 +38,12 @@ function install(version::VersionNumber)
     # installation to its final directory which should be unique
     vi = VersionInfo(`$julia_exec`)
     installed_dir = joinpath(CORE.src_dir, string(vi))
-    mv(tmp_install_dir, installed_dir)
-    julia_exec = replace(julia_exec, tmp_install_dir, installed_dir)
+    if !isdir(installed_dir)
+        mv(tmp_install_dir, installed_dir)
+        julia_exec = replace(julia_exec, tmp_install_dir, installed_dir)
 
-    info("Installed Julia version $(vi.version) revision $(vi.revision) built at $(vi.built)")
+        info("Installed Julia version $(vi.version) revision $(vi.revision) built at $(vi.built)")
+    end
 
     # Generate a link to make this Julia revision globally accessible
     primary_alias = joinpath(CORE.bin_dir, "julia-$(string(vi))")
