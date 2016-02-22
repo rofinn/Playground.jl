@@ -31,10 +31,20 @@ function install{S<:AbstractString}(config::Config, version::VersionNumber; labe
         end
     end
 
-    bin_path = Playground.install_julia_bin(tmp_dest, config, base_name, false)
-    Playground.link_julia(bin_path, config, labels)
+    # Install pre-compiled Julia
+    julia_exec = install_julia(tmp_dest, joinpath(config.dir.src, base_name))
 
-    mklink(bin_path, joinpath(config.dir.bin, "julia-$(version.major).$(version.minor)"))
+    # Make sure that the permissions for the julia executable is set correctly
+    chmod(julia_exec, 0o755)
+
+    # Generate a link to make this Julia revision globally accessible
+    primary_alias = joinpath(config.dir.bin, base_name)
+    println("Linking $julia_exec -> $primary_alias")
+    mklink(julia_exec, primary_alias)
+
+    Playground.link_julia(primary_alias, config, labels)
+
+    mklink(primary_alias, joinpath(config.dir.bin, "julia-$(version.major).$(version.minor)"))
 end
 
 
@@ -128,71 +138,38 @@ end
 #     println("Julia has been built and installed.")
 # end
 
-
-@osx_only function install_julia_bin(src::AbstractString, config::Config, base_name, force)
-    src_path = abspath(joinpath(config.dir.src, base_name))
-    bin_path = abspath(joinpath(config.dir.bin, base_name))
-    exe_path = abspath(joinpath(src_path, "Contents/Resources/julia/bin/julia"))
-
-    function install_from_dmg(mountdir::AbstractString)
-        app_path = nothing
-        try
-            run(`hdiutil attach -mountpoint $mountdir $src`)
-            for f in readdir(mountdir)
-               if endswith(f, ".app")
-                    app_path = joinpath(mountdir, f)
-               end
-            end
-            if app_path != nothing
-                copy(app_path, src_path)
-                chmod(exe_path, 00755)
-            end
-        finally
-            run(`hdiutil detach $mountdir`)
-        end
-    end
-
-    dmg_tmp_dir = mktempdir(config.dir.tmp)
+@osx_only function install_julia(installer::AbstractString, dest::AbstractString)
+    mount_dir = mktempdir()
     try
-        # Don't bother running this if src_path already exists
-        if !ispath(src_path) || force
-            install_from_dmg(dmg_tmp_dir)
-        end
+        # Installer is a disk image
+        run(`hdiutil attach -mountpoint $mount_dir $installer`)
 
-        mklink(exe_path, bin_path)
+        app_name = first(filter(f -> endswith(f, ".app"), readdir(mount_dir)))
+        app_path = joinpath(mount_dir, app_name)
+
+        copy(app_path, dest)
+        julia_exec = joinpath(dest, "Contents", "Resources", "julia", "bin", "julia")
+
+        return julia_exec
     finally
-        rm(dmg_tmp_dir)
+        run(`hdiutil detach $mount_dir`)
+        rm(mount_dir)
     end
-
-    return bin_path
 end
 
-@linux_only function install_julia_bin(src::AbstractString, config::Config, base_name, force)
-    src_path = abspath(joinpath(config.dir.src, base_name))
-    bin_path = abspath(joinpath(config.dir.bin, base_name))
-
-    if !ispath(src_path) || force
-        mkpath(src_path)
-        try
-            run(`tar -xzf $src -C $src_path`)
-        catch
-            rm(src_path, recursive=true)
-        end
+@linux_only function install_julia(installer::AbstractString, dest::AbstractString)
+    mkpath(dest)
+    try
+        run(`tar -xzf $installer -C $dest`)
+    catch
+        rm(dest, recursive=true)
     end
 
-    julia_bin_path = joinpath(
-        src_path,
-        readdir(src_path)[1],
-        "bin/julia"
-    )
-    chmod(julia_bin_path, 00755)
-    mklink(julia_bin_path, bin_path)
-
-    return bin_path
+    julia_exec = joinpath(dest, first(readdir(dest)), "bin", "julia")
+    return julia_exec
 end
 
-@windows_only function install_julia_bin(src::AbstractString, config::Config)
+@windows_only function install_julia(installer::AbstractString, dest::AbstractString)
     # not sure what to do here yet.
     error("installing Julia EXEs on Windows not implemented yet.")
 end
-
