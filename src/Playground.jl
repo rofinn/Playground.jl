@@ -45,9 +45,13 @@ function main{S<:AbstractString}(cmd_args::Array{S}=ARGS, root::AbstractString="
 
     if !isempty(root)
         core = PlaygroundCore(root)
-        init!(core)
         set_core(core)
+    else
+        core = Playground.CORE
     end
+
+    # Always try and create the core since this could be the first time the core is used.
+    init!(core)
 
     if cmd == "install"
         install_cmd = args["%COMMAND%"]
