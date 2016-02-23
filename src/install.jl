@@ -6,21 +6,15 @@
     binary version for your platform, or downloads and builds
     it from source if `src` is true.
 """ ->
-function install{S<:AbstractString}(config::Config, version::VersionNumber; labels::Array{S}=[])
-    init(config)
-
-    # download the julia version
-    download_url = julia_url(version)
-    base_name = "julia-$(version.major).$(version.minor)_$(Dates.today())"
-    tmp_dest = joinpath(config.dir.tmp, base_name)
-
-    info("Downloading julia $(version.major).$(version.minor) from $download_url ...")
-    Playground.download(download_url, tmp_dest, false)
+function install(version::VersionNumber)
+    url = julia_url(version)
+    info("Downloading Julia $(version.major).$(version.minor) from $url ...")
+    installer = download(url)
 
     # Perform some verification on the download
-    if stat(tmp_dest).size < 1024
+    if stat(installer).size < 1024
         # S3 responds with an error message when a URL doesn't exist
-        unavailable = open(tmp_dest, "r") do f
+        unavailable = open(installer, "r") do f
             contains(readall(f), "key does not exist")
         end
 
@@ -31,37 +25,80 @@ function install{S<:AbstractString}(config::Config, version::VersionNumber; labe
         end
     end
 
-    bin_path = Playground.install_julia_bin(tmp_dest, config, base_name, false)
-    Playground.link_julia(bin_path, config, labels)
+    # Install Julia to a temporary directory as the final install directory name includes
+    # information which we need to run Julia to determine
+    tmp_install_dir = joinpath(CORE.tmp_dir, "julia-$(version)_$(Dates.today())")
+    julia_exec = install_julia(installer, tmp_install_dir)
+    rm(installer)
 
-    mklink(bin_path, joinpath(config.dir.bin, "julia-$(version.major).$(version.minor)"))
+    # Make sure that the permissions for the julia executable is set correctly
+    chmod(julia_exec, 0o755)
+
+    # Retrieve the correct version information from the Julia executable and move the
+    # installation to its final directory which should be unique
+    vi = VersionInfo(`$julia_exec`)
+    installed_dir = joinpath(CORE.src_dir, string(vi))
+    if !isdir(installed_dir)
+        mv(tmp_install_dir, installed_dir)
+        julia_exec = replace(julia_exec, tmp_install_dir, installed_dir)
+
+        info("Installed Julia version $(vi.version) revision $(vi.revision) built at $(vi.built)")
+    end
+
+    # Generate a link to make this Julia revision globally accessible
+    primary_alias = joinpath(CORE.bin_dir, "julia-$(string(vi))")
+    println("Linking $julia_exec -> $primary_alias")
+    mklink(julia_exec, primary_alias)
+
+    return primary_alias, vi
 end
-
 
 @doc doc"""
     This option simply creates symlinks from an existing julia
     install.
 """ ->
-function dirinstall{S<:AbstractString}(config::Config, executable::AbstractString; labels::Array{S}=[])
-    info("Adding julia labels $labels to $executable")
+function link_install(executable::AbstractString)
+    # info("Adding julia labels $labels to $executable")
     if ispath(executable)
-        init(config)
+        julia_exec = abspath(realpath(executable))
 
-        exe = abspath(executable)
-        while islink(exe)
-            exe = joinpath(dirname(exe), readlink(exe))
-        end
+        if isexecutable(julia_exec)
+            vi = VersionInfo(`$julia_exec`)
 
-        exe = abspath(exe)
-        if isexecutable(exe)
-            Playground.link_julia(exe, config, labels)
+            primary_alias = joinpath(CORE.bin_dir, "julia-$(string(vi))")
+            println("Linking $julia_exec -> $primary_alias")
+            mklink(julia_exec, primary_alias)
         else
-            error("$exe is not executable.")
+            error("$julia_exec is not executable.")
         end
     else
         error("$executable is not a valid path")
     end
+
+    return primary_alias, vi
 end
+
+function julia_aliases{S<:AbstractString}(executable::AbstractString, labels::Array{S})
+    for label in labels
+        mklink(executable, joinpath(CORE.bin_dir, label))
+    end
+end
+
+function julia_aliases(executable::AbstractString, vi::VersionInfo)
+    # Generate additional aliases. Note we are overwritting existing links regardless of
+    # whether this latest revision for this version
+    v, r = vi.version, vi.revision
+    labels = [
+        "julia-$(v.major).$(v.minor).$(v.patch)",
+        "julia-$(v.major).$(v.minor)",
+        "julia-$r",
+    ]
+    julia_aliases(executable, labels)
+end
+
+julia_aliases(exec::AbstractString) = create_aliases(exec, VersionInfo(`$exec`))
+
+
 
 
 # @doc doc"""
@@ -70,7 +107,7 @@ end
 #         2. checks out the supplied revision into the local branch_name.
 #         3. attempts to build julia from scratch.
 # """ ->
-# function gitinstall(config::Config; url::ASCIIString="", dir::AbstractString="", revision="", labels=[])
+# function gitinstall(config::PlaygroundCore; url::ASCIIString="", dir::AbstractString="", revision="", labels=[])
 
 #     error("Installing from a git repo isn't implemented yet.")
 
@@ -84,25 +121,6 @@ end
 #     build_julia(julia, , log_path)
 #     cd(cwd)
 # end
-
-
-function link_julia{S<:AbstractString}(bin_path::AbstractString, config::Config, labels::Array{S}=[])
-    for label in labels
-        mklink(bin_path, joinpath(config.dir.bin, label))
-    end
-
-    @unix_only begin
-        ret = readall(`$(bin_path) -e versioninfo()`)
-        lines = split(ret, "\n")
-
-        versionstr = split(lines[1], " ")[3]
-        mklink(bin_path, joinpath(config.dir.bin, "julia-$(versionstr)"))
-
-        commit_sha = strip(split(lines[2], " ")[2], '*')
-        mklink(bin_path, joinpath(config.dir.bin, "julia-$(commit_sha)"))
-    end
-end
-
 
 # function build_julia(target, root_path, log_path)
 #     info("Building julia ( $(target) )...")
@@ -126,71 +144,38 @@ end
 #     println("Julia has been built and installed.")
 # end
 
-
-@osx_only function install_julia_bin(src::AbstractString, config::Config, base_name, force)
-    src_path = abspath(joinpath(config.dir.src, base_name))
-    bin_path = abspath(joinpath(config.dir.bin, base_name))
-    exe_path = abspath(joinpath(src_path, "Contents/Resources/julia/bin/julia"))
-
-    function install_from_dmg(mountdir::AbstractString)
-        app_path = nothing
-        try
-            run(`hdiutil attach -mountpoint $mountdir $src`)
-            for f in readdir(mountdir)
-               if endswith(f, ".app")
-                    app_path = joinpath(mountdir, f)
-               end
-            end
-            if app_path != nothing
-                copy(app_path, src_path)
-                chmod(exe_path, 00755)
-            end
-        finally
-            run(`hdiutil detach $mountdir`)
-        end
-    end
-
-    dmg_tmp_dir = mktempdir(config.dir.tmp)
+@osx_only function install_julia(installer::AbstractString, dest::AbstractString)
+    mount_dir = mktempdir()
     try
-        # Don't bother running this if src_path already exists
-        if !ispath(src_path) || force
-            install_from_dmg(dmg_tmp_dir)
-        end
+        # Installer is a disk image
+        run(`hdiutil attach -mountpoint $mount_dir $installer`)
 
-        mklink(exe_path, bin_path)
+        app_name = first(filter(f -> endswith(f, ".app"), readdir(mount_dir)))
+        app_path = joinpath(mount_dir, app_name)
+
+        copy(app_path, dest)
+        julia_exec = joinpath(dest, "Contents", "Resources", "julia", "bin", "julia")
+
+        return julia_exec
     finally
-        rm(dmg_tmp_dir)
+        run(`hdiutil detach $mount_dir`)
+        rm(mount_dir)
     end
-
-    return bin_path
 end
 
-@linux_only function install_julia_bin(src::AbstractString, config::Config, base_name, force)
-    src_path = abspath(joinpath(config.dir.src, base_name))
-    bin_path = abspath(joinpath(config.dir.bin, base_name))
-
-    if !ispath(src_path) || force
-        mkpath(src_path)
-        try
-            run(`tar -xzf $src -C $src_path`)
-        catch
-            rm(src_path, recursive=true)
-        end
+@linux_only function install_julia(installer::AbstractString, dest::AbstractString)
+    mkpath(dest)
+    try
+        run(`tar -xzf $installer -C $dest`)
+    catch
+        rm(dest, recursive=true)
     end
 
-    julia_bin_path = joinpath(
-        src_path,
-        readdir(src_path)[1],
-        "bin/julia"
-    )
-    chmod(julia_bin_path, 00755)
-    mklink(julia_bin_path, bin_path)
-
-    return bin_path
+    julia_exec = joinpath(dest, first(readdir(dest)), "bin", "julia")
+    return julia_exec
 end
 
-@windows_only function install_julia_bin(src::AbstractString, config::Config)
+@windows_only function install_julia(installer::AbstractString, dest::AbstractString)
     # not sure what to do here yet.
     error("installing Julia EXEs on Windows not implemented yet.")
 end
-

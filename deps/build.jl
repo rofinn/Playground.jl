@@ -46,7 +46,7 @@ Playground.copy(joinpath(deps_dir, "..", "README.md"), joinpath(build_dir, "READ
 install = haskey(ENV, "PLAYGROUND_INSTALL")
 
 # Store our install paths
-install_dir = Playground.config_path()
+install_dir = Playground.CORE.root_dir
 config_installed = joinpath(install_dir, "config.yml")
 playground_installed = joinpath(install_dir, "bin", "playground")
 playground_compiled = joinpath(build_dir, "playground")
@@ -78,7 +78,7 @@ if install
 
     info(
         "Adding $(joinpath(install_dir, "bin")) to your PATH " *
-        "variable will make `playground` and any julia versions installed via" *
+        "variable will make `playground` and any julia versions installed via " *
         "Playground.jl available on your search path."
     )
 else

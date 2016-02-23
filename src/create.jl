@@ -1,94 +1,142 @@
-function create(config::Config; dir::AbstractString="", name::AbstractString="",
+function create_playground(; root::AbstractString="", name::AbstractString="",
     julia::AbstractString="", reqs_file::AbstractString="", reqs_type::Symbol=:REQUIRE)
 
-    init(config)
+    pg = PlaygroundConfig(root, name)
 
-    pg = PlaygroundConfig(config, dir, name)
-    create_paths(pg)
+    # Only create a new playground if the destination is non-existent or empty
+    if !ispath(pg.root) || isdir(pg.root) && length(readdir(pg.root)) == 0
+        if isnull(pg.name)
+            info("Creating playground $(pg.root)")
+        else
+            info("Creating playground named $(get(pg.name)) in $(pg.root)")
+        end
 
-    info("Playground folders created")
+        mkpath(pg.root)
 
-    if julia != ""
-        mklink(joinpath(config.dir.bin, julia), pg.julia_path)
+        # Make the playground globally accessible by it's name
+        if !isnull(pg.name)
+            global_root = joinpath(CORE.share_dir, get(pg.name))
+            !isdir(global_root) && symlink(abspath(pg.root), global_root)
+        end
     else
-        sys_julia_path = abspath(readchomp(`which julia`))
-        mklink(sys_julia_path, pg.julia_path)
+        error("Playground directory already in use")
     end
 
-    if dir != "" && name != ""
-        mklink(pg.root_path, abspath(joinpath(config.dir.store, name)))
+    # Set the playground Julia executable
+    if isempty(julia)
+        julia_path = readchomp(`which julia`)
+    elseif ispath(julia)
+        julia_path = julia
+    else
+        julia_path = joinpath(CORE.bin_dir, julia)
+        ispath(julia_path) || throw(ArgumentError("Cannot locate Julia executable: $julia"))
     end
 
-    ENV["JULIA_PKGDIR"] = pg.pkg_path
+    mkpath(dirname(pg.julia_path))
+    mklink(abspath(julia_path), pg.julia_path)
 
-    if reqs_file != "" && ispath(reqs_file)
-        if basename(reqs_file) == "DECLARE" || reqs_type == :DECLARE
-            if ispath(DECLARATIVE_PACKAGES_DIR)
-                ENV["DECLARE"] = reqs_file
-                ENV["JULIA_PKGDIR"] = joinpath(pg.pkg_path, ".declare_packages")
-                mkpath(ENV["JULIA_PKGDIR"])
-                copy(reqs_file, joinpath(ENV["JULIA_PKGDIR"], "DECLARE"))
-
-                old_folders = readdir(pg.pkg_path)
-                info("Installing packages from DECLARE file $reqs_file...")
-                passed = false
-                try
-                    run(`$(pg.julia_path) $(DECLARATIVE_PACKAGES_DIR)/src/installpackages.jl`)
-                    passed = true
-                catch
-                    passed = false
-                    warn("Failed to install from DECLARE file. Perhaps there is something wrong with your DECLARE file or you need to update DeclarativePackages.jl")
-                end
-
-                if passed
-                    # Despite a declarative packages JULIA_PKGDIR being provided
-                    # DeclarativePackages will just create a temporary folder
-                    # in the parent directory. So we compare the pg.pkg_path before
-                    # and after running installpackages.jl. Once, we find the generated folder
-                    # that isn't just symlinks we copy the version folder over.
-                    new_folders = readdir(pg.pkg_path)
-                    to_delete = []
-                    for f in new_folders
-                        if !(f in old_folders)
-                            declared_folder = joinpath(pg.pkg_path, f)
-                            push!(to_delete, declared_folder)
-                            if !islink(declared_folder) && isdir(declared_folder)
-                                for v in readdir(declared_folder)
-                                    vfolder = joinpath(declared_folder, v)
-                                    copy(vfolder, joinpath(pg.pkg_path, v))
-                                end
-                            end
-                        end
-                    end
-                    for d in to_delete
-                        try
-                            rm(d, recursive=true)
-                        catch
-                            @unix_only begin
-                                run(`chmod -R 755 $d`)
-                                run(`rm -rf $d`)
-                            end
-                        end
-                    end
-                end
-            else
-                warn("DeclarativePackages isn't installed")
-            end
-        elseif basename(reqs_file) == "REQUIRE" || reqs_type == :REQUIRE
+    # Install packages listed in the requirements file
+    if !isempty(reqs_file)
+        if reqs_type == :DECLARE || basename(reqs_file) == "DECLARE"
+            info("Installing packages from DECLARE file $reqs_file...")
+            install_declared_packages(pg, reqs_file)
+        elseif reqs_type == :REQUIRE || basename(reqs_file) == "REQUIRE"
             info("Installing packages from REQUIRE file $reqs_file...")
-            run(`$(pg.julia_path) -e Pkg.init()`)
-            for v in readdir(pg.pkg_path)
-                copy(reqs_file, joinpath(pg.pkg_path, v, "REQUIRE"))
-                try
-                    run(`$(pg.julia_path) -e Pkg.resolve()`)
-                catch
-                    warn("Failed to resolve requirements. Perhaps there is something wrong with your REQUIRE file.")
-                end
-            end
+            install_required_packages(pg, reqs_file)
         else
             error("Unknown requirements file type $reqs_type for file $reqs_file")
         end
     else
+        mkpath(pg.pkg_dir)
+    end
+
+    return pg
+end
+
+function install_required_packages(pg::PlaygroundConfig, file_path::AbstractString)
+    withenv("JULIA_PKGDIR" => pg.pkg_dir) do
         run(`$(pg.julia_path) -e Pkg.init()`)
+        for version in readdir(pg.pkg_dir)
+            copy(file_path, joinpath(pg.pkg_dir, version, "REQUIRE"))
+            try
+                run(`$(pg.julia_path) -e Pkg.resolve()`)
+            catch
+                warn("Failed to resolve requirements. Perhaps there is something wrong with your REQUIRE file.")
+                rethrow()
+            end
+        end
+    end
+end
+
+function install_declared_packages(pg::PlaygroundConfig, file_path::AbstractString)
+    declarative_packages_dir = Pkg.dir("DeclarativePackages")
+    !isdir(declarative_packages_dir) && error("DeclarativePackages not installed")
+    install_packages_script = joinpath(declarative_packages_dir, "src", "installpackages.jl")
+
+    function added{T}(o::Array{T}, n::Array{T})
+        changes = T[]
+        for el in n
+            if !(el in o)
+                push!(changes, el)
+            end
+        end
+        return changes
+    end
+
+    # Use a temporary file for interacting with DeclarativePackages.jl since the package
+    # will modify our DECLARE file.
+    tmp_declare = tempname()
+    copy(file_path, tmp_declare)
+
+    # Note: ".declare"
+    withenv("JULIA_PKGDIR" => joinpath(pg.pkg_dir, ".declare"), "DECLARE" => tmp_declare) do
+        parent_dir = normpath(joinpath(ENV["JULIA_PKGDIR"], ".."))
+        mkpath(parent_dir)
+        old_listing = readdir(parent_dir)
+
+        local created
+        try
+            # Make sure to run DeclarativePackages.jl from the current version of Julia as
+            # that the current version of Julia will be compatible with this package.
+            try
+                include(install_packages_script)
+            finally
+                # DeclarativePackages always creates a temporary directory in the parent of
+                # JULIA_PKGDIR. To determine what was installed we'll compare directory
+                # listings before and after running "installpackages.jl"
+                created = map(
+                    f -> joinpath(pg.pkg_dir, f),
+                    added(old_listing, readdir(parent_dir)),
+                )
+
+                # TODO: DeclarativePackages.jl removes the write permission for some reason...
+                @unix_only for f in created
+                    run(`chmod -R u+w $f`)
+                end
+            end
+        catch
+            warn("Failed to install from DECLARE file. Perhaps there is something wrong with your DECLARE file or you need to update DeclarativePackages.jl")
+            for f in created
+                rm(f, recursive=true)
+            end
+            rethrow()
+        end
+
+        # Move the declared packages version folders to the pkg_dir
+        for declared_folder in created
+            if isdir(declared_folder) && !islink(declared_folder)
+                for version in readdir(declared_folder)
+                    mv(joinpath(declared_folder, version), joinpath(pg.pkg_dir, version))
+
+                    # Keep a permanent record of the original DECLARE file.
+                    copy(file_path, joinpath(pg.pkg_dir, version, "DECLARE"))
+                end
+            end
+        end
+
+        # Clean up the temporary directories created by DeclarativePackages.jl
+        for f in created
+            rm(f, recursive=true)
+        end
     end
 end

@@ -1,50 +1,55 @@
 using Base.Test
-using Lint
-using Mocking
+# using Mocking
 
-include("../src/Playground.jl")
 using Playground
 
-TEST_DIR = pwd()
+TMP_DIR = joinpath(pwd(), "tmp")
+isdir(TMP_DIR) && rm(TMP_DIR, recursive=true)  # Cleanup previous test runs
+mkpath(TMP_DIR)
 
-#TEST_TMP_DIR = mktempdir("../test/")
-TEST_TMP_DIR = "$TEST_DIR/tmp/"
-TEST_PLAYGROUND_DIR = joinpath(TEST_TMP_DIR, "playground")
-TEST_CONFIG = load_config(DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
+# Setup a temporary core for testing
+core_dir = joinpath(TMP_DIR, "core")
+Playground.set_core(Playground.init!(Playground.PlaygroundCore(core_dir)))
 
-mkpath(TEST_TMP_DIR)
-mkpath(TEST_PLAYGROUND_DIR)
+# Verify the new core was succesfully created
+@test Playground.CORE.root_dir == core_dir
+@test isdir(Playground.CORE.root_dir)
+@test isdir(Playground.CORE.tmp_dir)
+@test isdir(Playground.CORE.src_dir)
+@test isdir(Playground.CORE.bin_dir)
+@test isdir(Playground.CORE.share_dir)
+@test isfile(joinpath(Playground.CORE.root_dir, "config.yml"))
 
-Playground.init(TEST_CONFIG)
+
 
 # Order matters.
 tests = [
-    "lint",
     "utils",
     "list",
-    "parsing",
+    "args",
     "install",
     "create",
     "activate",
     "execute",
-    "clean"
+    "clean",
 ]
 
 
 println("Running tests:")
 
 
-for t in tests
-    tfile = string(t, ".jl")
-    println(" * $(tfile) ...")
-    include(joinpath(TEST_DIR, tfile))
+for name in tests
+    test_file = "$(name).jl"
+    println(" * $test_file ...")
+    include(test_file)
 end
 
 
-main(["install", "download", "0.4", "--labels", "julia-0.3"], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
-main(["install", "link", joinpath(TEST_CONFIG.dir.bin, "julia-0.3"), "--labels", "julia-stable-dir"], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
-main(["create"], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
-main(["exec", "ls -al", joinpath(TEST_DIR, ".playground")], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
-main(["list"], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
-main(["clean"], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
-main(["rm", "--dir", joinpath(TEST_DIR, ".playground")], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
+playground_dir = joinpath(TMP_DIR, ".playground")
+Playground.main(["install", "download", "0.4+", "--labels", "julia-0.3"])
+Playground.main(["install", "link", joinpath(Playground.CORE.bin_dir, "julia-0.3"), "--labels", "julia-stable-dir"])
+Playground.main(["create", playground_dir])
+Playground.main(["exec", playground_dir, "ls -al"])
+Playground.main(["list"])
+Playground.main(["clean"])
+Playground.main(["rm", playground_dir])

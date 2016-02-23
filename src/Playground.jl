@@ -6,9 +6,11 @@ using Compat
 using ArgParse
 
 include("constants.jl")
-include("config.jl")
+include("core.jl")
+include("playgroundconfig.jl")
+include("versioninfo.jl")
 include("utils.jl")
-include("parsing.jl")
+include("args.jl")
 include("install.jl")
 include("create.jl")
 include("activate.jl")
@@ -18,92 +20,71 @@ include("clean.jl")
 
 
 export
-    # methods
-    main,
-    argparse,
-    load_config,
-    install,
-    dirinstall,
-    #gitinstall,
-    create,
-    activate,
-    execute,
-    list,
-    clean,
-    config_path,
+    # # methods
+    # main,
+    # load_config,
+    # install,
+    # dirinstall,
+    # gitinstall,
+    # create,
+    # activate,
+    # execute,
+    # list,
+    # clean,
+    # config_path,
 
     # Constants
     DEFAULT_CONFIG
 
 
-
-function main(cmd_args=ARGS, config="", root="")
-    if config == "" && root == ""
-        config = joinpath(config_path(), "config.yml")
-        root = config_path()
-    end
-
+function main{S<:AbstractString}(cmd_args::Array{S}=ARGS, root::AbstractString="")
     args = argparse(cmd_args)
 
     cmd = args["%COMMAND%"]
     args = args[cmd]
 
-    config = load_config(config, root)
+    if !isempty(root)
+        core = PlaygroundCore(root)
+        set_core(core)
+    else
+        core = Playground.CORE
+    end
+
+    # Always try and create the core since this could be the first time the core is used.
+    init!(core)
 
     if cmd == "install"
         install_cmd = args["%COMMAND%"]
         args = args[install_cmd]
 
         if install_cmd == "download"
-            install(
-                config,
-                args["version"];
-                labels=args["labels"],
-            )
+            julia, version_info = install(args["version"])
+            julia_aliases(julia, args["labels"])
         elseif install_cmd == "link"
-            dirinstall(
-                config,
-                abspath(args["dir"]);
-                labels=args["labels"],
-            )
-        # elseif install_cmd == "build"
-        #     error("Building from source isn't supported yet.")
+            julia, version_info = link_install(args["exec"])
+            julia_aliases(julia, args["labels"])
         end
     elseif cmd == "create"
-        create(
-            config;
-            dir=args["dir"],
+        create_playground(
             name=args["name"],
+            root=args["dir"],
             julia=args["julia-version"],
             reqs_file=args["requirements"],
             reqs_type=args["req-type"],
         )
     elseif cmd == "activate"
-        activate(
-            config;
-            dir=args["dir"],
-            name=args["name"],
-        )
+        playground = load_playground(args["dir"], args["name"])
+        activate(playground)
     elseif cmd == "exec"
-        execute(
-            config,
-            `$(Base.shell_split(args["cmd"]))`;
-            dir=args["dir"],
-            name=args["name"],
-        )
+        playground = load_playground(args["dir"], args["name"])
+        run(playground, `$(Base.shell_split(args["cmd"]))`)
     elseif cmd == "list"
-        list(
-            config;
-            show_links=args["show-links"],
-        )
+        list(args["show-links"])
     elseif cmd == "clean"
-        clean(config)
+        clean()
     elseif cmd == "rm"
-        rm(
-            config;
-            name=args["name"],
-            dir=args["dir"],
-        )
+        playground = load_playground(args["dir"], args["name"])
+        remove(playground)
     end
 end
 

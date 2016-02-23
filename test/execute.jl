@@ -1,6 +1,14 @@
-function test_execute()
-    execute(TEST_CONFIG, `ls -al`; name="myproject")
-    execute(TEST_CONFIG, `julia -v`; dir=joinpath(TEST_TMP_DIR, "test-playground"))
-end
+playground = Playground.create_playground(
+    root=joinpath(TMP_DIR, "execute"),
+)
 
-test_execute()
+default_julia = readchomp(`which julia`)
+playground_julia = readchomp(playground, `which julia`)
+
+@test playground_julia != default_julia
+@test playground_julia == playground.julia_path
+
+# When julia executable is unavailable an error will be raised.
+Playground.run(`julia -v`)
+
+Playground.remove(playground)

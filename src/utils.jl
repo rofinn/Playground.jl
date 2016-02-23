@@ -24,6 +24,35 @@ function mklink(src::AbstractString, dest::AbstractString; soft=true, overwrite=
     end
 end
 
+"""
+    rmdeadlinks(path) -> AbstractString[]
+
+Removes all symlinks in a chain that points to a non existent file or form a cycle. Returns
+the symlinks that were deleted.
+"""
+function rmdeadlinks(path::AbstractString)
+    links = AbstractString[]
+    cyclical = false
+
+    # Take special care to handle paths we have already seen. This indicates an cyclical
+    # chain of symlinks.
+    while !cyclical && islink(path)
+        push!(links, path)
+        path = joinpath(dirname(path), readlink(path))  # Note: dirname only append if link is relative
+        cyclical = path in links
+    end
+
+    if cyclical || !ispath(path)
+        for link in links
+            rm(link)
+        end
+    else
+        empty!(links)
+    end
+
+    return links
+end
+
 
 function copy(src::AbstractString, dest::AbstractString; soft=true, overwrite=true)
     if ispath(src)
@@ -42,47 +71,6 @@ function copy(src::AbstractString, dest::AbstractString; soft=true, overwrite=tr
     else
         error("$(src) is not a valid path")
     end
-end
-
-
-@doc doc"""
-    We overload download for our tests in order to make sure we're just download. The
-    julia builds once.
-""" ->
-function Base.download(src::AbstractString, dest::AbstractString, overwrite)
-    if !ispath(dest) || overwrite
-        download(src, dest)
-    end
-    return dest
-end
-
-
-function get_playground_dir(config::Config, dir::AbstractString, name::AbstractString)
-    if dir == "" && name == ""
-        return abspath(joinpath(pwd(), config.default_playground_path))
-    elseif dir == "" && name != ""
-        return abspath(joinpath(config.dir.store, name))
-    elseif dir != ""
-        return abspath(dir)
-    end
-end
-
-
-function get_playground_name(config::Config, dir::AbstractString)
-    root_path = abspath(dir)
-    name = ""
-
-    for p in readdir(config.dir.store)
-        file_path = joinpath(config.dir.store, p)
-        if islink(file_path)
-            if abspath(readlink(file_path)) == root_path
-                name = p
-                break
-            end
-        end
-    end
-
-    return name
 end
 
 function julia_url(version::VersionNumber, os::Symbol=OS_NAME, arch::Integer=WORD_SIZE)
