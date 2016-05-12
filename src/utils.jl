@@ -86,52 +86,40 @@ function get_playground_name(config::Config, dir::AbstractString)
 end
 
 
-function get_julia_dl_url(version::VersionNumber, config::Config)
-    tmp_download_page = joinpath(config.dir.tmp, "julia-downloads.html")
+function julia_url(version::VersionNumber, os::Symbol=OS_NAME, arch::Integer=WORD_SIZE)
+    # Cannibalized from https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/script/julia.rb
 
-    if isfile(tmp_download_page)
-        delta = Dates.today() - Dates.Date(Dates.unix2datetime(stat(tmp_download_page).mtime))
-        if delta.value > 0
-            rm(tmp_download_page)
-            download(JULIA_DOWNLOADS_URL, tmp_download_page)
-        end
+    if os === :Linux && arch == 64
+        os_arch = "linux/x64"
+        ext = "linux-x86_64.tar.gz"
+        # nightly_ext = "linux64.tar.gz"
+    elseif os === :Linux && arch == 32
+        os_arch = "linux/x32"
+        ext = "linux-i686.tar.gz"
+        # nightly_ext = "linux32.tar.gz"
+    elseif os === :Darwin && arch == 64
+        os_arch = "osx/x64"
+        ext = "osx10.7+.dmg"
+        # nightly_ext = "osx.dmg"
+    elseif os === :Windows && arch == 64
+        os_arch = "winnt/x64"
+        ext = "win64.exe"
+    elseif os === :Windows && arch == 32
+        os_arch = "winnt/x86"
+        ext = "win32.exe"
     else
-        download(JULIA_DOWNLOADS_URL, tmp_download_page)
+        error("Julia does not support $arch-bit $os")
     end
 
-    txt = open(readall, tmp_download_page)
-    lines = split(txt, "\n")
-
-    platform = "N/A"
-    if OS_NAME===:Windows
-        platform = "win64"
-    elseif OS_NAME===:Linux
-        platform = "linux-x86_64"
-    elseif OS_NAME===:Darwin
-        platform = "osx"
+    major_minor = "$(version.major).$(version.minor)"
+    if version.patch == 0
+        url = "s3.amazonaws.com/julialang/bin/$os_arch/$major_minor/julia-$major_minor-latest-$ext"
+    else
+        url = "s3.amazonaws.com/julialang/bin/$os_arch/$major_minor/julia-$version-$ext"
     end
 
-    links = []
+    # Nightly url:
+    # url = "s3.amazonaws.com/julianightlies/bin/$os_arch/julia-latest-$nightly_ext"
 
-    for line in lines
-        m = match(r"(?i)<a href=\"([^>]+)\">(.+?)</a>", line)
-        if m != nothing && contains(m.captures[1], platform)
-            link = m.captures[1]
-            if version < NIGHTLY
-                if contains(link, "$(version.major).$(version.minor)")
-                    push!(links, link)
-                end
-            else
-                if contains(link, "status.julialang.org")
-                    push!(links, link)
-                end
-            end
-        end
-    end
-
-    if length(links) != 1
-        error("Expected 1 valid link, got $(length(links)). $links")
-    end
-
-    return links[1]
+    return "https://$url"
 end
