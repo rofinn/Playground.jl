@@ -35,7 +35,7 @@ end
         pg_rc = joinpath(dirname(ENV["JULIA_PKGDIR"]), basename(ENV["SHELL"]) * "rc")
 
         if !ispath(pg_rc)
-            cp(usr_rc, pg_rc)
+            cp(usr_rc, pg_rc, follow_symlinks=true)
             fstream = open(pg_rc, "a")
             try
                 path = ENV["PATH"]
