@@ -1,13 +1,13 @@
 
 function test_argparse()
-    install_download_args = argparse(["install", "download", "0.3", "--labels", "julia-0.3"])
+    install_download_args = argparse(["install", "download", "0.3"])
     @test install_download_args == Dict(
         "%COMMAND%" => "install",
         "install" => Dict(
             "%COMMAND%" => "download",
             "download" => Dict(
-                "labels" => ["julia-0.3"],
-                "version" => "0.3"
+                "labels" => AbstractString[],
+                "version" => v"0.3",
             )
         )
     )
@@ -18,7 +18,7 @@ function test_argparse()
         "install" => Dict(
             "%COMMAND%" => "link",
             "link" => Dict(
-                "labels" => ["julia-src"],
+                "labels" => AbstractString["julia-src"],
                 "dir" => "/path/to/julia"
             )
         )
@@ -32,7 +32,7 @@ function test_argparse()
             "requirements" => "",
             "name" => "",
             "julia-version" => "",
-            "req-type" => "REQUIRE"
+            "req-type" => :REQUIRE,
         )
     )
 
@@ -52,7 +52,7 @@ function test_argparse()
             "requirements" => "/path/to/requirements",
             "name" => "myplayground",
             "julia-version" => "julia-0.3",
-            "req-type" => "DECLARE"
+            "req-type" => :DECLARE,
         )
     )
 
