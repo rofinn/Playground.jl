@@ -11,7 +11,7 @@ function create(config::Config; dir::AbstractString="", name::AbstractString="",
     if julia != ""
         mklink(joinpath(config.dir.bin, julia), pg.julia_path)
     else
-        sys_julia_path = abspath(strip(readall(`which julia`), '\n'))
+        sys_julia_path = abspath(readchomp(`which julia`))
         mklink(sys_julia_path, pg.julia_path)
     end
 
