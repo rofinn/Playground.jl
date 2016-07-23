@@ -19,8 +19,6 @@ script:
 - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
 # initial clone so that we install the dependencies correctly, but this copies the pwd
 - julia -e 'Pkg.clone(pwd())'
-- ls "$PWD"
-- ls "$HOME/.julia/v$TRAVIS_JULIA_VERSION"
 # remove the copy
 - rm -rf "$HOME/.julia/v$TRAVIS_JULIA_VERSION/Playground"
 # symlink in the pwd
@@ -37,8 +35,6 @@ before_deploy:
 - echo "Attempting to bundle playground..."
 - mkdir -p playground
 - cp -r ./deps/usr/build/* ./playground/
-- cp ./README.md ./playground/README.md
-- cp ./LICENSE ./playground/LICENSE
 - tar -czvf "playground-$TRAVIS_OS_NAME.tar.gz" ./playground
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then shasum -a 256 --binary "playground-osx.tar.gz" > "SHA256SUM-osx.asc"; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sha256sum --binary "playground-linux.tar.gz" > "SHA256SUM-linux.asc"; fi

@@ -1,5 +1,8 @@
 function argparse(cmd_args=ARGS)
-    parse_settings = ArgParseSettings(suppress_warnings=true)
+    parse_settings = ArgParseSettings(
+        commands_are_required=true,
+        suppress_warnings=true,
+    )
 
     @add_arg_table parse_settings begin
         "install"
@@ -32,56 +35,48 @@ function argparse(cmd_args=ARGS)
         "link"
             action = :command
             help = "Path to an existing julia build you'd like to use with playgrounds."
-        "build"
-            action = :command
-            help = "The git url to clone the julia source from"
+        # "build"
+        #     action = :command
+        #     help = "The git url to clone the julia source from"
     end
 
     @add_arg_table parse_settings["create"] begin
         "dir"
             help = "Where to create the playground. Defaults to the current working directory (can be changed in `~/.playground/config`."
-            action = :store_arg
             default = ""
         "--requirements", "-r"
             help = "A REQUIRE or DECLARE file of dependencies to install into the playground."
-            action = :store_arg
             default = ""
         "--name", "-n"
             help = "A global name to allow activating the playground from anywhere."
-            action = :store_arg
             default = ""
         "--julia-version", "-j"
             help = "The version(s) of julia available to use. If multiple versions are provided the first entry will be the one used by `julia`. By default the user/system level version is used."
-            action = :store_arg
             default = ""
         "--req-type", "-t"
             help = "If --requirments isn't being passed a path ending in REQUIRE or DECLARE file, please specify which type is it \"REQUIRE\" or \"DECLARE\""
-            default = "REQUIRE"
+            arg_type = Symbol
+            default = :REQUIRE
     end
 
     @add_arg_table parse_settings["activate"] begin
         "dir"
             help = "The path to the playground to use. This takes priority over --name."
-            action = :store_arg
             default = ""
         "--name", "-n"
             help = "A global name to allow activating the playground from anywhere."
-            action = :store_arg
             default = ""
     end
 
     @add_arg_table parse_settings["exec"] begin
         "cmd"
             help = "The command you would like to run inside the playground."
-            action = :store_arg
             required = true
         "dir"
             help = "The path to the playground to use. This takes priority over --name."
-            action = :store_arg
             default = ""
         "--name", "-n"
             help = "A global name to allow activating the playground from anywhere."
-            action = :store_arg
             default = ""
     end
 
@@ -97,52 +92,45 @@ function argparse(cmd_args=ARGS)
     @add_arg_table parse_settings["rm"] begin
         "name"
             help = "Deletes the playground directory with the given name and the link to it."
-            action = :store_arg
             default = ""
         "--dir"
             help = "Deletes the provided playground directory and the link to it."
-            action = :store_arg
             default = ""
     end
 
     @add_arg_table parse_settings["install"]["download"] begin
         "version"
             help = "The release version available to download at http://julialang.org/downloads/"
+            arg_type = VersionNumber
             required = true
         "--labels", "-l"
-            help = "Extra labels to apply to the new julia verions."
+            help = "Extra labels to apply to the new julia versions."
+            arg_type = AbstractString
             nargs = '*'
-            action = :store_arg
-            default = []
     end
 
     @add_arg_table parse_settings["install"]["link"] begin
         "dir"
             help = "The path to a julia executable you'd like to be made available to playgrounds."
-            action = :store_arg
             default = ""
         "--labels", "-l"
-            help = "Extra labels to apply to the new julia verions."
+            help = "Extra labels to apply to the new julia versions."
+            arg_type = AbstractString
             nargs = '*'
-            action = :store_arg
-            default = []
     end
 
-    @add_arg_table parse_settings["install"]["build"] begin
-        "url"
-            help = "The git url to clone the julialang source from. Defaults to https://github.com/JuliaLang/julia.git. NOT IMPLEMENTED"
-            action = :store_arg
-            default = ""
-        "revision"
-            help = "The revision to checkout prior to building julia. Defaults to origin/master"
-            default = ""
-        "--labels", "-l"
-            help = "Extra labels to apply to the new julia verions."
-            nargs = '*'
-            action = :store_arg
-            default = []
-    end
+    # @add_arg_table parse_settings["install"]["build"] begin
+    #     "url"
+    #         help = "The git url to clone the julialang source from. Defaults to https://github.com/JuliaLang/julia.git"
+    #         default = ""
+    #     "revision"
+    #         help = "The revision to checkout prior to building julia. Defaults to origin/master"
+    #         default = ""
+    #     "--labels", "-l"
+    #         help = "Extra labels to apply to the new julia versions."
+    #         arg_type = AbstractString
+    #         nargs = '*'
+    # end
 
-    args = parse_args(cmd_args, parse_settings)
-    return args
+    return parse_args(cmd_args, parse_settings)
 end

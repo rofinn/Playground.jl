@@ -6,16 +6,31 @@
     binary version for your platform, or downloads and builds
     it from source if `src` is true.
 """ ->
-function install(config::Config, version::VersionNumber; labels=[])
+function install{S<:AbstractString}(config::Config, version::VersionNumber; labels::Array{S}=[])
     init(config)
 
     # download the julia version
-    download_url = get_julia_dl_url(version, config)
+    download_url = julia_url(version)
     base_name = "julia-$(version.major).$(version.minor)_$(Dates.today())"
     tmp_dest = joinpath(config.dir.tmp, base_name)
 
     info("Downloading julia $(version.major).$(version.minor) from $download_url ...")
     Playground.download(download_url, tmp_dest, false)
+
+    # Perform some verification on the download
+    if stat(tmp_dest).size < 1024
+        # S3 responds with an error message when a URL doesn't exist
+        unavailable = open(tmp_dest, "r") do f
+            contains(readall(f), "key does not exist")
+        end
+
+        if unavailable
+            error("Julia version $version does not exist")
+        else
+            error("Aborting install. Download appears corrupt")
+        end
+    end
+
     bin_path = Playground.install_julia_bin(tmp_dest, config, base_name, false)
     Playground.link_julia(bin_path, config, labels)
 
@@ -27,7 +42,7 @@ end
     This option simply creates symlinks from an existing julia
     install.
 """ ->
-function dirinstall(config::Config, executable::AbstractString; labels=[])
+function dirinstall{S<:AbstractString}(config::Config, executable::AbstractString; labels::Array{S}=[])
     info("Adding julia labels $labels to $executable")
     if ispath(executable)
         init(config)
@@ -71,7 +86,7 @@ end
 # end
 
 
-function link_julia(bin_path::AbstractString, config::Config, labels=[])
+function link_julia{S<:AbstractString}(bin_path::AbstractString, config::Config, labels::Array{S}=[])
     for label in labels
         mklink(bin_path, joinpath(config.dir.bin, label))
     end
@@ -112,76 +127,70 @@ end
 # end
 
 
-@osx_only begin
-    function install_julia_bin(src::AbstractString, config::Config, base_name, force)
-        src_path = abspath(joinpath(config.dir.src, base_name))
-        bin_path = abspath(joinpath(config.dir.bin, base_name))
-        exe_path = abspath(joinpath(src_path, "Contents/Resources/julia/bin/julia"))
+@osx_only function install_julia_bin(src::AbstractString, config::Config, base_name, force)
+    src_path = abspath(joinpath(config.dir.src, base_name))
+    bin_path = abspath(joinpath(config.dir.bin, base_name))
+    exe_path = abspath(joinpath(src_path, "Contents/Resources/julia/bin/julia"))
 
-        function install_from_dmg(mountdir::AbstractString)
-            app_path = nothing
-            try
-                run(`hdiutil attach -mountpoint $mountdir $src`)
-                for f in readdir(mountdir)
-                   if endswith(f, ".app")
-                        app_path = joinpath(mountdir, f)
-                   end
-                end
-                if app_path != nothing
-                    copy(app_path, src_path)
-                    chmod(exe_path, 0o755)
-                end
-            finally
-                run(`hdiutil detach $mountdir`)
-            end
-        end
-
-        dmg_tmp_dir = mktempdir(config.dir.tmp)
+    function install_from_dmg(mountdir::AbstractString)
+        app_path = nothing
         try
-            # Don't bother running this if src_path already exists
-            if !ispath(src_path) || force
-                install_from_dmg(dmg_tmp_dir)
+            run(`hdiutil attach -mountpoint $mountdir $src`)
+            for f in readdir(mountdir)
+               if endswith(f, ".app")
+                    app_path = joinpath(mountdir, f)
+               end
             end
-
-            mklink(exe_path, bin_path)
+            if app_path != nothing
+                copy(app_path, src_path)
+                chmod(exe_path, 0o755)
+            end
         finally
-            rm(dmg_tmp_dir)
+            run(`hdiutil detach $mountdir`)
         end
-
-        return bin_path
     end
-end
 
-@linux_only begin
-    function install_julia_bin(src::AbstractString, config::Config, base_name, force)
-        src_path = abspath(joinpath(config.dir.src, base_name))
-        bin_path = abspath(joinpath(config.dir.bin, base_name))
-
+    dmg_tmp_dir = mktempdir(config.dir.tmp)
+    try
+        # Don't bother running this if src_path already exists
         if !ispath(src_path) || force
-            mkpath(src_path)
-            try
-                run(`tar -xzf $src -C $src_path`)
-            catch
-                rm(src_path, recursive=true)
-            end
+            install_from_dmg(dmg_tmp_dir)
         end
 
-        julia_bin_path = joinpath(
-            src_path,
-            readdir(src_path)[1],
-            "bin/julia"
-        )
-        chmod(julia_bin_path, 0o755)
-        mklink(julia_bin_path, bin_path)
-
-        return bin_path
+        mklink(exe_path, bin_path)
+    finally
+        rm(dmg_tmp_dir)
     end
+
+    return bin_path
 end
 
-@windows_only begin
-    function install_julia_bin(src::AbstractString, config::Config)
-        # not sure what to do here yet.
-        error("installing Julia EXEs on Windows not implemented yet.")
+@linux_only function install_julia_bin(src::AbstractString, config::Config, base_name, force)
+    src_path = abspath(joinpath(config.dir.src, base_name))
+    bin_path = abspath(joinpath(config.dir.bin, base_name))
+
+    if !ispath(src_path) || force
+        mkpath(src_path)
+        try
+            run(`tar -xzf $src -C $src_path`)
+        catch
+            rm(src_path, recursive=true)
+        end
     end
+
+    julia_bin_path = joinpath(
+        src_path,
+        readdir(src_path)[1],
+        "bin/julia"
+    )
+    chmod(julia_bin_path, 0o755)
+    mklink(julia_bin_path, bin_path)
+
+    return bin_path
+end
+
+@windows_only function install_julia_bin(src::AbstractString, config::Config)
+    # not sure what to do here yet.
+    error("installing Julia EXEs on Windows not implemented yet.")
 end
 
