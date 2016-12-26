@@ -1,6 +1,7 @@
 function test_install()
-    install(TEST_CONFIG, v"0.4.0"; labels=["julia-bin", "julia-stable-bin"])
-    install(TEST_CONFIG, v"0.5.0-"; labels=["julia-nightly-bin"])
+    install(TEST_CONFIG, v"0.4.0"; labels=["julia-bin", "julia-old-bin"])
+    install(TEST_CONFIG, v"0.5.0"; labels=["julia-bin", "julia-stable-bin"])
+    install(TEST_CONFIG, v"0.6.0-"; labels=["julia-nightly-bin"])
 end
 
 function test_dirinstall()

@@ -4,6 +4,7 @@ module Playground
 
 using Compat
 using ArgParse
+using Mocking
 
 include("constants.jl")
 include("config.jl")
