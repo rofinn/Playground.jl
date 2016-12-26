@@ -1,6 +1,7 @@
 using Base.Test
-using Lint
+# using Lint
 using Mocking
+Mocking.enable()
 
 include("../src/Playground.jl")
 using Playground
@@ -19,7 +20,7 @@ Playground.init(TEST_CONFIG)
 
 # Order matters.
 tests = [
-    "lint",
+    # "lint",
     "utils",
     "list",
     "parsing",

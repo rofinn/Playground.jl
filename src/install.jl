@@ -193,4 +193,3 @@ end
     # not sure what to do here yet.
     error("installing Julia EXEs on Windows not implemented yet.")
 end
-
