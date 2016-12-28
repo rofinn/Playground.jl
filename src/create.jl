@@ -64,7 +64,7 @@ function create(config::Config; dir::AbstractString="", name::AbstractString="",
                         try
                             rm(d, recursive=true)
                         catch
-                            @unix_only begin
+                            @compat if is_unix()
                                 run(`chmod -R 755 $d`)
                                 run(`rm -rf $d`)
                             end
