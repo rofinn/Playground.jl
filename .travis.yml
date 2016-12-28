@@ -38,7 +38,7 @@ script:
   Pkg.test("Playground";  coverage=true)'
 - ~/.playground/bin/playground list
 - rm ~/.playground/bin/playground
-- julia 'ENV["PLAYGROUND_INSTALL"] = true; ENV["PLAYGROUND_BIN_EXEC"] = true; Pkg.build("Playground")'
+- julia -e 'ENV["PLAYGROUND_INSTALL"] = true; ENV["PLAYGROUND_BIN_EXEC"] = true; Pkg.build("Playground")'
 - ~/.playground/bin/playground list
 after_success:
 - julia -e 'cd(Pkg.dir("Playground")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
