@@ -32,7 +32,6 @@ function test_argparse()
             "requirements" => "",
             "name" => "",
             "julia-version" => "",
-            "req-type" => :REQUIRE,
         )
     )
 
@@ -42,18 +41,7 @@ function test_argparse()
             "--name", "myplayground",
             "--julia-version", "julia-0.3",
             "--requirements", "/path/to/requirements",
-            "--req-type", "DECLARE"
         ]
-    )
-    @test create_args2 == Dict(
-        "%COMMAND%" => "create",
-        "create" => Dict(
-            "dir" => "/path/to/playground",
-            "requirements" => "/path/to/requirements",
-            "name" => "myplayground",
-            "julia-version" => "julia-0.3",
-            "req-type" => :DECLARE,
-        )
     )
 
     activate_args1 = argparse(["activate"])

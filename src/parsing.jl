@@ -53,10 +53,6 @@ function argparse(cmd_args=ARGS)
         "--julia-version", "-j"
             help = "The version(s) of julia available to use. If multiple versions are provided the first entry will be the one used by `julia`. By default the user/system level version is used."
             default = ""
-        "--req-type", "-t"
-            help = "If --requirments isn't being passed a path ending in REQUIRE or DECLARE file, please specify which type is it \"REQUIRE\" or \"DECLARE\""
-            arg_type = Symbol
-            default = :REQUIRE
     end
 
     @add_arg_table parse_settings["activate"] begin
