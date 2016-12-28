@@ -10,7 +10,7 @@ mkpath(build_dir)
 
 build_script = "script.jl"
 
-bin_exec = haskey(ENV, "PLAYGROUND_BIN_EXEC") ? ENV["PLAYGROUND_BIN_EXEC"] : false
+bin_exec = haskey(ENV, "PLAYGROUND_BIN_EXEC") ? parse(ENV["PLAYGROUND_BIN_EXEC"]) : false
 
 if bin_exec
     # Actually build the playground executable
@@ -53,7 +53,7 @@ Playground.copy(joinpath(deps_dir, "..", "README.md"), joinpath(build_dir, "READ
 # PLAYGROUND_INSTALL env variable has been set.
 # This is just cause there isn't a `Pkg.install` or
 # `Pkg.build("Pkg", install=true)`
-install = haskey(ENV, "PLAYGROUND_INSTALL") ? ENV["PLAYGROUND_INSTALL"] : false
+install = haskey(ENV, "PLAYGROUND_INSTALL") ? parse(ENV["PLAYGROUND_INSTALL"]) : false
 
 # Store our install paths
 install_dir = Playground.config_path()
