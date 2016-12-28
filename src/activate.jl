@@ -21,14 +21,14 @@ end
 
 
 @windows_only function run_shell(config, prompt)
-    run(`cmd /K prompt $(prompt)`)
+    @mock run(`cmd /K prompt $(prompt)`)
 end
 
 
 @unix_only function run_shell(config, prompt)
     ENV["PS1"] = prompt
     if haskey(ENV, "SHELL") && contains(ENV["SHELL"], "fish")
-        run(`$(ENV["SHELL"]) -i`)
+        @mock run(`$(ENV["SHELL"]) -i`)
     elseif haskey(ENV, "SHELL")
         # Try and setup the new shell as close to the user's default shell as possible.
         usr_rc = joinpath(homedir(), "." * basename(ENV["SHELL"]) * "rc")
@@ -54,13 +54,13 @@ end
                 close(fstream)
             end
         end
-		
+
 		if contains(ENV["SHELL"],"zsh")
-			run(`$(ENV["SHELL"]) -c "source $pg_rc; $(ENV["SHELL"])"`)
+			@mock run(`$(ENV["SHELL"]) -c "source $pg_rc; $(ENV["SHELL"])"`)
 		else
-			run(`$(ENV["SHELL"]) --rcfile $pg_rc`)
+			@mock run(`$(ENV["SHELL"]) --rcfile $pg_rc`)
 		end
     else
-        run(`sh -i`)
+        @mock run(`sh -i`)
     end
 end
