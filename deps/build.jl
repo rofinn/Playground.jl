@@ -1,4 +1,4 @@
-using BuildExecutable
+using Compat
 import Playground
 
 # Get our current working path
@@ -10,14 +10,24 @@ mkpath(build_dir)
 
 build_script = "script.jl"
 
-# Actually build the playground executable
-info("Trying to build playground executable in $build_dir ...")
-build_executable(
-    "playground",
-    build_script,
-    build_dir,
-    "generic"; force=true
-)
+bin_exec = haskey(ENV, "PLAYGROUND_BIN_EXEC") ? parse(ENV["PLAYGROUND_BIN_EXEC"]) : false
+
+if bin_exec
+    # Actually build the playground executable
+    info("Trying to build playground executable in $build_dir ...")
+    using BuildExecutable
+    build_executable(
+        "playground",
+        build_script,
+        build_dir,
+        "generic"; force=true
+    )
+else
+    info("Copying playground script to $build_dir")
+    PKG_PLAYGROUND_BIN = joinpath(deps_dir, "usr", "bin", "playground")
+    Playground.copy(PKG_PLAYGROUND_BIN, joinpath(build_dir, "playground"))
+    chmod(joinpath(build_dir, "playground"), filemode(PKG_PLAYGROUND_BIN))
+end
 
 config_file = joinpath(build_dir, "config.yml")
 
@@ -32,7 +42,7 @@ open(config_file, "w+") do fstream
     write(fstream, Playground.DEFAULT_CONFIG)
 end
 
-@unix_only begin
+@compat if is_unix()
     Playground.copy(joinpath(deps_dir, "usr", "bin", "INSTALL.sh"), joinpath(build_dir, "INSTALL.sh"))
 end
 
@@ -43,7 +53,7 @@ Playground.copy(joinpath(deps_dir, "..", "README.md"), joinpath(build_dir, "READ
 # PLAYGROUND_INSTALL env variable has been set.
 # This is just cause there isn't a `Pkg.install` or
 # `Pkg.build("Pkg", install=true)`
-install = haskey(ENV, "PLAYGROUND_INSTALL")
+install = haskey(ENV, "PLAYGROUND_INSTALL") ? parse(ENV["PLAYGROUND_INSTALL"]) : false
 
 # Store our install paths
 install_dir = Playground.config_path()

@@ -6,10 +6,9 @@ function mklink(src::AbstractString, dest::AbstractString; soft=true, overwrite=
         end
 
         if !ispath(dest)
-            @unix_only begin
+            @compat if is_unix()
                 run(`ln -s $(src) $(dest)`)
-            end
-            @windows_only begin
+            elseif is_windows()
                 if isfile(src)
                     run(`mklink $(dest) $(src)`)
                 else
@@ -85,9 +84,14 @@ function get_playground_name(config::Config, dir::AbstractString)
     return name
 end
 
-function julia_url(version::VersionNumber, os::Symbol=OS_NAME, arch::Integer=WORD_SIZE)
-    # Cannibalized from https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/script/julia.rb
+function julia_url(version)
+    os = @compat @static VERSION >= v"0.5.0" ? Base.Sys.KERNEL : Base.OS_NAME
+    arch = @compat @static VERSION >= v"0.5.0" ? Base.Sys.WORD_SIZE : Base.WORD_SIZE
+    julia_url(version, os, arch)
+end
 
+function julia_url(version::VersionNumber, os::Symbol, arch::Integer)
+    # Cannibalized from https://github.com/travis-ci/travis-build/blob/master/lib/travis/build/script/julia.rb
     if os === :Linux && arch == 64
         os_arch = "linux/x64"
         ext = "linux-x86_64.tar.gz"
@@ -131,7 +135,7 @@ function julia_url(version::VersionNumber, os::Symbol=OS_NAME, arch::Integer=WOR
     return "https://$url"
 end
 
-function julia_url(version::AbstractString, os::Symbol=OS_NAME, arch::Integer=WORD_SIZE)
+function julia_url(version::AbstractString, os::Symbol, arch::Integer)
     if version == "nightly"
         ver = NIGHTLY
     elseif version == "release"

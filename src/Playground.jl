@@ -4,6 +4,7 @@ module Playground
 
 using Compat
 using ArgParse
+using Mocking
 
 include("constants.jl")
 include("config.jl")
@@ -76,7 +77,6 @@ function main(cmd_args=ARGS, config="", root="")
             name=args["name"],
             julia=args["julia-version"],
             reqs_file=args["requirements"],
-            reqs_type=args["req-type"],
         )
     elseif cmd == "activate"
         activate(

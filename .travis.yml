@@ -4,21 +4,31 @@ os:
 - linux
 julia:
 - 0.4
+- 0.5
 env:
   global:
     secure: CD5Wv1UQ8oM+3tLPBxWiWS9XdMfFxwCSKbMzteaFrtSgY06DIdNON6cPr3zKARHHKiX0hsznU3vNTnOkYfXrmEPocep5YDBNccA3uWTUfP/j/Zrg2oUuTdc2ZKhUZIupqQf6FfJ8IudgrMrWd/LRBchKahNSCmvomP+4cXRTouk=
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-5
 notifications:
   email: false
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     sudo add-apt-repository ppa:staticfloat/julia-deps -y;
     sudo apt-get update -qq -y;
-    sudo apt-get install patchelf;
+    mkdir -p $HOME/bin;
+    ln -s /usr/bin/gcc-5 $HOME/bin/gcc;
+    ln -s /usr/bin/gcc-5 $HOME/bin/x86_64-linux-gnu-gcc;
+    gcc --version;
   fi
 script:
 - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
 # initial clone so that we install the dependencies correctly, but this copies the pwd
-- julia -e 'Pkg.clone(pwd())'
+- julia -e 'Pkg.clone("https://github.com/dhoegh/BuildExecutable.jl"); Pkg.build("BuildExecutable"); Pkg.clone(pwd())'
 # remove the copy
 - rm -rf "$HOME/.julia/v$TRAVIS_JULIA_VERSION/Playground"
 # symlink in the pwd
@@ -26,6 +36,9 @@ script:
 # now build playground
 - julia --depwarn=no -e 'ENV["PLAYGROUND_INSTALL"] = true; Pkg.build("Playground");
   Pkg.test("Playground";  coverage=true)'
+- ~/.playground/bin/playground list
+- rm ~/.playground/bin/playground
+- julia -e 'ENV["PLAYGROUND_INSTALL"] = true; ENV["PLAYGROUND_BIN_EXEC"] = true; Pkg.build("Playground")'
 - ~/.playground/bin/playground list
 after_success:
 - julia -e 'cd(Pkg.dir("Playground")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'

@@ -13,12 +13,12 @@ A package for managing julia sandboxes like python's virtualenv (with a little i
 The ideal way to install playground is via the registered julia package. However, this requires that you already have julia installed on your system.
 
 Installing the julia package
-```shell
+```julia
 julia> Pkg.add("Playground")
 ```
 
 NOTE: As of v0.0.6 you will need to run
-```shell
+```julia
 julia> ENV["PLAYGROUND_INSTALL"] = true
 ```
 prior to running `Pkg.add` or `Pkg.build` if you'd like the compiled playground executable to be installed into the common `~/.playground/bin/` path.
@@ -28,7 +28,7 @@ Running the playground script
 ~/.playground/bin/playground
 ```
 
-Recommended: add the playground bin directory to your path 
+Recommended: add the playground bin directory to your path
 by editing your ~/.bashrc, ~/.zshrc, ~/.tcshrc, etc.
 ```shell
 echo "PATH=~/.playground/bin/:$PATH" >> ~/.bashrc
@@ -50,6 +50,25 @@ Steps:
 
 NOTE: This alias hack with `LD_LIBRARY_PATH` is only necessary due to an issue in the binaries created with [BuildExecutable.jl](https://github.com/dhoegh/BuildExecutable.jl). In future releases it should only be necessary for `~/bin/playground` to be on your search path (ie: in your `PATH` variable).
 
+### Making Binary Executables
+
+If you'd like to build you own playground binary executables you'll have a few more steps.
+First, add `BuildExecutable`
+
+```julia
+julia> Pkg.add("BuildExecutable")
+```
+
+If you're on linux you may want to install the latest master release which will handle installing `patchelf` for you.
+
+```julia
+julia> Pkg.clone("https://github.com/dhoegh/BuildExecutable.jl")
+```
+In order to tell the Playground.jl build script to create a binary executable you'll need to run
+```julia
+julia> ENV["PLAYGROUND_BIN_EXEC"] = true
+```
+prior to calling `Pkg.build("Playground")`.
 
 ## Usage (subcommands)##
 ### install (Unix only) ###
