@@ -1,12 +1,15 @@
 Playground.jl
 =============
 
-[![Build Status](https://travis-ci.org/Rory-Finnegan/Playground.jl.svg)](https://travis-ci.org/Rory-Finnegan/Playground.jl)
-[![codecov.io](http://codecov.io/github/Rory-Finnegan/Playground.jl/coverage.svg)](http://codecov.io/github/Rory-Finnegan/Playground.jl)
-[![Join the chat at https://gitter.im/Rory-Finnegan/Playground.jl](https://badges.gitter.im/Rory-Finnegan/Playground.jl.svg)](https://gitter.im/Rory-Finnegan/Playground.jl?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/rofinn/Playground.jl.svg)](https://travis-ci.org/rofinn/Playground.jl)
+[![codecov.io](http://codecov.io/github/rofinn/Playground.jl/coverage.svg)](http://codecov.io/github/rofinn/Playground.jl)
+[![Project Status: Active - The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 
 A package for managing julia sandboxes like python's virtualenv (with a little influence from pyenv and virtualenvwrapper)
 
+**Supports**:
+[![StatsBase](http://pkg.julialang.org/badges/Playground_0.5.svg)](http://pkg.julialang.org/?pkg=Playground&ver=0.5)
+[![StatsBase](http://pkg.julialang.org/badges/Playground_0.6.svg)](http://pkg.julialang.org/?pkg=Playground&ver=0.6)
 
 ## Installation ##
 ### With Julia ###
