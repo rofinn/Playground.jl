@@ -1,8 +1,6 @@
 function activate(config::Config; dir::AbstractString="", name::AbstractString="")
     init(config)
-
     pg = Environment(config, dir, name)
-
     prompt = config.default_prompt
 
     if name != ""
@@ -37,6 +35,7 @@ elseif is_unix()
             if !ispath(pg_rc)
                 cp(usr_rc, pg_rc, follow_symlinks=true)
                 fstream = open(pg_rc, "a")
+
                 try
                     path = ENV["PATH"]
                     ps1 = ENV["PS1"]

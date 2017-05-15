@@ -7,10 +7,8 @@ function create(
 )
 
     init(config)
-
     pg = Environment(config, dir, name)
     init(pg)
-
     info("Playground folders created")
 
     if julia != ""
