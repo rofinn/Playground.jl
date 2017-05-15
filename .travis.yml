@@ -6,9 +6,6 @@ julia:
 - 0.4
 - 0.5
 - nightly
-env:
-  global:
-    secure: CD5Wv1UQ8oM+3tLPBxWiWS9XdMfFxwCSKbMzteaFrtSgY06DIdNON6cPr3zKARHHKiX0hsznU3vNTnOkYfXrmEPocep5YDBNccA3uWTUfP/j/Zrg2oUuTdc2ZKhUZIupqQf6FfJ8IudgrMrWd/LRBchKahNSCmvomP+4cXRTouk=
 addons:
   apt:
     sources:
@@ -58,7 +55,8 @@ before_deploy:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sha256sum --binary "playground-linux.tar.gz" > "SHA256SUM-linux.asc"; fi
 deploy:
   provider: releases
-  api_key: ${GITHUB_TOKEN}
+  api_key:
+    secure: VXiNu6Z4IDq4QIzCBadfA8Z0HXfyJhoLhrGsftGEO2pRDgzS0wogJxOIQ6s7vtfg/PmgiT4hzVFb5XSmQdTWZ1LxB83J8AXkd+YswNvJuWqqYwUSnsVybE37n7EuQTGS7c+IzD6pe3G+hwm/6sHwCeXx4wIugBYvEigixfY3sAI=
   file:
   - "playground-$TRAVIS_OS_NAME.tar.gz"
   - "SHA256SUM-$TRAVIS_OS_NAME.asc"
