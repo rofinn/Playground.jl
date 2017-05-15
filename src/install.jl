@@ -87,12 +87,13 @@ end
 
 
 function link_julia{S<:AbstractString}(bin_path::AbstractString, config::Config, labels::Array{S}=[])
+    bin_path = abspath(bin_path)
     for label in labels
         mklink(bin_path, joinpath(config.bin, label))
     end
 
     @compat if is_unix()
-        ret = readstring(`$(bin_path) -e versioninfo()`)
+        ret = readstring(`$(bin_path) -e 'versioninfo()'`)
         lines = split(ret, "\n")
 
         versionstr = split(lines[1], " ")[3]

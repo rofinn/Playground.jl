@@ -28,16 +28,16 @@ function create(
 
     if reqs_file != "" && ispath(reqs_file)
         info("Installing packages from REQUIRE file $reqs_file...")
-        run(`$(pg.julia) -e Pkg.init()`)
+        run(`$(pg.julia) -e 'Pkg.init()'`)
         for v in readdir(pg.pkg)
             copy(reqs_file, joinpath(pg.pkg, v, "REQUIRE"))
             try
-                run(`$(pg.julia) -e Pkg.resolve()`)
+                run(`$(pg.julia) -e 'Pkg.resolve()'`)
             catch
                 warn("Failed to resolve requirements. Perhaps there is something wrong with your REQUIRE file.")
             end
         end
     else
-        run(`$(pg.julia) -e Pkg.init()`)
+        run(`$(pg.julia) -e 'Pkg.init()'`)
     end
 end
