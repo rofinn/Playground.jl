@@ -5,6 +5,7 @@ os:
 julia:
 - 0.4
 - 0.5
+- nightly
 env:
   global:
     secure: CD5Wv1UQ8oM+3tLPBxWiWS9XdMfFxwCSKbMzteaFrtSgY06DIdNON6cPr3zKARHHKiX0hsznU3vNTnOkYfXrmEPocep5YDBNccA3uWTUfP/j/Zrg2oUuTdc2ZKhUZIupqQf6FfJ8IudgrMrWd/LRBchKahNSCmvomP+4cXRTouk=
@@ -16,6 +17,10 @@ addons:
       - gcc-5
 notifications:
   email: false
+matrix:
+  fast_finish: true
+  allow_failures:
+  - julia: nightly
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     sudo add-apt-repository ppa:staticfloat/julia-deps -y;
@@ -61,4 +66,4 @@ deploy:
   on:
     tags: true
     all_branches: true
-    repo: Rory-Finnegan/Playground.jl
+    repo: rofinn/Playground.jl

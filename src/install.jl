@@ -12,7 +12,7 @@ function install{S<:AbstractString}(config::Config, version::VersionNumber; labe
     # download the julia version
     download_url = julia_url(version)
     base_name = "julia-$(version.major).$(version.minor)_$(Dates.today())"
-    tmp_dest = joinpath(config.dir.tmp, base_name)
+    tmp_dest = joinpath(config.tmp, base_name)
 
     info("Downloading julia $(version.major).$(version.minor) from $download_url ...")
     Playground.download(download_url, tmp_dest, false)
@@ -34,7 +34,7 @@ function install{S<:AbstractString}(config::Config, version::VersionNumber; labe
     bin_path = Playground.install_julia_bin(tmp_dest, config, base_name, false)
     Playground.link_julia(bin_path, config, labels)
 
-    mklink(bin_path, joinpath(config.dir.bin, "julia-$(version.major).$(version.minor)"))
+    mklink(bin_path, joinpath(config.bin, "julia-$(version.major).$(version.minor)"))
 end
 
 
@@ -88,7 +88,7 @@ end
 
 function link_julia{S<:AbstractString}(bin_path::AbstractString, config::Config, labels::Array{S}=[])
     for label in labels
-        mklink(bin_path, joinpath(config.dir.bin, label))
+        mklink(bin_path, joinpath(config.bin, label))
     end
 
     @compat if is_unix()
@@ -96,10 +96,10 @@ function link_julia{S<:AbstractString}(bin_path::AbstractString, config::Config,
         lines = split(ret, "\n")
 
         versionstr = split(lines[1], " ")[3]
-        mklink(bin_path, joinpath(config.dir.bin, "julia-$(versionstr)"))
+        mklink(bin_path, joinpath(config.bin, "julia-$(versionstr)"))
 
         commit_sha = strip(split(lines[2], " ")[2], '*')
-        mklink(bin_path, joinpath(config.dir.bin, "julia-$(commit_sha)"))
+        mklink(bin_path, joinpath(config.bin, "julia-$(commit_sha)"))
     end
 end
 
@@ -128,8 +128,8 @@ end
 
 @compat if is_apple()
     function install_julia_bin(src::AbstractString, config::Config, base_name, force)
-        src_path = abspath(joinpath(config.dir.src, base_name))
-        bin_path = abspath(joinpath(config.dir.bin, base_name))
+        src_path = abspath(joinpath(config.src, base_name))
+        bin_path = abspath(joinpath(config.bin, base_name))
         exe_path = abspath(joinpath(src_path, "Contents/Resources/julia/bin/julia"))
 
         function install_from_dmg(mountdir::AbstractString)
@@ -150,7 +150,7 @@ end
             end
         end
 
-        dmg_tmp_dir = mktempdir(config.dir.tmp)
+        dmg_tmp_dir = mktempdir(config.tmp)
         try
             # Don't bother running this if src_path already exists
             if !ispath(src_path) || force
@@ -166,8 +166,8 @@ end
     end
 elseif is_unix()
     function install_julia_bin(src::AbstractString, config::Config, base_name, force)
-        src_path = abspath(joinpath(config.dir.src, base_name))
-        bin_path = abspath(joinpath(config.dir.bin, base_name))
+        src_path = abspath(joinpath(config.src, base_name))
+        bin_path = abspath(joinpath(config.bin, base_name))
 
         if !ispath(src_path) || force
             mkpath(src_path)

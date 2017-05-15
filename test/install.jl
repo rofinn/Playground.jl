@@ -7,12 +7,12 @@ end
 function test_dirinstall()
     dirinstall(
         TEST_CONFIG,
-        joinpath(TEST_CONFIG.dir.bin, "julia-nightly-bin");
+        joinpath(TEST_CONFIG.bin, "julia-nightly-bin");
         labels=["julia-nightly-dir"]
     )
     dirinstall(
         TEST_CONFIG,
-        joinpath(TEST_CONFIG.dir.bin, "julia-stable-bin");
+        joinpath(TEST_CONFIG.bin, "julia-stable-bin");
         labels=["julia-stable-dir"]
     )
 end
