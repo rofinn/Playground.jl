@@ -30,10 +30,6 @@ script:
 - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
 # initial clone so that we install the dependencies correctly, but this copies the pwd
 - julia -e 'Pkg.clone("https://github.com/dhoegh/BuildExecutable.jl"); Pkg.build("BuildExecutable"); Pkg.clone(pwd())'
-# remove the copy
-- rm -rf "$HOME/.julia/v$TRAVIS_JULIA_VERSION/Playground"
-# symlink in the pwd
-- ln -s "$PWD" "$HOME/.julia/v$TRAVIS_JULIA_VERSION/Playground"
 # now build playground
 - julia --depwarn=no -e 'ENV["PLAYGROUND_INSTALL"] = true; Pkg.build("Playground");
   Pkg.test("Playground";  coverage=true)'
@@ -43,7 +39,6 @@ script:
 - ~/.playground/bin/playground list
 after_success:
 - julia -e 'cd(Pkg.dir("Playground")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
-- julia -e 'cd(Pkg.dir("Playground")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
 before_deploy:
 # Assuming skip_cleanup works the README.md and the build directory we want should be under the pwd
 - echo "Attempting to bundle playground..."
