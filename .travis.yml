@@ -43,7 +43,7 @@ before_deploy:
 # Assuming skip_cleanup works the README.md and the build directory we want should be under the pwd
 - echo "Attempting to bundle playground..."
 - mkdir -p playground
-- cp -r ./deps/usr/build/* ./playground/
+- cp -r $HOME/.julia/v$TRAVIS_JULIA_VERSION/Playground/deps/usr/build/* ./playground/
 - tar -czvf "playground-$TRAVIS_OS_NAME.tar.gz" ./playground
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then shasum -a 256 --binary "playground-osx.tar.gz" > "SHA256SUM-osx.asc"; fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sha256sum --binary "playground-linux.tar.gz" > "SHA256SUM-linux.asc"; fi
