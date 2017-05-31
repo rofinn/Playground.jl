@@ -14,19 +14,19 @@ function clean(config::Config)
             end
         end
     end
-    rm_deadlinks(config.dir.store)
-    rm_deadlinks(config.dir.bin)
+    rm_deadlinks(config.share)
+    rm_deadlinks(config.bin)
 end
 
 
 function Base.rm(config::Config; name::AbstractString="", dir::AbstractString="")
     if name != "" && dir == ""
         # If we find the name in the bin folder then we should just delete the julia symlink
-        if name in readdir(abspath(config.dir.bin)) && name != "playground"
-            rm(joinpath(abspath(config.dir.bin), name))
+        if name in readdir(abspath(config.bin)) && name != "playground"
+            rm(joinpath(abspath(config.bin), name))
             return true
         # Otherwise the name should be in
-        elseif name in readdir(abspath(config.dir.store))
+        elseif name in readdir(abspath(config.share))
             dir = get_playground_dir(config, "", name)
 
             # The dir returned could be a link

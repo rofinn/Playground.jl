@@ -60,7 +60,7 @@ function get_playground_dir(config::Config, dir::AbstractString, name::AbstractS
     if dir == "" && name == ""
         return abspath(joinpath(pwd(), config.default_playground_path))
     elseif dir == "" && name != ""
-        return abspath(joinpath(config.dir.store, name))
+        return abspath(joinpath(config.share, name))
     elseif dir != ""
         return abspath(dir)
     end
@@ -71,8 +71,8 @@ function get_playground_name(config::Config, dir::AbstractString)
     root_path = abspath(dir)
     name = ""
 
-    for p in readdir(config.dir.store)
-        file_path = joinpath(config.dir.store, p)
+    for p in readdir(config.share)
+        file_path = joinpath(config.share, p)
         if islink(file_path)
             if abspath(readlink(file_path)) == root_path
                 name = p

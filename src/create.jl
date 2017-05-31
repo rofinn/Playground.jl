@@ -1,38 +1,41 @@
-function create(config::Config; dir::AbstractString="", name::AbstractString="",
-    julia::AbstractString="", reqs_file::AbstractString="")
+function create(
+    config::Config;
+    dir::AbstractString="",
+    name::AbstractString="",
+    julia::AbstractString="",
+    reqs_file::AbstractString=""
+)
 
     init(config)
-
-    pg = PlaygroundConfig(config, dir, name)
-    create_paths(pg)
-
+    pg = Environment(config, dir, name)
+    init(pg)
     info("Playground folders created")
 
     if julia != ""
-        mklink(joinpath(config.dir.bin, julia), pg.julia_path)
+        mklink(joinpath(config.bin, julia), pg.julia)
     else
-        sys_julia_path = abspath(readchomp(`which julia`))
-        mklink(sys_julia_path, pg.julia_path)
+        sys_julia = abspath(readchomp(`which julia`))
+        mklink(sys_julia, pg.julia)
     end
 
     if dir != "" && name != ""
-        mklink(pg.root_path, abspath(joinpath(config.dir.store, name)))
+        mklink(pg.root, abspath(joinpath(config.share, name)))
     end
 
-    ENV["JULIA_PKGDIR"] = pg.pkg_path
+    ENV["JULIA_PKGDIR"] = pg.pkg
 
     if reqs_file != "" && ispath(reqs_file)
         info("Installing packages from REQUIRE file $reqs_file...")
-        run(`$(pg.julia_path) -e Pkg.init()`)
-        for v in readdir(pg.pkg_path)
-            copy(reqs_file, joinpath(pg.pkg_path, v, "REQUIRE"))
+        run(`$(pg.julia) -e 'Pkg.init()'`)
+        for v in readdir(pg.pkg)
+            copy(reqs_file, joinpath(pg.pkg, v, "REQUIRE"))
             try
-                run(`$(pg.julia_path) -e Pkg.resolve()`)
+                run(`$(pg.julia) -e 'Pkg.resolve()'`)
             catch
                 warn("Failed to resolve requirements. Perhaps there is something wrong with your REQUIRE file.")
             end
         end
     else
-        run(`$(pg.julia_path) -e Pkg.init()`)
+        run(`$(pg.julia) -e 'Pkg.init()'`)
     end
 end

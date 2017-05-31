@@ -3,11 +3,8 @@ os:
 - osx
 - linux
 julia:
-- 0.4
 - 0.5
-env:
-  global:
-    secure: CD5Wv1UQ8oM+3tLPBxWiWS9XdMfFxwCSKbMzteaFrtSgY06DIdNON6cPr3zKARHHKiX0hsznU3vNTnOkYfXrmEPocep5YDBNccA3uWTUfP/j/Zrg2oUuTdc2ZKhUZIupqQf6FfJ8IudgrMrWd/LRBchKahNSCmvomP+4cXRTouk=
+- nightly
 addons:
   apt:
     sources:
@@ -16,6 +13,10 @@ addons:
       - gcc-5
 notifications:
   email: false
+matrix:
+  fast_finish: true
+  allow_failures:
+  - julia: nightly
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     sudo add-apt-repository ppa:staticfloat/julia-deps -y;
@@ -29,10 +30,6 @@ script:
 - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
 # initial clone so that we install the dependencies correctly, but this copies the pwd
 - julia -e 'Pkg.clone("https://github.com/dhoegh/BuildExecutable.jl"); Pkg.build("BuildExecutable"); Pkg.clone(pwd())'
-# remove the copy
-- rm -rf "$HOME/.julia/v$TRAVIS_JULIA_VERSION/Playground"
-# symlink in the pwd
-- ln -s "$PWD" "$HOME/.julia/v$TRAVIS_JULIA_VERSION/Playground"
 # now build playground
 - julia --depwarn=no -e 'ENV["PLAYGROUND_INSTALL"] = true; Pkg.build("Playground");
   Pkg.test("Playground";  coverage=true)'
@@ -42,7 +39,6 @@ script:
 - ~/.playground/bin/playground list
 after_success:
 - julia -e 'cd(Pkg.dir("Playground")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
-- julia -e 'cd(Pkg.dir("Playground")); Pkg.add("Coverage"); using Coverage; Coveralls.submit(process_folder())'
 before_deploy:
 # Assuming skip_cleanup works the README.md and the build directory we want should be under the pwd
 - echo "Attempting to bundle playground..."
@@ -53,7 +49,8 @@ before_deploy:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then sha256sum --binary "playground-linux.tar.gz" > "SHA256SUM-linux.asc"; fi
 deploy:
   provider: releases
-  api_key: ${GITHUB_TOKEN}
+  api_key:
+    secure: VXiNu6Z4IDq4QIzCBadfA8Z0HXfyJhoLhrGsftGEO2pRDgzS0wogJxOIQ6s7vtfg/PmgiT4hzVFb5XSmQdTWZ1LxB83J8AXkd+YswNvJuWqqYwUSnsVybE37n7EuQTGS7c+IzD6pe3G+hwm/6sHwCeXx4wIugBYvEigixfY3sAI=
   file:
   - "playground-$TRAVIS_OS_NAME.tar.gz"
   - "SHA256SUM-$TRAVIS_OS_NAME.asc"
@@ -61,4 +58,4 @@ deploy:
   on:
     tags: true
     all_branches: true
-    repo: Rory-Finnegan/Playground.jl
+    repo: rofinn/Playground.jl

@@ -1,14 +1,12 @@
 function activate(config::Config; dir::AbstractString="", name::AbstractString="")
     init(config)
-
-    pg = PlaygroundConfig(config, dir, name)
-
+    pg = Environment(config, dir, name)
     prompt = config.default_prompt
 
     if name != ""
         prompt = replace(prompt, "playground", name)
     else
-        found = get_playground_name(config, pg.root_path)
+        found = get_playground_name(config, pg.root)
         if found != ""
             prompt = replace(prompt, "playground", found)
             pg.name = found
@@ -37,6 +35,7 @@ elseif is_unix()
             if !ispath(pg_rc)
                 cp(usr_rc, pg_rc, follow_symlinks=true)
                 fstream = open(pg_rc, "a")
+
                 try
                     path = ENV["PATH"]
                     ps1 = ENV["PS1"]
