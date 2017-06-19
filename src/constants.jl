@@ -1,6 +1,6 @@
 DECLARATIVE_PACKAGES_DIR = Pkg.dir("DeclarativePackages")
 DEFAULT_PROMPT = is_windows() ? "playground>" : "\\e[0;35m\\u@\\h:\\W (playground)> \\e[m"
-NIGHTLY = v"0.6-"
+NIGHTLY = v"0.7-"
 DEFAULT_CONFIG = """
 ---
 # This is just default location to store a new playground.

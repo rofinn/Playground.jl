@@ -21,7 +21,7 @@ function install{S<:AbstractString}(config::Config, version::VersionNumber; labe
     if stat(tmp_dest).size < 1024
         # S3 responds with an error message when a URL doesn't exist
         unavailable = open(tmp_dest, "r") do f
-            contains(@compat readstring(f), "key does not exist")
+            contains((@compat readstring(f)), "key does not exist")
         end
 
         if unavailable
