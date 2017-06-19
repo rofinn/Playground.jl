@@ -122,14 +122,21 @@ function julia_url(version::VersionNumber, os::Symbol, arch::Integer)
 
     major_minor = "$(version.major).$(version.minor)"
     future_release = Base.nextpatch(NIGHTLY)  # Note: Nightly expected to be a prerelease
+    pre = version.prerelease
     if version >= future_release
         throw(ArgumentError("The version $version exceeds the latest known nightly build $NIGHTLY"))
     elseif version >= NIGHTLY
+        # https://status.julialang.org/download/win64
+        # https://status.julialang.org/download/osx10.7+
+        # https://status.julialang.org/download/linux-x86_64
         url = "s3.amazonaws.com/julianightlies/bin/$os_arch/julia-latest-$nightly_ext"
-    elseif version.patch == 0 && version == Base.upperbound(version)
-        url = "s3.amazonaws.com/julialang/bin/$os_arch/$major_minor/julia-$major_minor-latest-$ext"
+    elseif version.patch == 0 && (version == Base.upperbound(version) || (length(pre) > 0 && pre[1] == "latest"))
+        # https://julialang-s3.julialang.org/bin/osx/x64/0.6/julia-0.6-latest-osx10.7+.dmg
+        # https://julialang-s3.julialang.org/bin/linux/x64/0.6/julia-0.6-latest-linux-x86_64.tar.gz
+        url = "julialang-s3.julialang.org/bin/$os_arch/$major_minor/julia-$major_minor-latest-$ext"
     else
-        url = "s3.amazonaws.com/julialang/bin/$os_arch/$major_minor/julia-$version-$ext"
+        # https://julialang-s3.julialang.org/bin/linux/x64/0.5/julia-0.5.2-linux-x86_64.tar.gz
+        url = "julialang-s3.julialang.org/bin/$os_arch/$major_minor/julia-$version-$ext"
     end
 
     return "https://$url"
