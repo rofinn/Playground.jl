@@ -1,16 +1,16 @@
 function clean(config::Config)
     function rm_deadlinks(dir)
         for f in readdir(dir)
-            file_path = abspath(joinpath(dir, f))
+            file_path = abs(join(dir, f))
             src = file_path
 
             while islink(src)
-                src = joinpath(dirname(src), readlink(src))
+                src = join(parent(src), readlink(src))
             end
 
-            src = abspath(src)
-            if !ispath(src)
-                rm(file_path)
+            src = abs(src)
+            if !exists(src)
+                remove(file_path)
             end
         end
     end
@@ -19,14 +19,14 @@ function clean(config::Config)
 end
 
 
-function Base.rm(config::Config; name::AbstractString="", dir::AbstractString="")
-    if name != "" && dir == ""
+function Base.rm(config::Config; name::AbstractString="", dir::AbstractPath=Path())
+    if !isempty(name) && isempty(dir)
         # If we find the name in the bin folder then we should just delete the julia symlink
-        if name in readdir(abspath(config.bin)) && name != "playground"
-            rm(joinpath(abspath(config.bin), name))
+        if name in readdir(abs(config.bin)) && name != "playground"
+            remove(join(abs(config.bin), name))
             return true
         # Otherwise the name should be in
-        elseif name in readdir(abspath(config.share))
+        elseif name in readdir(abs(config.share))
             dir = get_playground_dir(config, "", name)
 
             # The dir returned could be a link
@@ -37,23 +37,24 @@ function Base.rm(config::Config; name::AbstractString="", dir::AbstractString=""
                 catch
                     # If it fails just assume that we have a dead link
                     # and run clean_link and return
-                    rm(dir)
+                    remove(dir)
                     return true
                 end
             end
         else
             error("Unknown name $name")
         end
-    elseif dir == "" && name == ""
+    elseif isempty(dir) && isempty(name)
         error("No julia-version, playground name or directory provided.")
     end
 
     # By this point dir should be valid or the function should have already exited.
     # DeclarativePackages creates a read-only directory so in case we run into that
     # during deletion we recursively chmod the path with write permissions.
-    run(`chmod -R +w $(abspath(dir))`)
-    warn("Recusively deleting $(abspath(dir))...")
-    rm(abspath(dir), recursive=true)
+    # run(`chmod -R +w $(abspath(dir))`)
+    chmod(abs(dir), "+w"; recursive=true)
+    warn("Recusively deleting $(abs(dir))...")
+    remove(abs(dir); recursive=true)
 
     # Just to be safe run clean_links
     clean(config)

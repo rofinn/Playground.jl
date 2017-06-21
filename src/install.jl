@@ -12,7 +12,7 @@ function install{S<:AbstractString}(config::Config, version::VersionNumber; labe
     # download the julia version
     download_url = julia_url(version)
     base_name = "julia-$(version.major).$(version.minor)_$(Dates.today())"
-    tmp_dest = joinpath(config.tmp, base_name)
+    tmp_dest = join(config.tmp, base_name)
 
     info("Downloading julia $(version.major).$(version.minor) from $download_url ...")
     Playground.download(download_url, tmp_dest, false)
@@ -31,10 +31,15 @@ function install{S<:AbstractString}(config::Config, version::VersionNumber; labe
         end
     end
 
-    bin_path = Playground.install_julia_bin(tmp_dest, config, base_name, false)
+    bin_path = Playground.install_bin(tmp_dest, config, base_name, false)
     Playground.link_julia(bin_path, config, labels)
 
-    mklink(bin_path, joinpath(config.bin, "julia-$(version.major).$(version.minor)"))
+    symlink(
+        bin_path,
+        join(config.bin, "julia-$(version.major).$(version.minor)");
+        exist_ok=true,
+        overwrite=true
+    )
 end
 
 
@@ -42,17 +47,17 @@ end
     This option simply creates symlinks from an existing julia
     install.
 """ ->
-function dirinstall{S<:AbstractString}(config::Config, executable::AbstractString; labels::Array{S}=[])
+function install{S<:AbstractString}(config::Config, executable::AbstractPath; labels::Array{S}=[])
     info("Adding julia labels $labels to $executable")
-    if ispath(executable)
+    if exists(executable)
         init(config)
 
-        exe = abspath(executable)
+        exe = abs(executable)
         while islink(exe)
-            exe = joinpath(dirname(exe), readlink(exe))
+            exe = join(parent(exe), readlink(exe))
         end
 
-        exe = abspath(exe)
+        exe = abs(exe)
         if isfile(exe)
             Playground.link_julia(exe, config, labels)
         else
@@ -86,10 +91,10 @@ end
 # end
 
 
-function link_julia{S<:AbstractString}(bin_path::AbstractString, config::Config, labels::Array{S}=[])
-    bin_path = abspath(bin_path)
+function link_julia{S<:AbstractString}(bin_path::AbstractPath, config::Config, labels::Array{S}=[])
+    bin_path = abs(bin_path)
     for label in labels
-        mklink(bin_path, joinpath(config.bin, label))
+        symlink(bin_path, join(config.bin, label); exist_ok=true, overwrite=true)
     end
 
     @compat if is_unix()
@@ -97,10 +102,10 @@ function link_julia{S<:AbstractString}(bin_path::AbstractString, config::Config,
         lines = split(ret, "\n")
 
         versionstr = split(lines[1], " ")[3]
-        mklink(bin_path, joinpath(config.bin, "julia-$(versionstr)"))
+        symlink(bin_path, join(config.bin, "julia-$(versionstr)"); exist_ok=true, overwrite=true)
 
         commit_sha = strip(split(lines[2], " ")[2], '*')
-        mklink(bin_path, joinpath(config.bin, "julia-$(commit_sha)"))
+        symlink(bin_path, join(config.bin, "julia-$(commit_sha)"); exist_ok=true, overwrite=true)
     end
 end
 
@@ -128,69 +133,81 @@ end
 # end
 
 @compat if is_apple()
-    function install_julia_bin(src::AbstractString, config::Config, base_name, force)
-        src_path = abspath(joinpath(config.src, base_name))
-        bin_path = abspath(joinpath(config.bin, base_name))
-        exe_path = abspath(joinpath(src_path, "Contents/Resources/julia/bin/julia"))
+    function install_bin(src::AbstractPath, config::Config, base_name, force)
+        src_path = abs(join(config.src, base_name))
+        bin_path = abs(join(config.bin, base_name))
+        exe_path = abs(join(src_path, "Contents/Resources/julia/bin/julia"))
 
-        function install_from_dmg(mountdir::AbstractString)
+        function install_dmg(mountdir::AbstractPath)
             app_path = nothing
             try
                 run(`hdiutil attach -mountpoint $mountdir $src`)
                 for f in readdir(mountdir)
-                   if endswith(f, ".app")
-                        app_path = joinpath(mountdir, f)
+                   if extension(f) == "app"
+                       println(f)
+                        app_path = join(mountdir, f)
                    end
                 end
                 if app_path != nothing
                     copy(app_path, src_path)
-                    chmod(exe_path, 0o755)
+                    chmod(
+                        exe_path,
+                        user=(READ + WRITE + EXEC),
+                        group=(READ + EXEC),
+                        other=(READ + EXEC),
+                    )
                 end
             finally
                 run(`hdiutil detach $mountdir`)
             end
         end
 
-        dmg_tmp_dir = mktempdir(config.tmp)
+        dmg_tmp_dir = mktmpdir(config.tmp)
         try
             # Don't bother running this if src_path already exists
-            if !ispath(src_path) || force
-                install_from_dmg(dmg_tmp_dir)
+            if !exists(src_path) || force
+                println("Installing $dmg_tmp_dir")
+                install_dmg(dmg_tmp_dir)
             end
 
-            mklink(exe_path, bin_path)
+            symlink(exe_path, bin_path; exist_ok=true, overwrite=true)
         finally
-            rm(dmg_tmp_dir)
+            remove(dmg_tmp_dir)
         end
 
         return bin_path
     end
 elseif is_unix()
-    function install_julia_bin(src::AbstractString, config::Config, base_name, force)
-        src_path = abspath(joinpath(config.src, base_name))
-        bin_path = abspath(joinpath(config.bin, base_name))
+    function install_bin(src::AbstractPath, config::Config, base_name, force)
+        src_path = abs(join(config.src, base_name))
+        bin_path = abs(join(config.bin, base_name))
 
         if !ispath(src_path) || force
             mkpath(src_path)
             try
                 run(`tar -xzf $src -C $src_path`)
             catch
-                rm(src_path, recursive=true)
+                remove(src_path, recursive=true)
             end
         end
 
-        julia_bin_path = joinpath(
+        julia_bin_path = join(
             src_path,
             readdir(src_path)[1],
-            "bin/julia"
+            p"bin/julia"
         )
-        chmod(julia_bin_path, 0o755)
-        mklink(julia_bin_path, bin_path)
+        chmod(
+            julia_bin_path,
+            user=(READ + WRITE + EXEC),
+            group=(READ + EXEC),
+            other=(READ + EXEC),
+        )
+        symlink(julia_bin_path, bin_path; exist_ok=true, overwrite=true)
 
         return bin_path
     end
 elseif is_windows()
-    function install_julia_bin(src::AbstractString, config::Config)
+    function install_bin(src::AbstractPath, config::Config)
         # not sure what to do here yet.
         error("installing Julia EXEs on Windows not implemented yet.")
     end

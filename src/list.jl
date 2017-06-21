@@ -3,8 +3,8 @@ function list(config::Config; show_links=false)
 
     println("Julia Versions:")
     for j in readdir(config.bin)
-        if j != "playground"
-            file_path = joinpath(config.bin, j)
+        if j != p"playground"
+            file_path = join(config.bin, j)
             if islink(file_path) && show_links
                 println("\t$(j) -> $(readlink(file_path))")
             else
@@ -15,11 +15,11 @@ function list(config::Config; show_links=false)
 
     println("\nPlaygrounds:")
     for p in readdir(config.share)
-        file_path = joinpath(config.share, p)
+        file_path = join(config.share, p)
         if islink(file_path) && show_links
-            println("\t$(p) -> $(readlink(file_path))")
+            println("\t$(string(p)) -> $(string(readlink(file_path)))")
         else
-            println("\t$(p)")
+            println("\t$(string(p))")
         end
     end
 end

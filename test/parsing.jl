@@ -19,7 +19,7 @@ function test_argparse()
             "%COMMAND%" => "link",
             "link" => Dict(
                 "labels" => AbstractString["julia-src"],
-                "dir" => "/path/to/julia"
+                "dir" => p"/path/to/julia"
             )
         )
     )
@@ -28,8 +28,8 @@ function test_argparse()
     @test create_args1 == Dict(
         "%COMMAND%" => "create",
         "create" => Dict(
-            "dir" => "",
-            "requirements" => "",
+            "dir" => Path(),
+            "requirements" => Path(),
             "name" => "",
             "julia-version" => "",
         )
@@ -48,7 +48,7 @@ function test_argparse()
     @test activate_args1 == Dict(
         "%COMMAND%" => "activate",
         "activate" => Dict(
-            "dir" => "",
+            "dir" => Path(),
             "name" => ""
         )
     )
@@ -57,7 +57,7 @@ function test_argparse()
     @test activate_args2 == Dict(
         "%COMMAND%" => "activate",
         "activate" => Dict(
-            "dir" => "",
+            "dir" => Path(),
             "name" => "myplayground"
         )
     )
@@ -67,7 +67,7 @@ function test_argparse()
         "%COMMAND%" => "exec",
         "exec" => Dict(
             "cmd" => "ls -al",
-            "dir" => "",
+            "dir" => Path(),
             "name" => "myplayground"
         )
     )
@@ -90,7 +90,7 @@ function test_argparse()
     @test rm_args == Dict(
         "%COMMAND%" => "rm",
         "rm" => Dict(
-            "dir" => "",
+            "dir" => Path(),
             "name" => "myplayground"
         )
     )

@@ -1,4 +1,4 @@
-function execute(config::Config, cmd::Cmd; dir::AbstractString="", name::AbstractString="")
+function execute(config::Config, cmd::Cmd; dir::AbstractPath=Path(), name::AbstractString="")
     init(config)
     pg = Environment(config, dir, name)
     set_envs(pg)
