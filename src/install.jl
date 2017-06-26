@@ -14,8 +14,8 @@ function install{S<:AbstractString}(config::Config, version::VersionNumber; labe
     base_name = "julia-$(version.major).$(version.minor)_$(Dates.today())"
     tmp_dest = join(config.tmp, base_name)
 
-    info("Downloading julia $(version.major).$(version.minor) from $download_url ...")
-    Playground.download(download_url, tmp_dest, false)
+    info(logger, "Downloading julia $(version.major).$(version.minor) from $download_url ...")
+    download(download_url, tmp_dest, false)
 
     # Perform some verification on the download
     if stat(tmp_dest).size < 1024
@@ -25,21 +25,18 @@ function install{S<:AbstractString}(config::Config, version::VersionNumber; labe
         end
 
         if unavailable
-            error("Julia version $version does not exist")
+            error(logger, "Julia version $version does not exist")
         else
-            error("Aborting install. Download appears corrupt")
+            error(logger, "Aborting install. Download appears corrupt")
         end
     end
 
     bin_path = Playground.install_bin(tmp_dest, config, base_name, false)
     Playground.link_julia(bin_path, config, labels)
 
-    symlink(
-        bin_path,
-        join(config.bin, "julia-$(version.major).$(version.minor)");
-        exist_ok=true,
-        overwrite=true
-    )
+    label_path = join(config.bin, "julia-$(version.major).$(version.minor)")
+    debug(logger, "Creating link $label_path -> $bin_path")
+    symlink(bin_path, label_path; exist_ok=true, overwrite=true)
 end
 
 
@@ -48,7 +45,7 @@ end
     install.
 """ ->
 function install{S<:AbstractString}(config::Config, executable::AbstractPath; labels::Array{S}=[])
-    info("Adding julia labels $labels to $executable")
+    info(logger, "Adding julia labels $labels to $executable")
     if exists(executable)
         init(config)
 
@@ -61,10 +58,10 @@ function install{S<:AbstractString}(config::Config, executable::AbstractPath; la
         if isfile(exe)
             Playground.link_julia(exe, config, labels)
         else
-            error("$exe is not a valid executable.")
+            error(logger, "$exe is not a valid executable.")
         end
     else
-        error("$executable is not a valid path")
+        error(logger, "$executable is not a valid path")
     end
 end
 
@@ -94,7 +91,9 @@ end
 function link_julia{S<:AbstractString}(bin_path::AbstractPath, config::Config, labels::Array{S}=[])
     bin_path = abs(bin_path)
     for label in labels
-        symlink(bin_path, join(config.bin, label); exist_ok=true, overwrite=true)
+        label_path = join(config.bin, label)
+        debug(logger, "Creating link $label_path -> $bin_path")
+        symlink(bin_path, label_path; exist_ok=true, overwrite=true)
     end
 
     @compat if is_unix()
@@ -102,9 +101,11 @@ function link_julia{S<:AbstractString}(bin_path::AbstractPath, config::Config, l
         lines = split(ret, "\n")
 
         versionstr = split(lines[1], " ")[3]
+        debug(logger, "Creating link julia-$(versionstr) -> $bin_path")
         symlink(bin_path, join(config.bin, "julia-$(versionstr)"); exist_ok=true, overwrite=true)
 
         commit_sha = strip(split(lines[2], " ")[2], '*')
+        debug(logger, "Creating link julia-$(commit_sha) -> $bin_path")
         symlink(bin_path, join(config.bin, "julia-$(commit_sha)"); exist_ok=true, overwrite=true)
     end
 end
@@ -141,23 +142,22 @@ end
         function install_dmg(mountdir::AbstractPath)
             app_path = nothing
             try
+                debug(logger, "Mounting $src @ $mountdir")
                 run(`hdiutil attach -mountpoint $mountdir $src`)
                 for f in readdir(mountdir)
                    if extension(f) == "app"
-                       println(f)
                         app_path = join(mountdir, f)
+                        break
                    end
                 end
                 if app_path != nothing
+                    debug(logger, "Copying $app_path to $src_path")
                     copy(app_path, src_path)
-                    chmod(
-                        exe_path,
-                        user=(READ + WRITE + EXEC),
-                        group=(READ + EXEC),
-                        other=(READ + EXEC),
-                    )
+                    chmod(exe_path, Playground.JULIA_BIN_MODE)
+                    debug(logger, "Permissions set to $(Playground.JULIA_BIN_MODE)")
                 end
             finally
+                debug("Detaching $src from $mountdir")
                 run(`hdiutil detach $mountdir`)
             end
         end
@@ -166,10 +166,11 @@ end
         try
             # Don't bother running this if src_path already exists
             if !exists(src_path) || force
-                println("Installing $dmg_tmp_dir")
+                info(logger, "Installing $src ...")
                 install_dmg(dmg_tmp_dir)
             end
 
+            debug(logger, "Creating link $bin_path -> $exe_path")
             symlink(exe_path, bin_path; exist_ok=true, overwrite=true)
         finally
             remove(dmg_tmp_dir)
@@ -182,26 +183,21 @@ elseif is_unix()
         src_path = abs(join(config.src, base_name))
         bin_path = abs(join(config.bin, base_name))
 
+        info(logger, "Installing $src ...")
         if !ispath(src_path) || force
             mkpath(src_path)
             try
+                debug(logger, "Extracting $src to $src_path")
                 run(`tar -xzf $src -C $src_path`)
             catch
                 remove(src_path, recursive=true)
             end
         end
 
-        julia_bin_path = join(
-            src_path,
-            readdir(src_path)[1],
-            p"bin/julia"
-        )
-        chmod(
-            julia_bin_path,
-            user=(READ + WRITE + EXEC),
-            group=(READ + EXEC),
-            other=(READ + EXEC),
-        )
+        julia_bin_path = join(src_path, readdir(src_path)[1], p"bin/julia")
+        chmod(julia_bin_path, Playground.JULIA_BIN_MODE)
+        debug(logger, "Permissions set to $(Playground.JULIA_BIN_MODE)")
+        debug(logger, "Creating link $bin_path -> $julia_bin_path")
         symlink(julia_bin_path, bin_path; exist_ok=true, overwrite=true)
 
         return bin_path
@@ -209,6 +205,6 @@ elseif is_unix()
 elseif is_windows()
     function install_bin(src::AbstractPath, config::Config)
         # not sure what to do here yet.
-        error("installing Julia EXEs on Windows not implemented yet.")
+        error(logger, "installing Julia EXEs on Windows not implemented yet.")
     end
 end

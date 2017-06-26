@@ -37,9 +37,7 @@ type Config
 end
 
 function init(config::Config)
-    info("Initializing shared playground environment...")
     for p in (config.root, config.tmp, config.src, config.bin, config.share)
-        info("$p created.")
         mkdir(p; recursive=true, exist_ok=true)
     end
 end
@@ -81,28 +79,38 @@ type Environment
 end
 
 function init(pg::Environment)
-    info("Initializing environment $(pg.name)...")
+    info(logger, "Creating playground environment $(pg.name)...")
     for p in (pg.root, pg.bin, pg.log, pg.pkg)
         mkdir(p; recursive=true, exist_ok=true)
-        info("$p created.")
+        debug(logger, "$p created.")
     end
 end
 
 function set_envs(pg::Environment)
     ENV["PATH"] = "$(pg.bin):" * ENV["PATH"]
+    debug(logger, string("PATH=", ENV["PATH"]))
+
     ENV["PLAYGROUND_ENV"] = pg.name == "" ? basename(pg.root) : pg.name
+    debug(logger, string("PLAYGROUND_ENV=", ENV["PLAYGROUND_ENV"]))
+
     ENV["JULIA_PKGDIR"] = pg.pkg
+    debug(logger, "JULIA_PKGDIR=$(pg.pkg)")
 
     if pg.default_shell != ""
         ENV["SHELL"] = pg.default_shell
+        debug(logger, "SHELL=$(pg.default_shell)")
     end
 
     if pg.isolated_julia_history
-        ENV["JULIA_HISTORY"] = join(pg.root, p".julia_history")
+        jh = join(pg.root, p".julia_history")
+        ENV["JULIA_HISTORY"] = jh
+        debug(logger, "JULIA_HISTORY=$jh")
     end
 
     if pg.isolated_shell_history
-        ENV["HISTFILE"] = join(pg.root, p".shell_history")
+        sh = join(pg.root, p".shell_history")
+        ENV["HISTFILE"] = sh
+        debug(logger, "HISTFILE=$sh")
     end
 end
 

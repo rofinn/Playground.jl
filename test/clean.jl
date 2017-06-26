@@ -1,5 +1,5 @@
 function test_clean()
-    rm(join(TEST_TMP_DIR, "test-playground"), recursive=true)
+    remove(join(TEST_TMP_DIR, "test-playground"), recursive=true)
     @test !exists(join(TEST_TMP_DIR, "test-playground"))
     @test islink(join(TEST_CONFIG.bin, "julia-bin"))
     @test islink(join(TEST_CONFIG.share, "myproject"))

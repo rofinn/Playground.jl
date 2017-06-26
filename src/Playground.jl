@@ -6,6 +6,7 @@ using Compat
 using ArgParse
 using Mocking
 using FilePaths
+using Memento
 
 include("constants.jl")
 include("config.jl")
@@ -25,8 +26,6 @@ export
     argparse,
     load_config,
     install,
-    dirinstall,
-    #gitinstall,
     create,
     activate,
     execute,
@@ -38,6 +37,7 @@ export
     DEFAULT_CONFIG
 
 
+const logger = get_logger(current_module())
 
 function main(cmd_args=ARGS, config=Path(), root=Path())
     if isempty(config) && isempty(root)
@@ -48,6 +48,9 @@ function main(cmd_args=ARGS, config=Path(), root=Path())
     args = argparse(cmd_args)
 
     cmd = args["%COMMAND%"]
+    log_level = args["debug"] ? "debug" : "info"
+    Memento.config(log_level; fmt="[{level}] {msg}")
+
     args = args[cmd]
 
     config = load_config(config, root)

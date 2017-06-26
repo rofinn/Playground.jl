@@ -10,6 +10,7 @@ function clean(config::Config)
 
             src = abs(src)
             if !exists(src)
+                debug(logger, "Removing $file_path")
                 remove(file_path)
             end
         end
@@ -23,7 +24,9 @@ function Base.rm(config::Config; name::AbstractString="", dir::AbstractPath=Path
     if !isempty(name) && isempty(dir)
         # If we find the name in the bin folder then we should just delete the julia symlink
         if name in readdir(abs(config.bin)) && name != "playground"
-            remove(join(abs(config.bin), name))
+            path = join(abs(config.bin), name)
+            debug(logger, "Removing $path")
+            remove(path)
             return true
         # Otherwise the name should be in
         elseif name in readdir(abs(config.share))
@@ -37,6 +40,7 @@ function Base.rm(config::Config; name::AbstractString="", dir::AbstractPath=Path
                 catch
                     # If it fails just assume that we have a dead link
                     # and run clean_link and return
+                    debug(logger, "Removing $dir")
                     remove(dir)
                     return true
                 end
@@ -45,7 +49,7 @@ function Base.rm(config::Config; name::AbstractString="", dir::AbstractPath=Path
             error("Unknown name $name")
         end
     elseif isempty(dir) && isempty(name)
-        error("No julia-version, playground name or directory provided.")
+        error(logger, "No julia-version, playground name or directory provided.")
     end
 
     # By this point dir should be valid or the function should have already exited.
@@ -53,7 +57,7 @@ function Base.rm(config::Config; name::AbstractString="", dir::AbstractPath=Path
     # during deletion we recursively chmod the path with write permissions.
     # run(`chmod -R +w $(abspath(dir))`)
     chmod(abs(dir), "+w"; recursive=true)
-    warn("Recusively deleting $(abs(dir))...")
+    warn(logger, "Recusively deleting $(abs(dir))...")
     remove(abs(dir); recursive=true)
 
     # Just to be safe run clean_links

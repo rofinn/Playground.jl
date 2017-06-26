@@ -8,7 +8,6 @@ function create(
     init(config)
     pg = Environment(config, dir, name)
     init(pg)
-    info("Playground folders created")
 
     if julia != ""
         symlink(join(config.bin, julia), pg.julia, exist_ok=true, overwrite=true)
@@ -24,17 +23,20 @@ function create(
     ENV["JULIA_PKGDIR"] = pg.pkg
 
     if !isempty(reqs_file) && exists(reqs_file)
-        info("Installing packages from REQUIRE file $reqs_file...")
-        run(`$(pg.julia) -e 'Pkg.init()'`)
+        info(logger, "Installing packages from REQUIRE file $reqs_file...")
+        Playground.log_output(`$(pg.julia) -e 'Pkg.init()'`)
         for v in readdir(pg.pkg)
             copy(reqs_file, join(pg.pkg, v, "REQUIRE"); exist_ok=true, overwrite=true)
             try
-                run(`$(pg.julia) -e 'Pkg.resolve()'`)
+                Playground.log_output(`$(pg.julia) -e 'Pkg.resolve()'`)
             catch
-                warn("Failed to resolve requirements. Perhaps there is something wrong with your REQUIRE file.")
+                warn(logger, string(
+                    "Failed to resolve requirements. ",
+                    "Perhaps there is something wrong with your REQUIRE file."
+                ))
             end
         end
     else
-        run(`$(pg.julia) -e 'Pkg.init()'`)
+        Playground.log_output(`$(pg.julia) -e 'Pkg.init()'`)
     end
 end

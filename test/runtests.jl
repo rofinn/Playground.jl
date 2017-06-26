@@ -44,9 +44,9 @@ end
 
 
 main(["install", "download", "0.5", "--labels", "julia-0.5"], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
-main(["install", "link", joinpath(string(TEST_CONFIG.bin), "julia-0.5"), "--labels", "julia-stable-dir"], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
+main(["install", "link", join(string(TEST_CONFIG.bin), "julia-0.5"), "--labels", "julia-stable-dir"], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
 main(["create"], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
-main(["exec", "ls -al", joinpath(string(TEST_DIR), ".playground")], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
+main(["exec", "ls -al", join(string(TEST_DIR), ".playground")], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
 main(["list"], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
 main(["clean"], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
-main(["rm", "--dir", joinpath(string(TEST_DIR), ".playground")], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)
+main(["rm", "--dir", join(string(TEST_DIR), ".playground")], DEFAULT_CONFIG, TEST_PLAYGROUND_DIR)

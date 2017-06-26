@@ -5,6 +5,10 @@ function argparse(cmd_args=ARGS)
     )
 
     @add_arg_table parse_settings begin
+        "--debug", "-d"
+            help = "Log debug message to STDOUT"
+            action = :store_true
+            default = false
         "install"
             action = :command
             help = "Installs julia version for you."

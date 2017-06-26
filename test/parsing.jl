@@ -9,7 +9,8 @@ function test_argparse()
                 "labels" => AbstractString[],
                 "version" => v"0.3",
             )
-        )
+        ),
+        "debug" => false
     )
 
     install_link_args = argparse(["install", "link", "/path/to/julia", "--labels", "julia-src"])
@@ -21,7 +22,8 @@ function test_argparse()
                 "labels" => AbstractString["julia-src"],
                 "dir" => p"/path/to/julia"
             )
-        )
+        ),
+        "debug" => false
     )
 
     create_args1 = argparse(["create"])
@@ -32,7 +34,8 @@ function test_argparse()
             "requirements" => Path(),
             "name" => "",
             "julia-version" => "",
-        )
+        ),
+        "debug" => false
     )
 
     create_args2 = argparse(
@@ -50,7 +53,8 @@ function test_argparse()
         "activate" => Dict(
             "dir" => Path(),
             "name" => ""
-        )
+        ),
+        "debug" => false
     )
 
     activate_args2 = argparse(["activate", "--name", "myplayground"])
@@ -59,7 +63,8 @@ function test_argparse()
         "activate" => Dict(
             "dir" => Path(),
             "name" => "myplayground"
-        )
+        ),
+        "debug" => false
     )
 
     exec_args = argparse(["exec", "ls -al", "--name", "myplayground"])
@@ -69,7 +74,8 @@ function test_argparse()
             "cmd" => "ls -al",
             "dir" => Path(),
             "name" => "myplayground"
-        )
+        ),
+        "debug" => false
     )
 
     list_args = argparse(["list", "--show-links"])
@@ -77,13 +83,15 @@ function test_argparse()
         "%COMMAND%" => "list",
         "list" => Dict(
             "show-links" => true
-        )
+        ),
+        "debug" => false
     )
 
     clean_args = argparse(["clean"])
     @test clean_args == Dict(
         "%COMMAND%" => "clean",
-        "clean" => Dict()
+        "clean" => Dict(),
+        "debug" => false
     )
 
     rm_args = argparse(["rm", "myplayground"])
@@ -92,7 +100,8 @@ function test_argparse()
         "rm" => Dict(
             "dir" => Path(),
             "name" => "myplayground"
-        )
+        ),
+        "debug" => false
     )
 end
 

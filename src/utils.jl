@@ -55,7 +55,7 @@ function julia_url(version::VersionNumber, os::Symbol, arch::Integer)
         ext = "win32.exe"
         nightly_ext = ext
     else
-        error("Julia does not support $arch-bit $os")
+        error(logger, "Julia does not support $arch-bit $os")
     end
 
     # Note: We could probably get specific revisions if we really wanted to.
@@ -68,12 +68,9 @@ function julia_url(version::VersionNumber, os::Symbol, arch::Integer)
     if version >= future_release
         throw(ArgumentError("The version $version exceeds the latest known nightly build $NIGHTLY"))
     elseif version >= NIGHTLY
-        # https://status.julialang.org/download/win64
-        # https://status.julialang.org/download/osx10.7+
         # https://status.julialang.org/download/linux-x86_64
         url = "s3.amazonaws.com/julianightlies/bin/$os_arch/julia-latest-$nightly_ext"
     elseif version.patch == 0 && (version == Base.upperbound(version) || (length(pre) > 0 && pre[1] == "latest"))
-        # https://julialang-s3.julialang.org/bin/osx/x64/0.6/julia-0.6-latest-osx10.7+.dmg
         # https://julialang-s3.julialang.org/bin/linux/x64/0.6/julia-0.6-latest-linux-x86_64.tar.gz
         url = "julialang-s3.julialang.org/bin/$os_arch/$major_minor/julia-$major_minor-latest-$ext"
     else
@@ -95,4 +92,34 @@ function julia_url(version::AbstractString, os::Symbol, arch::Integer)
     end
 
     return julia_url(ver, os, arch)
+end
+
+
+function log_output(cmd::Cmd)
+    try
+        stdout = Pipe()
+        stderr = Pipe()
+
+        p = spawn(pipeline(cmd, stdin=DevNull, stdout=stdout, stderr=stderr))
+
+        close(stdout.in)
+        close(stderr.in)
+
+        # Julia logs print to stderr
+        for l in readlines(stderr)
+            if startswith(l, "INFO: ")
+                debug(logger, join(split(l)[2:end], ' '))
+            elseif startswith(l, "WARNING: ")
+                warn(logger, join(split(l)[2:end], ' '))
+            else
+                debug(logger, l)
+            end
+        end
+
+        for l in readlines(stdout)
+            debug(logger, l)
+        end
+    catch e
+        error(logger, e)
+    end
 end
