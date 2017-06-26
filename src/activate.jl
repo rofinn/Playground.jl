@@ -1,9 +1,9 @@
-function activate(config::Config; dir::AbstractString="", name::AbstractString="")
+function activate(config::Config; dir::AbstractPath=Path(), name::AbstractString="")
     init(config)
     pg = Environment(config, dir, name)
     prompt = config.default_prompt
 
-    if name != ""
+    if !isempty(name)
         prompt = replace(prompt, "playground", name)
     else
         found = get_playground_name(config, pg.root)
@@ -29,32 +29,25 @@ elseif is_unix()
             @mock run(`$(ENV["SHELL"]) -i`)
         elseif haskey(ENV, "SHELL")
             # Try and setup the new shell as close to the user's default shell as possible.
-            usr_rc = joinpath(homedir(), "." * basename(ENV["SHELL"]) * "rc")
-            pg_rc = joinpath(dirname(ENV["JULIA_PKGDIR"]), basename(ENV["SHELL"]) * "rc")
+            usr_rc = join(home(), "." * basename(ENV["SHELL"] * "rc"))
+            pg_rc = join(parent(Path(ENV["JULIA_PKGDIR"])), basename(ENV["SHELL"] * "rc"))
 
-            if !ispath(pg_rc)
+            if !exists(pg_rc)
                 cp(usr_rc, pg_rc, follow_symlinks=true)
-                fstream = open(pg_rc, "a")
+                content = string(
+                    "export PATH=", ENV["PATH"], "\n",
+                    "export PS1=\"$(prompt)\"\n",
+                    "export JULIA_PKGDIR=", ENV["JULIA_PKGDIR"], "\n",
+                )
 
-                try
-                    path = ENV["PATH"]
-                    ps1 = ENV["PS1"]
-                    pkg_dir = ENV["JULIA_PKGDIR"]
-
-                    write(fstream, "export PATH=$path\n")
-                    write(fstream, "export PS1=\"$(prompt)\"\n")
-                    write(fstream, "export JULIA_PKGDIR=$pkg_dir\n")
-
-                    if haskey(ENV, "HISTFILE")
-                        histfile = ENV["HISTFILE"]
-                        write(fstream, "export HISTFILE=$histfile\n")
-                    end
-                finally
-                    close(fstream)
+                if haskey(ENV, "HISTFILE")
+                    content = string(content, "export HISTFILE=", ENV["HISTFILE"], "\n")
                 end
+
+                write(pg_rc, content, "a")
             end
 
-    		if contains(ENV["SHELL"],"zsh")
+            if contains(ENV["SHELL"], "zsh")
     			@mock run(`$(ENV["SHELL"]) -c "source $pg_rc; $(ENV["SHELL"])"`)
     		else
     			@mock run(`$(ENV["SHELL"]) --rcfile $pg_rc`)

@@ -9,7 +9,8 @@ function test_argparse()
                 "labels" => AbstractString[],
                 "version" => v"0.3",
             )
-        )
+        ),
+        "debug" => false
     )
 
     install_link_args = argparse(["install", "link", "/path/to/julia", "--labels", "julia-src"])
@@ -19,20 +20,22 @@ function test_argparse()
             "%COMMAND%" => "link",
             "link" => Dict(
                 "labels" => AbstractString["julia-src"],
-                "dir" => "/path/to/julia"
+                "dir" => p"/path/to/julia"
             )
-        )
+        ),
+        "debug" => false
     )
 
     create_args1 = argparse(["create"])
     @test create_args1 == Dict(
         "%COMMAND%" => "create",
         "create" => Dict(
-            "dir" => "",
-            "requirements" => "",
+            "dir" => Path(),
+            "requirements" => Path(),
             "name" => "",
             "julia-version" => "",
-        )
+        ),
+        "debug" => false
     )
 
     create_args2 = argparse(
@@ -48,18 +51,20 @@ function test_argparse()
     @test activate_args1 == Dict(
         "%COMMAND%" => "activate",
         "activate" => Dict(
-            "dir" => "",
+            "dir" => Path(),
             "name" => ""
-        )
+        ),
+        "debug" => false
     )
 
     activate_args2 = argparse(["activate", "--name", "myplayground"])
     @test activate_args2 == Dict(
         "%COMMAND%" => "activate",
         "activate" => Dict(
-            "dir" => "",
+            "dir" => Path(),
             "name" => "myplayground"
-        )
+        ),
+        "debug" => false
     )
 
     exec_args = argparse(["exec", "ls -al", "--name", "myplayground"])
@@ -67,9 +72,10 @@ function test_argparse()
         "%COMMAND%" => "exec",
         "exec" => Dict(
             "cmd" => "ls -al",
-            "dir" => "",
+            "dir" => Path(),
             "name" => "myplayground"
-        )
+        ),
+        "debug" => false
     )
 
     list_args = argparse(["list", "--show-links"])
@@ -77,22 +83,25 @@ function test_argparse()
         "%COMMAND%" => "list",
         "list" => Dict(
             "show-links" => true
-        )
+        ),
+        "debug" => false
     )
 
     clean_args = argparse(["clean"])
     @test clean_args == Dict(
         "%COMMAND%" => "clean",
-        "clean" => Dict()
+        "clean" => Dict(),
+        "debug" => false
     )
 
     rm_args = argparse(["rm", "myplayground"])
     @test rm_args == Dict(
         "%COMMAND%" => "rm",
         "rm" => Dict(
-            "dir" => "",
+            "dir" => Path(),
             "name" => "myplayground"
-        )
+        ),
+        "debug" => false
     )
 end
 

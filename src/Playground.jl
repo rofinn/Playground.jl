@@ -5,6 +5,8 @@ module Playground
 using Compat
 using ArgParse
 using Mocking
+using FilePaths
+using Memento
 
 include("constants.jl")
 include("config.jl")
@@ -24,8 +26,6 @@ export
     argparse,
     load_config,
     install,
-    dirinstall,
-    #gitinstall,
     create,
     activate,
     execute,
@@ -37,16 +37,20 @@ export
     DEFAULT_CONFIG
 
 
+const logger = get_logger(current_module())
 
-function main(cmd_args=ARGS, config="", root="")
-    if config == "" && root == ""
-        config = joinpath(config_path(), "config.yml")
+function main(cmd_args=ARGS, config=Path(), root=Path())
+    if isempty(config) && isempty(root)
+        config = join(config_path(), p"config.yml")
         root = config_path()
     end
 
     args = argparse(cmd_args)
 
     cmd = args["%COMMAND%"]
+    log_level = args["debug"] ? "debug" : "info"
+    Memento.config(log_level; fmt="[{level}] {msg}")
+
     args = args[cmd]
 
     config = load_config(config, root)
@@ -62,9 +66,9 @@ function main(cmd_args=ARGS, config="", root="")
                 labels=args["labels"],
             )
         elseif install_cmd == "link"
-            dirinstall(
+            install(
                 config,
-                abspath(args["dir"]);
+                abs(args["dir"]);
                 labels=args["labels"],
             )
         # elseif install_cmd == "build"

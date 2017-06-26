@@ -1,7 +1,8 @@
-DECLARATIVE_PACKAGES_DIR = Pkg.dir("DeclarativePackages")
-DEFAULT_PROMPT = is_windows() ? "playground>" : "\\e[0;35m\\u@\\h:\\W (playground)> \\e[m"
-NIGHTLY = v"0.7-"
-DEFAULT_CONFIG = """
+const DECLARATIVE_PACKAGES_DIR = Pkg.dir("DeclarativePackages")
+const DEFAULT_PROMPT = is_windows() ? "playground>" : "\\e[0;35m\\u@\\h:\\W (playground)> \\e[m"
+const NIGHTLY = v"0.7-"
+const JULIA_BIN_MODE = Mode(user=(READ+WRITE+EXEC), group=(READ+EXEC), other=(READ+EXEC))
+const DEFAULT_CONFIG = """
 ---
 # This is just default location to store a new playground.
 # This is used by create and activate if no --name or --path.

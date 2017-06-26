@@ -5,6 +5,10 @@ function argparse(cmd_args=ARGS)
     )
 
     @add_arg_table parse_settings begin
+        "--debug", "-d"
+            help = "Log debug message to STDOUT"
+            action = :store_true
+            default = false
         "install"
             action = :command
             help = "Installs julia version for you."
@@ -43,10 +47,12 @@ function argparse(cmd_args=ARGS)
     @add_arg_table parse_settings["create"] begin
         "dir"
             help = "Where to create the playground. Defaults to the current working directory (can be changed in `~/.playground/config`."
-            default = ""
+            arg_type = AbstractPath
+            default = Path()
         "--requirements", "-r"
             help = "A REQUIRE or DECLARE file of dependencies to install into the playground."
-            default = ""
+            arg_type = AbstractPath
+            default = Path()
         "--name", "-n"
             help = "A global name to allow activating the playground from anywhere."
             default = ""
@@ -58,7 +64,8 @@ function argparse(cmd_args=ARGS)
     @add_arg_table parse_settings["activate"] begin
         "dir"
             help = "The path to the playground to use. This takes priority over --name."
-            default = ""
+            arg_type = AbstractPath
+            default = Path()
         "--name", "-n"
             help = "A global name to allow activating the playground from anywhere."
             default = ""
@@ -70,7 +77,8 @@ function argparse(cmd_args=ARGS)
             required = true
         "dir"
             help = "The path to the playground to use. This takes priority over --name."
-            default = ""
+            arg_type = AbstractPath
+            default = Path()
         "--name", "-n"
             help = "A global name to allow activating the playground from anywhere."
             default = ""
@@ -91,7 +99,8 @@ function argparse(cmd_args=ARGS)
             default = ""
         "--dir"
             help = "Deletes the provided playground directory and the link to it."
-            default = ""
+            arg_type = AbstractPath
+            default = Path()
     end
 
     @add_arg_table parse_settings["install"]["download"] begin
@@ -108,7 +117,8 @@ function argparse(cmd_args=ARGS)
     @add_arg_table parse_settings["install"]["link"] begin
         "dir"
             help = "The path to a julia executable you'd like to be made available to playgrounds."
-            default = ""
+            arg_type = AbstractPath
+            default = Path()
         "--labels", "-l"
             help = "Extra labels to apply to the new julia versions."
             arg_type = AbstractString

@@ -1,80 +1,22 @@
-# currently only creates a symlink
-function mklink(src::AbstractString, dest::AbstractString; soft=true, overwrite=true)
-    if ispath(src)
-        if ispath(dest) && soft && overwrite
-            rm(dest, recursive=true)
-        end
-
-        if !ispath(dest)
-            @compat if is_unix()
-                run(`ln -s $(src) $(dest)`)
-            elseif is_windows()
-                if isfile(src)
-                    run(`mklink $(dest) $(src)`)
-                else
-                    run(`mklink /D $(dest) $(src)`)
-                end
-            end
-        elseif !soft
-            error("$(dest) already exists.")
-        end
-    else
-        error("$(src) is not a valid path")
+function get_playground_dir(config::Config, dir::AbstractPath, name::AbstractString)
+    if isempty(dir) && isempty(name)
+        return abs(join(cwd(), config.default_playground_path))
+    elseif isempty(dir) && !isempty(name)
+        return abs(join(config.share, name))
+    elseif !isempty(dir)
+        return abs(dir)
     end
 end
 
 
-function copy(src::AbstractString, dest::AbstractString; soft=true, overwrite=true)
-    if ispath(src)
-        if ispath(dest) && soft && overwrite
-            rm(dest, recursive=true)
-        end
-
-        if !ispath(dest)
-            # Shell out to copy directories cause this isn't supported
-            # in v0.3 and I don't feel like copying all of that code into this
-            # project. This if should be deleted when 0.3 is deprecated
-            cp(src, dest)
-        elseif !soft
-            error("$(dest) already exists.")
-        end
-    else
-        error("$(src) is not a valid path")
-    end
-end
-
-
-@doc doc"""
-    We overload download for our tests in order to make sure we're just download. The
-    julia builds once.
-""" ->
-function Base.download(src::AbstractString, dest::AbstractString, overwrite)
-    if !ispath(dest) || overwrite
-        download(src, dest)
-    end
-    return dest
-end
-
-
-function get_playground_dir(config::Config, dir::AbstractString, name::AbstractString)
-    if dir == "" && name == ""
-        return abspath(joinpath(pwd(), config.default_playground_path))
-    elseif dir == "" && name != ""
-        return abspath(joinpath(config.share, name))
-    elseif dir != ""
-        return abspath(dir)
-    end
-end
-
-
-function get_playground_name(config::Config, dir::AbstractString)
-    root_path = abspath(dir)
+function get_playground_name(config::Config, dir::AbstractPath)
+    root_path = abs(dir)
     name = ""
 
     for p in readdir(config.share)
-        file_path = joinpath(config.share, p)
+        file_path = join(config.share, p)
         if islink(file_path)
-            if abspath(readlink(file_path)) == root_path
+            if abs(readlink(file_path)) == root_path
                 name = p
                 break
             end
@@ -113,7 +55,7 @@ function julia_url(version::VersionNumber, os::Symbol, arch::Integer)
         ext = "win32.exe"
         nightly_ext = ext
     else
-        error("Julia does not support $arch-bit $os")
+        error(logger, "Julia does not support $arch-bit $os")
     end
 
     # Note: We could probably get specific revisions if we really wanted to.
@@ -126,12 +68,9 @@ function julia_url(version::VersionNumber, os::Symbol, arch::Integer)
     if version >= future_release
         throw(ArgumentError("The version $version exceeds the latest known nightly build $NIGHTLY"))
     elseif version >= NIGHTLY
-        # https://status.julialang.org/download/win64
-        # https://status.julialang.org/download/osx10.7+
         # https://status.julialang.org/download/linux-x86_64
         url = "s3.amazonaws.com/julianightlies/bin/$os_arch/julia-latest-$nightly_ext"
     elseif version.patch == 0 && (version == Base.upperbound(version) || (length(pre) > 0 && pre[1] == "latest"))
-        # https://julialang-s3.julialang.org/bin/osx/x64/0.6/julia-0.6-latest-osx10.7+.dmg
         # https://julialang-s3.julialang.org/bin/linux/x64/0.6/julia-0.6-latest-linux-x86_64.tar.gz
         url = "julialang-s3.julialang.org/bin/$os_arch/$major_minor/julia-$major_minor-latest-$ext"
     else
@@ -153,4 +92,34 @@ function julia_url(version::AbstractString, os::Symbol, arch::Integer)
     end
 
     return julia_url(ver, os, arch)
+end
+
+
+function log_output(cmd::Cmd)
+    try
+        stdout = Pipe()
+        stderr = Pipe()
+
+        p = spawn(pipeline(cmd, stdin=DevNull, stdout=stdout, stderr=stderr))
+
+        close(stdout.in)
+        close(stderr.in)
+
+        # Julia logs print to stderr
+        for l in readlines(stderr)
+            if startswith(l, "INFO: ")
+                debug(logger, join(split(l)[2:end], ' '))
+            elseif startswith(l, "WARNING: ")
+                warn(logger, join(split(l)[2:end], ' '))
+            else
+                debug(logger, l)
+            end
+        end
+
+        for l in readlines(stdout)
+            debug(logger, l)
+        end
+    catch e
+        error(logger, e)
+    end
 end
