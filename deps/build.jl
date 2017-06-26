@@ -7,9 +7,7 @@ deps_dir = parent(Path(@__FILE__))
 
 # Setup the build directory
 build_dir = join(deps_dir, "usr", "build")
-mkdir(build_dir; recursive=true)
-
-build_script = p"script.jl"
+mkdir(build_dir; recursive=true, exist_ok=true)
 
 bin_exec = haskey(ENV, "PLAYGROUND_BIN_EXEC") ? parse(ENV["PLAYGROUND_BIN_EXEC"]) : false
 
@@ -17,13 +15,8 @@ if bin_exec
     # Actually build the playground executable
     info("Trying to build playground executable in $build_dir ...")
     using BuildExecutable
-    build_executable(
-        "playground",
-        build_script,
-        build_dir,
-        "generic";
-        force=true
-    )
+    # We avoid passing a Path to build_executable as it can cause problems.
+    build_executable("playground", "script.jl", String(build_dir), "generic"; force=true)
 else
     info("Copying playground script to $build_dir")
     PKG_PLAYGROUND_BIN = join(deps_dir, "usr", "bin", "playground")
@@ -69,8 +62,8 @@ playground_compiled = join(build_dir, "playground")
 if install
     # Set up the user level playground directory
     info("Setting up user playground directory...")
-    mkdir(install_dir; recursive=true)
-    mkdir(join(install_dir, p"bin"); recursive=true)
+    mkdir(install_dir; recursive=true, exist_ok=true)
+    mkdir(join(install_dir, p"bin"); recursive=true, exist_ok=true)
 
     info("Linking playground config to $config_installed.")
 
@@ -83,7 +76,7 @@ if install
 
     info("Linking playground executable to $playground_installed")
 
-    if exist(playground_installed)
+    if exists(playground_installed)
         backup_file = join(install_dir, "bin", ".playground_$(Dates.today()).bak")
         info("Backing up existing playground executable to $backup_file")
         copy(playground_installed, backup_file; exist_ok=true, overwrite=true)

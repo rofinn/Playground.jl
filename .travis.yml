@@ -4,6 +4,7 @@ os:
 - linux
 julia:
 - 0.5
+- 0.6
 - nightly
 addons:
   apt:
@@ -28,20 +29,18 @@ before_install:
   fi
 script:
 - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-# initial clone so that we install the dependencies correctly, but this copies the pwd
-- julia -e 'Pkg.clone("https://github.com/dhoegh/BuildExecutable.jl"); Pkg.build("BuildExecutable"); Pkg.clone(pwd())'
-# now build playground
-- julia --depwarn=no -e 'ENV["PLAYGROUND_INSTALL"] = true; Pkg.build("Playground");
-  Pkg.test("Playground";  coverage=true)'
-- ~/.playground/bin/playground list
-- rm ~/.playground/bin/playground
-- julia -e 'ENV["PLAYGROUND_INSTALL"] = true; ENV["PLAYGROUND_BIN_EXEC"] = true; Pkg.build("Playground")'
+- julia -e 'ENV["PLAYGROUND_INSTALL"] = true; Pkg.clone(pwd()); Pkg.build("Playground")'
+- julia --compilecache=no -e 'Pkg.test("Playground";  coverage=true)'
 - ~/.playground/bin/playground list
 after_success:
 - julia -e 'cd(Pkg.dir("Playground")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
 before_deploy:
 # Assuming skip_cleanup works the README.md and the build directory we want should be under the pwd
-- echo "Attempting to bundle playground..."
+- echo "Attempting to compile and bundle playground..."
+- julia -e 'Pkg.add("BuildExecutable"); Pkg.checkout("BuildExecutable"); Pkg.build("BuildExecutable")'
+- rm ~/.playground/bin/playground
+- julia -e 'ENV["PLAYGROUND_INSTALL"] = true; ENV["PLAYGROUND_BIN_EXEC"] = true; Pkg.build("Playground")'
+- ~/.playground/bin/playground list
 - mkdir -p playground
 - cp -r $HOME/.julia/v$TRAVIS_JULIA_VERSION/Playground/deps/usr/build/* ./playground/
 - tar -czvf "playground-$TRAVIS_OS_NAME.tar.gz" ./playground
@@ -59,3 +58,4 @@ deploy:
     tags: true
     all_branches: true
     repo: rofinn/Playground.jl
+    julia: 0.6

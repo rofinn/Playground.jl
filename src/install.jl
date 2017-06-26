@@ -157,7 +157,7 @@ end
                     debug(logger, "Permissions set to $(Playground.JULIA_BIN_MODE)")
                 end
             finally
-                debug("Detaching $src from $mountdir")
+                debug(logger, "Detaching $src from $mountdir")
                 run(`hdiutil detach $mountdir`)
             end
         end
