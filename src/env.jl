@@ -103,17 +103,21 @@ function getenvs(env::Environment)
 end
 
 function set!(env::Environment, keyvals::Pair...)
+    old = Dict{AbstractString, Any}()
+
     for (key, val) in keyvals
-        debug(logger, "Set $key = $val")
-        env.cache["ENV"][key] = get(ENV, key, nothing)
+        logenv(key, val)
+        old[key] = get(ENV, key, nothing)
         ENV[key] = val
     end
+
+    return old
 end
 
-function restore!(env::Environment)
-    for (key, val) in env.cache["ENV"]
+function restore!(old::Dict{AbstractString, Any})
+    for (key, val) in old
         if val !== nothing
-            debug(logger, "Set $key = $val")
+            logenv(key, val)
             ENV[key] = val
         else
             debug(logger, "Deleted $key")
@@ -122,13 +126,22 @@ function restore!(env::Environment)
     end
 end
 
+function logenv(key, val)
+    if key == "PATH"
+        paths = join(unique(split(val, ":")), "\n\t")
+        debug(logger, "Set $key = \n\t$paths")
+    else
+        debug(logger, "Set $key = $val")
+    end
+end
+
 function Base.withenv(f::Function, env::Environment)
     env.active = true
-    set!(env, getenvs(env)...)
+    old = set!(env, getenvs(env)...)
     try
         f()
     finally
-        restore!(env)
+        restore!(old)
         env.active = false
     end
 end

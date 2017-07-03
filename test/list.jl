@@ -1,1 +1,3 @@
-list(TEST_CONFIG)
+@testset "list" begin
+    list(TEST_CONFIG)
+end

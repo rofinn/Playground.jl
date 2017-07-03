@@ -11,49 +11,51 @@ However, when `shell=false` the existing julia REPL will be modifed and
 activate(; shell=true) = activate(Environment(); shell=shell)
 
 function activate(config::Config, args...; shell=true)
-    println(args)
     activate(Environment(config, args...); shell=shell)
 end
 
 function activate(env::Environment; shell=true)
     prompt = getprompt(env; shell=shell)
-    debug(logger, "Activating playground $prompt...")
+    debug(logger, "Activating playground $(name(env))...")
 
     if shell
         withenv(env) do
             runshell(prompt)
         end
     else
-        env.active = true
-        set!(env, getenvs(env)...)
+        old = Dict{Symbol, Any}()
+        old[:ENV] = set!(env, getenvs(env)...)
         try
-            env.cache["prompt"] = strip(Base.active_repl.interface.modes[1].prompt)
+            old[:PROMPT] = strip(Base.active_repl.interface.modes[1].prompt)
             input_prompt!(prompt, :magenta)
         catch e
             warn(logger, "Failed to set the julia prompt to $prompt ($e)")
+        finally
+            push!(cache, old)
         end
     end
-    return env
 end
 
 """
-    deactivate(env::Environment)
+    deactivate()
 
 Deactivates the active environment and restores the original julia environment.
 """
-function deactivate(env::Environment)
-    if env.active
-        debug(logger, "Deactivating playground $(name(env))...")
+function deactivate()
+    if !isempty(cache)
+        debug(logger, "Deactivating playground ...")
+        old = pop!(cache)
 
-        try
-            input_prompt!(env.cache["prompt"])
-        catch _
-            warn(logger, string("Failed to restore the julia prompt."))
+        if haskey(old, :PROMPT)
+            try
+                input_prompt!(old[:PROMPT])
+            catch _
+                warn(logger, string("Failed to restore the julia prompt."))
+            end
         end
-        restore!(env)
-        env.active=false
+
+        restore!(old[:ENV])
     else
-        warn(logger, "Environment $env is not active.")
+        warn(logger, "There are no cached environment settings to restore.")
     end
-    return env
 end

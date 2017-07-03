@@ -42,6 +42,7 @@ export
 
 
 const logger = get_logger(current_module())
+const cache = Vector{Dict{Symbol, Any}}()
 
 function main(cmdargs, configargs...)
     args = argparse(cmdargs)

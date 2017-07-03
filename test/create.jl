@@ -1,5 +1,4 @@
-
-function test_create()
+@testset "create" begin
     create(
         TEST_CONFIG,
         join(TEST_TMP_DIR, "test-playground"),
@@ -16,5 +15,3 @@ function test_create()
     @test exists(join(TEST_DIR, ".playground"))
     @test isdir(join(TEST_DIR, ".playground"))
 end
-
-test_create()

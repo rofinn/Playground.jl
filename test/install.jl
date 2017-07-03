@@ -1,4 +1,4 @@
-function test_install()
+@testset "install" begin
     install(TEST_CONFIG, v"0.4.0"; labels=["julia-bin", "julia-old-bin"])
     install(TEST_CONFIG, v"0.5.0"; labels=["julia-bin", "julia-stable-bin"])
     install(TEST_CONFIG, v"0.6.0-latest"; labels=["julia-nightly-bin"])
@@ -13,5 +13,3 @@ function test_install()
         labels=["julia-stable-dir"]
     )
 end
-
-test_install()
