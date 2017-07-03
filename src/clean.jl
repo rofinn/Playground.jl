@@ -15,7 +15,9 @@ function clean(config::Config)
             end
         end
     end
+    debug(logger, "Cleaning $(config.share)...")
     rm_deadlinks(config.share)
+    debug(logger, "Cleaning $(config.bin)...")
     rm_deadlinks(config.bin)
 end
 

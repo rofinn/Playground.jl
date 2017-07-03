@@ -1,6 +1,6 @@
 function test_execute()
-    execute(TEST_CONFIG, `ls -al`; name="myproject")
-    execute(TEST_CONFIG, `julia -v`; dir=join(TEST_TMP_DIR, "test-playground"))
+    execute(`ls -al`, TEST_CONFIG, "myproject")
+    execute(`julia -v`, TEST_CONFIG, join(TEST_TMP_DIR, "test-playground"))
 end
 
 test_execute()

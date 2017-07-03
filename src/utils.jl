@@ -1,31 +1,3 @@
-function get_playground_dir(config::Config, dir::AbstractPath, name::AbstractString)
-    if isempty(dir) && isempty(name)
-        return abs(join(cwd(), config.default_playground_path))
-    elseif isempty(dir) && !isempty(name)
-        return abs(join(config.share, name))
-    elseif !isempty(dir)
-        return abs(dir)
-    end
-end
-
-
-function get_playground_name(config::Config, dir::AbstractPath)
-    root_path = abs(dir)
-    name = ""
-
-    for p in readdir(config.share)
-        file_path = join(config.share, p)
-        if islink(file_path)
-            if abs(readlink(file_path)) == root_path
-                name = p
-                break
-            end
-        end
-    end
-
-    return name
-end
-
 function julia_url(version)
     os = @compat @static VERSION >= v"0.5.0" ? Base.Sys.KERNEL : Base.OS_NAME
     arch = @compat @static VERSION >= v"0.5.0" ? Base.Sys.WORD_SIZE : Base.WORD_SIZE

@@ -1,9 +1,9 @@
 
 function test_create()
     create(
-        TEST_CONFIG;
-        dir=join(TEST_TMP_DIR, "test-playground"),
-        name="myproject",
+        TEST_CONFIG,
+        join(TEST_TMP_DIR, "test-playground"),
+        "myproject";
         reqs_file=join(TEST_DIR, "../REQUIRE"),
         julia="julia-bin"
     )
