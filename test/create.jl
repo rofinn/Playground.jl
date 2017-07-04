@@ -14,4 +14,6 @@
     create(TEST_CONFIG)
     @test exists(join(TEST_DIR, ".playground"))
     @test isdir(join(TEST_DIR, ".playground"))
+
+    create(TEST_CONFIG, join(TEST_TMP_DIR, "test-playground2"), "otherproject")
 end

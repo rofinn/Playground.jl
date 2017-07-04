@@ -28,10 +28,10 @@ elseif is_unix()
             end
 
             if contains(ENV["SHELL"], "zsh")
-    			@mock run(`$(ENV["SHELL"]) -c "source $pg_rc; $(ENV["SHELL"])"`)
-    		else
-    			@mock run(`$(ENV["SHELL"]) --rcfile $pg_rc`)
-    		end
+                @mock run(`$(ENV["SHELL"]) -c "source $pg_rc; $(ENV["SHELL"])"`)
+            else
+                @mock run(`$(ENV["SHELL"]) --rcfile $pg_rc`)
+            end
         else
             @mock run(`sh -i`)
         end

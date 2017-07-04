@@ -32,18 +32,17 @@ function Base.rm(config::Config; name::AbstractString="", dir::AbstractPath=Path
             return true
         # Otherwise the name should be in
         elseif name in readdir(abs(config.share))
-            dir = get_playground_dir(config, "", name)
+            dir = envpath(config, name)
 
             # The dir returned could be a link
             # so we attempt to read that link.
             if islink(dir)
-                try
-                    dir = readlink(dir)
-                catch
-                    # If it fails just assume that we have a dead link
-                    # and run clean_link and return
-                    debug(logger, "Removing $dir")
-                    remove(dir)
+                dir = readlink(dir)
+
+                if !exists(dir)
+                    # If the linked path doesn't exist then simply run clean
+                    # and return true.
+                    clean(config)
                     return true
                 end
             end
@@ -57,9 +56,8 @@ function Base.rm(config::Config; name::AbstractString="", dir::AbstractPath=Path
     # By this point dir should be valid or the function should have already exited.
     # DeclarativePackages creates a read-only directory so in case we run into that
     # during deletion we recursively chmod the path with write permissions.
-    # run(`chmod -R +w $(abspath(dir))`)
-    chmod(abs(dir), "+w"; recursive=true)
     warn(logger, "Recusively deleting $(abs(dir))...")
+    chmod(abs(dir), "+w"; recursive=true)
     remove(abs(dir); recursive=true)
 
     # Just to be safe run clean_links
