@@ -26,7 +26,7 @@ function activate(env::Environment; shell=true)
         old = Dict{Symbol, Any}()
         old[:ENV] = set!(env, getenvs(env)...)
         try
-            old[:PROMPT] = strip(Base.active_repl.interface.modes[1].prompt)
+            old[:PROMPT] = input_prompt()
             input_prompt!(prompt, :magenta)
         catch e
             warn(logger, "Failed to set the julia prompt to $prompt ($e)")
@@ -46,12 +46,10 @@ function deactivate()
         debug(logger, "Deactivating playground ...")
         old = pop!(cache)
 
-        if haskey(old, :PROMPT)
-            try
-                input_prompt!(old[:PROMPT])
-            catch _
-                warn(logger, string("Failed to restore the julia prompt."))
-            end
+        try
+            input_prompt!(old[:PROMPT])
+        catch _
+            warn(logger, string("Failed to restore the julia prompt."))
         end
 
         restore!(old[:ENV])

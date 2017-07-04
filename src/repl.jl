@@ -16,3 +16,11 @@ function input_prompt!(s::String, col = :green)
     isdefined(Base, :active_repl) && isdefined(Base.active_repl, :interface) && update_interface(Base.active_repl.interface)
     return
 end
+
+function input_prompt()
+    try
+        strip(Base.active_repl.interface.modes[1].prompt)
+    catch
+        INPUT_PROMPT
+    end
+end
