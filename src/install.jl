@@ -6,7 +6,7 @@
     binary version for your platform, or downloads and builds
     it from source if `src` is true.
 """ ->
-function install{S<:AbstractString}(config::Config, version::VersionNumber; labels::Array{S}=[])
+function install{S<:AbstractString}(config::Config, version::VersionNumber; labels::Array{S}=String[])
     init(config)
 
     # download the julia version
@@ -21,7 +21,7 @@ function install{S<:AbstractString}(config::Config, version::VersionNumber; labe
     if stat(tmp_dest).size < 1024
         # S3 responds with an error message when a URL doesn't exist
         unavailable = open(tmp_dest, "r") do f
-            contains((@compat readstring(f)), "key does not exist")
+            @mock contains(readstring(f), "key does not exist")
         end
 
         if unavailable
