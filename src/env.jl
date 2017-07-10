@@ -4,8 +4,6 @@ type Environment
     config::Config
     name::AbstractString
     root::AbstractPath
-    cache::Dict{AbstractString, Any}  # Used for storing the original environment
-    active::Bool
 end
 
 Environment() = Environment(Config())
@@ -30,16 +28,6 @@ function Environment(config::Config, dir::AbstractPath, name::String)
     Environment(config, name, envpath(config, dir))
 end
 
-function Environment(config::Config, name::String, root::AbstractPath)
-    Environment(
-        config,
-        name,
-        root,
-        Dict{AbstractString, Any}("ENV" => Dict{AbstractString, Any}()),
-        false
-    )
-end
-
 function init(env::Environment)
     info(logger, "Creating playground environment $(env.name)...")
     for p in (root, bin, log, pkg)
@@ -54,7 +42,6 @@ end
 
 name(env::Environment) = env.name
 root(env::Environment) = env.root
-isactive(env::Environment) = env.active
 log(env::Environment) = join(env.root, p"log")
 bin(env::Environment) = join(env.root, p"bin")
 pkg(env::Environment) = join(env.root, p"packages")
@@ -136,12 +123,10 @@ function logenv(key, val)
 end
 
 function Base.withenv(f::Function, env::Environment)
-    env.active = true
     old = set!(env, getenvs(env)...)
     try
         f()
     finally
         restore!(old)
-        env.active = false
     end
 end
