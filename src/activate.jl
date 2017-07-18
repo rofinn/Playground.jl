@@ -1,59 +1,59 @@
-function activate(config::Config; dir::AbstractPath=Path(), name::AbstractString="")
-    init(config)
-    pg = Environment(config, dir, name)
-    prompt = config.default_prompt
+"""
+    activate(; shell=true)
+    activate(config::Config, args...; shell=true)
+    activate(env::Environment; shell=true)
 
-    if !isempty(name)
-        prompt = replace(prompt, "playground", name)
-    else
-        found = get_playground_name(config, pg.root)
-        if found != ""
-            prompt = replace(prompt, "playground", found)
-            pg.name = found
-        end
-    end
+Modifies the current environment to operate within a specific playground environment.
+When `shell=true` a new shell environment will be created.
+However, when `shell=false` the existing julia REPL will be modifed and
+`deactive(env::Enviornmentt)` must be called to restore the REPL state.
+"""
+activate(; shell=true) = activate(Environment(); shell=shell)
 
-    set_envs(pg)
-    run_shell(pg, prompt)
+function activate(config::Config, args...; shell=true)
+    activate(Environment(config, args...); shell=shell)
 end
 
+function activate(env::Environment; shell=true)
+    prompt = getprompt(env; shell=shell)
+    debug(logger, "Activating playground $(name(env))...")
 
-if is_windows()
-    function run_shell(config, prompt)
-        @mock run(`cmd /K prompt $(prompt)`)
-    end
-elseif is_unix()
-    function run_shell(config, prompt)
-        ENV["PS1"] = prompt
-        if haskey(ENV, "SHELL") && contains(ENV["SHELL"], "fish")
-            @mock run(`$(ENV["SHELL"]) -i`)
-        elseif haskey(ENV, "SHELL")
-            # Try and setup the new shell as close to the user's default shell as possible.
-            usr_rc = join(home(), "." * basename(ENV["SHELL"] * "rc"))
-            pg_rc = join(parent(Path(ENV["JULIA_PKGDIR"])), basename(ENV["SHELL"] * "rc"))
-
-            if !exists(pg_rc)
-                cp(usr_rc, pg_rc, follow_symlinks=true)
-                content = string(
-                    "export PATH=", ENV["PATH"], "\n",
-                    "export PS1=\"$(prompt)\"\n",
-                    "export JULIA_PKGDIR=", ENV["JULIA_PKGDIR"], "\n",
-                )
-
-                if haskey(ENV, "HISTFILE")
-                    content = string(content, "export HISTFILE=", ENV["HISTFILE"], "\n")
-                end
-
-                write(pg_rc, content, "a")
-            end
-
-            if contains(ENV["SHELL"], "zsh")
-    			@mock run(`$(ENV["SHELL"]) -c "source $pg_rc; $(ENV["SHELL"])"`)
-    		else
-    			@mock run(`$(ENV["SHELL"]) --rcfile $pg_rc`)
-    		end
-        else
-            @mock run(`sh -i`)
+    if shell
+        withenv(env) do
+            runshell(prompt)
         end
+    else
+        old = Dict{Symbol, Any}()
+        old[:ENV] = set!(env, getenvs(env)...)
+        try
+            old[:PROMPT] = input_prompt()
+            input_prompt!(prompt, :magenta)
+        catch e
+            warn(logger, "Failed to set the julia prompt to $prompt ($e)")
+        finally
+            push!(cache, old)
+        end
+    end
+end
+
+"""
+    deactivate()
+
+Deactivates the active environment and restores the original julia environment.
+"""
+function deactivate()
+    if !isempty(cache)
+        debug(logger, "Deactivating playground ...")
+        old = pop!(cache)
+
+        try
+            input_prompt!(old[:PROMPT])
+        catch _
+            warn(logger, string("Failed to restore the julia prompt."))
+        end
+
+        restore!(old[:ENV])
+    else
+        warn(logger, "There are no cached environment settings to restore.")
     end
 end

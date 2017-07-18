@@ -1,12 +1,9 @@
-@doc doc"""
-    The simplest install involves providing the just
-    the version number only counting the latest minor version.
+"""
+    install{S<:AbstractString}(config::Config, version::VersionNummber; labels::Array{S}=String[])
 
-    This method will just try and download the latest
-    binary version for your platform, or downloads and builds
-    it from source if `src` is true.
-""" ->
-function install{S<:AbstractString}(config::Config, version::VersionNumber; labels::Array{S}=[])
+Downloads the latest binary version for your platform and symlinks the binary with the appropriate labels.
+"""
+function install{S<:AbstractString}(config::Config, version::VersionNumber; labels::Array{S}=String[])
     init(config)
 
     # download the julia version
@@ -21,7 +18,7 @@ function install{S<:AbstractString}(config::Config, version::VersionNumber; labe
     if stat(tmp_dest).size < 1024
         # S3 responds with an error message when a URL doesn't exist
         unavailable = open(tmp_dest, "r") do f
-            contains((@compat readstring(f)), "key does not exist")
+            @mock contains(readstring(f), "key does not exist")
         end
 
         if unavailable
@@ -40,11 +37,12 @@ function install{S<:AbstractString}(config::Config, version::VersionNumber; labe
 end
 
 
-@doc doc"""
-    This option simply creates symlinks from an existing julia
-    install.
-""" ->
-function install{S<:AbstractString}(config::Config, executable::AbstractPath; labels::Array{S}=[])
+"""
+    install{S<:AbstractString}(config::Config, executable::AbstractPath; labels::Array{S}=String[])
+
+Creates symlinks from an existing julia install.
+"""
+function install{S<:AbstractString}(config::Config, executable::AbstractPath; labels::Array{S}=String[])
     info(logger, "Adding julia labels $labels to $executable")
     if exists(executable)
         init(config)

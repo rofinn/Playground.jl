@@ -1,42 +1,55 @@
-function create(
-    config::Config;
-    dir::AbstractPath=Path(),
-    name::AbstractString="",
-    julia::AbstractString="",
-    reqs_file::AbstractPath=Path()
-)
-    init(config)
-    pg = Environment(config, dir, name)
-    init(pg)
+"""
+    create(; kwargs...)
+    create(config::Config, args...; kwargs...)
+    create(env::Environment; kwargs...)
 
-    if julia != ""
-        symlink(join(config.bin, julia), pg.julia, exist_ok=true, overwrite=true)
+Creates a new playground `Environment` including initializing its package directory and installing
+any package in the REQUIRE file passed in.
+
+# Optional Arguments
+You can optionally pass in an `Environment` instance of a `Config` and args to build one.
+
+# Keywords Arguments
+* `julia::AbstractString` - a julia binary to use in this playground environment.
+* `reqs_file::AbstractPath` - path to a REQUIRE file of packages to install in this environment.
+"""
+create(; kwargs...) = create(Environment(); kwargs...)
+create(config::Config, args...; kwargs...) = create(Environment(config, args...); kwargs...)
+
+function create(env::Environment; kwargs...)
+    init(env)
+    opts = Dict(kwargs)
+
+    julia_exec = if haskey(opts, :julia) && !isempty(opts[:julia])
+        join(env.config.bin, opts[:julia])
     else
-        sys_julia = abs(Path(readchomp(`which julia`)))
-        symlink(sys_julia, pg.julia, exist_ok=true, overwrite=true)
+        out = readchomp(`which julia`)
+        debug(logger, out)
+        debug(logger, Path(out))
+        debug(logger, abs(Path(out)))
+        abs(Path(readchomp(`which julia`)))
     end
 
-    if !isempty(dir) && name != ""
-        symlink(pg.root, abs(join(config.share, name)), exist_ok=true, overwrite=true)
-    end
+    debug(logger, "$(julia(env)) -> $julia_exec")
+    symlink(julia_exec, julia(env), exist_ok=true, overwrite=true)
 
-    ENV["JULIA_PKGDIR"] = pg.pkg
-
-    if !isempty(reqs_file) && exists(reqs_file)
-        info(logger, "Installing packages from REQUIRE file $reqs_file...")
-        Playground.log_output(`$(pg.julia) -e 'Pkg.init()'`)
-        for v in readdir(pg.pkg)
-            copy(reqs_file, join(pg.pkg, v, "REQUIRE"); exist_ok=true, overwrite=true)
-            try
-                Playground.log_output(`$(pg.julia) -e 'Pkg.resolve()'`)
-            catch
-                warn(logger, string(
-                    "Failed to resolve requirements. ",
-                    "Perhaps there is something wrong with your REQUIRE file."
-                ))
+    withenv(env) do
+        if haskey(opts, :reqs_file) && !isempty(opts[:reqs_file]) && exists(opts[:reqs_file])
+            info(logger, "Installing packages from REQUIRE file $(opts[:reqs_file])...")
+            Playground.log_output(`$(julia(env)) -e 'Pkg.init()'`)
+            for v in readdir(pkg(env))
+                copy(opts[:reqs_file], join(pkg(env), v, "REQUIRE"); exist_ok=true, overwrite=true)
+                try
+                    Playground.log_output(`$(julia(env)) -e 'Pkg.resolve()'`)
+                catch
+                    warn(logger, string(
+                        "Failed to resolve requirements. ",
+                        "Perhaps there is something wrong with your REQUIRE file."
+                    ))
+                end
             end
+        else
+            Playground.log_output(`$(julia(env)) -e 'Pkg.init()'`)
         end
-    else
-        Playground.log_output(`$(pg.julia) -e 'Pkg.init()'`)
     end
 end

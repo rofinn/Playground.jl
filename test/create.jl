@@ -1,9 +1,8 @@
-
-function test_create()
+@testset "create" begin
     create(
-        TEST_CONFIG;
-        dir=join(TEST_TMP_DIR, "test-playground"),
-        name="myproject",
+        TEST_CONFIG,
+        join(TEST_TMP_DIR, "test-playground"),
+        "myproject";
         reqs_file=join(TEST_DIR, "../REQUIRE"),
         julia="julia-bin"
     )
@@ -15,6 +14,6 @@ function test_create()
     create(TEST_CONFIG)
     @test exists(join(TEST_DIR, ".playground"))
     @test isdir(join(TEST_DIR, ".playground"))
-end
 
-test_create()
+    create(TEST_CONFIG, join(TEST_TMP_DIR, "test-playground2"), "otherproject")
+end

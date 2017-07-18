@@ -1,3 +1,8 @@
+"""
+    list(config::Config; show_links=false)
+
+Prints out all installed julia version and playgrounds.
+"""
 function list(config::Config; show_links=false)
 	init(config)
 

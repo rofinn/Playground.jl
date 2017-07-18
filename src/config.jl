@@ -1,6 +1,11 @@
 import YAML: load
 
+"""
+    Config(; file=p"~/.playground/config.yml", root=p"~/.playground")
 
+Stores various default playground environment settings including paths for
+storing shared binaries and environments.
+"""
 type Config
     root::AbstractPath
     tmp::AbstractPath
@@ -8,7 +13,8 @@ type Config
     bin::AbstractPath
     share::AbstractPath
     default_playground_path::AbstractPath
-    default_prompt::AbstractString
+    repl_prompt::AbstractString
+    shell_prompt::AbstractString
     default_shell::AbstractString
     default_git_address::AbstractString
     default_git_revision::AbstractString
@@ -26,7 +32,8 @@ type Config
             join(root, p"bin"),
             join(root, p"share"),
             default_pg_path,
-            kwargs["default_prompt"],
+            kwargs["repl_prompt"],
+            kwargs["shell_prompt"],
             haskey(kwargs, "default_shell") ? kwargs["default_shell"] : "",
             kwargs["default_git_address"],
             kwargs["default_git_revision"],
@@ -36,82 +43,41 @@ type Config
     end
 end
 
+function Config(config::AbstractString, root::AbstractPath)
+    config_dict = load(config)
+    config_dict["root"] = root
+    return Config(config_dict)
+end
+
+function Config{P<:AbstractPath}(; file::P=join(configpath(), "config.yml"), root::P=configpath())
+    Config(read(file), root)
+end
+
 function init(config::Config)
     for p in (config.root, config.tmp, config.src, config.bin, config.share)
         mkdir(p; recursive=true, exist_ok=true)
     end
 end
 
-load_config(config::AbstractPath, root::AbstractPath) = load_config(read(config), root)
+configpath() = join(home(), ".playground")
 
-function load_config(config::AbstractString, root::AbstractPath)
-    config_dict = load(config)
-    config_dict["root"] = root
-    return Config(config_dict)
+envpath(config::Config) = abs(join(cwd(), config.default_playground_path))
+envpath(config::Config, name::AbstractString) = abs(join(config.share, name))
+envpath(config::Config, path::AbstractPath) = isempty(path) ? envpath(config) : abs(path)
+
+function envname(config::Config, path::AbstractPath)
+    root_path = abs(path)
+    name = ""
+
+    for p in readdir(config.share)
+        file_path = join(config.share, p)
+        if islink(file_path)
+            if abs(readlink(file_path)) == root_path
+                name = basename(p)
+                break
+            end
+        end
+    end
+
+    return name
 end
-
-
-type Environment
-    name::AbstractString
-    root::AbstractPath
-    log::AbstractPath
-    bin::AbstractPath
-    pkg::AbstractPath
-    julia::AbstractPath
-    default_shell::AbstractString
-    isolated_shell_history::Bool
-    isolated_julia_history::Bool
-
-    function Environment(config::Config, dir::AbstractPath, name::AbstractString)
-        root = get_playground_dir(config, dir, name)
-        new(
-            name,
-            root,
-            join(root, p"log"),
-            join(root, p"bin"),
-            join(root, p"packages"),
-            join(root, p"bin", p"julia"),
-            config.default_shell,
-            config.isolated_shell_history,
-            config.isolated_julia_history
-        )
-    end
-end
-
-function init(pg::Environment)
-    info(logger, "Creating playground environment $(pg.name)...")
-    for p in (pg.root, pg.bin, pg.log, pg.pkg)
-        mkdir(p; recursive=true, exist_ok=true)
-        debug(logger, "$p created.")
-    end
-end
-
-function set_envs(pg::Environment)
-    ENV["PATH"] = "$(pg.bin):" * ENV["PATH"]
-    debug(logger, string("PATH=", ENV["PATH"]))
-
-    ENV["PLAYGROUND_ENV"] = pg.name == "" ? basename(pg.root) : pg.name
-    debug(logger, string("PLAYGROUND_ENV=", ENV["PLAYGROUND_ENV"]))
-
-    ENV["JULIA_PKGDIR"] = pg.pkg
-    debug(logger, "JULIA_PKGDIR=$(pg.pkg)")
-
-    if pg.default_shell != ""
-        ENV["SHELL"] = pg.default_shell
-        debug(logger, "SHELL=$(pg.default_shell)")
-    end
-
-    if pg.isolated_julia_history
-        jh = join(pg.root, p".julia_history")
-        ENV["JULIA_HISTORY"] = jh
-        debug(logger, "JULIA_HISTORY=$jh")
-    end
-
-    if pg.isolated_shell_history
-        sh = join(pg.root, p".shell_history")
-        ENV["HISTFILE"] = sh
-        debug(logger, "HISTFILE=$sh")
-    end
-end
-
-config_path() = join(home(), p".playground")
