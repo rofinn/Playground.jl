@@ -3,3 +3,5 @@
 *.playground
 *.cov
 deps/usr/build/
+docs/build
+docs/site

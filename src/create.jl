@@ -1,3 +1,18 @@
+"""
+    create(; kwargs...)
+    create(config::Config, args...; kwargs...)
+    create(env::Environment; kwargs...)
+
+Creates a new playground `Environment` including initializing its package directory and installing
+any package in the REQUIRE file passed in.
+
+# Optional Arguments
+You can optionally pass in an `Environment` instance of a `Config` and args to build one.
+
+# Keywords Arguments
+* `julia::AbstractString` - a julia binary to use in this playground environment.
+* `reqs_file::AbstractPath` - path to a REQUIRE file of packages to install in this environment.
+"""
 create(; kwargs...) = create(Environment(); kwargs...)
 create(config::Config, args...; kwargs...) = create(Environment(config, args...); kwargs...)
 

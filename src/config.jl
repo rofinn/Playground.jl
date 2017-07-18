@@ -1,5 +1,11 @@
 import YAML: load
 
+"""
+    Config(; file=p"~/.playground/config.yml", root=p"~/.playground")
+
+Stores various default playground environment settings including paths for
+storing shared binaries and environments.
+"""
 type Config
     root::AbstractPath
     tmp::AbstractPath

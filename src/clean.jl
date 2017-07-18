@@ -1,3 +1,8 @@
+"""
+    clean(config::Config)
+
+Removes any deadlinks Playground's `bin` and `share` directories.
+"""
 function clean(config::Config)
     function rm_deadlinks(dir)
         for f in readdir(dir)
@@ -21,7 +26,11 @@ function clean(config::Config)
     rm_deadlinks(config.bin)
 end
 
+"""
+    rm(config::Config; name::AbstractString="", dir::AbstractPath=Path())
 
+Removes a julia binary or playground from Playground's `bin` and `share` directories.
+"""
 function Base.rm(config::Config; name::AbstractString="", dir::AbstractPath=Path())
     if !isempty(name) && isempty(dir)
         # If we find the name in the bin folder then we should just delete the julia symlink

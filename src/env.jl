@@ -1,5 +1,12 @@
-# We could in theory support different types of environments.
-# (e.g., DockerEnvironment).
+"""
+    Environment([config::Config], [name::String], [root::AbstractPath])
+
+An environment stores information about a playground environment and
+provides methods fro interacting with them.
+
+NOTE: In the future we might want to support different types of environments
+(e.g., DockerEnvironment).
+"""
 type Environment
     config::Config
     name::AbstractString
@@ -35,8 +42,11 @@ function init(env::Environment)
         debug(logger, "$(p(env)) created.")
     end
 
-    if !isempty(env.name)
-        symlink(env.root, abs(join(env.config.share, env.name)), exist_ok=true, overwrite=true)
+    # If the playground name is set and the root path isn't already in the
+    # shared folder then create a symlink.
+    share_path = abs(join(env.config.share, env.name))
+    if !isempty(env.name) && env.root != share_path
+        symlink(env.root, share_path, exist_ok=true, overwrite=true)
     end
 end
 
@@ -66,6 +76,12 @@ function getprompt(env::Environment; shell::Bool=true)
     isempty(name(env)) ? prompt : replace(prompt, "playground", name(env))
 end
 
+"""
+    getenvs(env::Environmnet) -> Vector{Pair}
+
+Generates a set of environment variable changes to make from the
+`Environment`.
+"""
 function getenvs(env::Environment)
     envs = Pair[]
     path = "$(bin(env)):" * ENV["PATH"]
@@ -89,6 +105,12 @@ function getenvs(env::Environment)
     return envs
 end
 
+"""
+    set!(env::Environment, keyvals::Pair...) -> Dict
+
+Applies a the `keyvals` to `ENV` and returns the old
+`ENV` settings to be used for restore the `ENV` state.
+"""
 function set!(env::Environment, keyvals::Pair...)
     old = Dict{AbstractString, Any}()
 
@@ -101,6 +123,11 @@ function set!(env::Environment, keyvals::Pair...)
     return old
 end
 
+"""
+    restore!(old::Dict{AbstractString, Any})
+
+Applies the `old` dict to `ENV` to restore the environment state.
+"""
 function restore!(old::Dict{AbstractString, Any})
     for (key, val) in old
         if val !== nothing
@@ -113,6 +140,12 @@ function restore!(old::Dict{AbstractString, Any})
     end
 end
 
+"""
+    logenv(key, val)
+
+Internal utility method used for nicely logging environment variable
+changes.
+"""
 function logenv(key, val)
     if key == "PATH"
         paths = join(unique(split(val, ":")), "\n\t")
@@ -122,6 +155,12 @@ function logenv(key, val)
     end
 end
 
+"""
+    withenv(f::Function, env::Environment)
+
+Works the same as `withenv(f, keyvals...)`, but is specific to running `f` within
+a playground `Environment`.
+"""
 function Base.withenv(f::Function, env::Environment)
     old = set!(env, getenvs(env)...)
     try
