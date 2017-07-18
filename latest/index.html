@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Playground.jl · Playground.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link href="assets/highlightjs/default.css" rel="stylesheet" type="text/css"/><link href="assets/documenter.css" rel="stylesheet" type="text/css"/><link href="assets/playground.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><a href="index.html"><img class="logo" src="assets/logo.png" alt="Playground.jl logo"/></a><h1>Playground.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" action="search.html"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li class="current"><a class="toctext" href="index.html">Playground.jl</a><ul class="internal"><li><a class="toctext" href="#Installation-1">Installation</a></li><li><a class="toctext" href="#Overview-1">Overview</a></li><li><a class="toctext" href="#Configuration-1">Configuration</a></li><li><a class="toctext" href="#TODOs-1">TODOs</a></li></ul></li><li><a class="toctext" href="binaries.html">Binary Releases</a></li><li><a class="toctext" href="executable.html">Executable</a></li><li><a class="toctext" href="repl.html">REPL</a></li><li><a class="toctext" href="api.html">API</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href="index.html">Playground.jl</a></li></ul><a class="edit-page" href="https://github.com/rofinn/Playground.jl/tree/93cf5fbf18270cec70befbfcce1440424800cd14/docs/src/index.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Playground.jl</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Playground.jl-1" href="#Playground.jl-1">Playground.jl</a></h1><p><a href="https://travis-ci.org/rofinn/Playground.jl"><img src="https://travis-ci.org/rofinn/Playground.jl.svg" alt="Build Status"/></a> <a href="http://codecov.io/github/rofinn/Playground.jl"><img src="http://codecov.io/github/rofinn/Playground.jl/coverage.svg" alt="codecov.io"/></a> <a href="http://www.repostatus.org/#active"><img src="http://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active - The project has reached a stable, usable state and is being actively developed."/></a></p><p>A package for managing julia sandboxes like python&#39;s virtualenv (with a little influence from pyenv and virtualenvwrapper)</p><p><strong>Supports</strong>: <a href="http://pkg.julialang.org/?pkg=Playground&amp;ver=0.5"><img src="http://pkg.julialang.org/badges/Playground_0.5.svg" alt="StatsBase"/></a> <a href="http://pkg.julialang.org/?pkg=Playground&amp;ver=0.6"><img src="http://pkg.julialang.org/badges/Playground_0.6.svg" alt="StatsBase"/></a></p><h2><a class="nav-anchor" id="Installation-1" href="#Installation-1">Installation</a></h2><p>You can install Playground.jl with <code>Pkg.add</code>.</p><pre><code class="language-julia">julia&gt; Pkg.add(&quot;Playground&quot;)</code></pre><p>If you&#39;d like to install the <code>playground</code> script and <code>config.yml</code> file to the shared <code>~/.playground</code> directory run:</p><pre><code class="language-julia">julia&gt; ENV[&quot;PLAYGROUND_INSTALL&quot;] = true; Pkg.build(&quot;Playground&quot;)</code></pre><p>The playground script is now ready to use.</p><pre><code class="language-shell">&gt; ~/.playground/bin/playground -h
+usage: &lt;PROGRAM&gt; [-d] [-h]
+                 {install|create|activate|list|clean|rm|exec}
+
+commands:
+  install      Installs julia version for you.
+  create       Builds the playground
+  activate     Activates the playground.
+  list         Lists available julia versions and playgrounds
+  clean        Deletes any dead julia-version or playground links, in
+               case you&#39;ve deleted the original folders.
+  rm           Deletes the specifid julia-version or playground.
+  exec         Execute a cmd inside a playground and exit.
+
+optional arguments:
+  -d, --debug  Log debug message to STDOUT
+  -h, --help   show this help message and exit</code></pre><p><strong>Recommended:</strong> Add the playground bin directory to your path by editing your ~/.bashrc, ~/.zshrc, ~/.tcshrc, etc.</p><pre><code class="language-shell">echo &quot;PATH=~/.playground/bin/:$PATH&quot; &gt;&gt; ~/.bashrc</code></pre><p>This will make the playground script and all managed julia versions easily accessible.</p><p><strong>NOTE:</strong> Currently, some of the dependencies in Playground.jl such as Options.jl and ArgParse.jl throw deprecation warnings. If you&#39;d like to ignore these warnings until new versions of these packages are release just add <code>--depwarn=no</code> to the shebang in <code>~/.playground/bin/playground</code>. If you&#39;re running linux you&#39;ll need to change this line to <code>#!/usr/bin/julia --depwarn=no</code> as <code>env</code> in linux can only take 1 argument otherwise the process will stall.</p><h2><a class="nav-anchor" id="Overview-1" href="#Overview-1">Overview</a></h2><h2><a class="nav-anchor" id="Configuration-1" href="#Configuration-1">Configuration</a></h2><p>For the most part, Playground.jl provide its virtualized environments by simply manipulating environment variables and symlinks to julia binaries/playgrounds. However, in order to do this it needs to create its own folder for managing these symlinks. By default Playground.jl creates its own config folder in <code>~/.playground</code>. This folder is structured as follows.</p><pre><code class="language-none">|-- .playground/
+    |-- config.yml
+    |-- bin/
+        |-- playground
+        |-- julia
+        |-- julia-stable
+        |-- julia-nightly
+        |-- julia-0.3
+        |-- julia-0.4
+        ...
+    |-- share/
+        |-- myproject
+        |-- testing
+        |-- research
+    |-- src/
+        |-- julia-038-osx10
+            ...
+    |-- tmp/
+        |-- julia-0.3.8-osx10.7+.dmg</code></pre><ul><li><p>bin: contains all the symlinks to installed julia versions (and also the playground script itself)</p></li><li><p>share: contains all the named playgrounds or links to named playgrounds.</p></li><li><p>src: contains the extracted binary builds and cloned julia repos.</p></li><li><p>tmp: just contains the raw julia binary downloads</p></li></ul><h3><a class="nav-anchor" id="config.yml-1" href="#config.yml-1">config.yml</a></h3><p>The config.yml file provides a mechanism for configuring default behaviour. This file is setup during installation.</p><pre><code class="language-none">---
+# This is just default location to store a new playground.
+# This is used by create and activate if no --name or --path.
+default_playground_path: .playground
+
+# Default shell prompt when you activate a playground.
+default_prompt: &quot;\\e[0;35m\\u@\\h:\\W (playground)&gt; \\e[m&quot;
+
+# Default git settings when using install build
+default_git_address: &quot;https://github.com/JuliaLang/julia.git&quot;
+default_git_revision: master
+
+# Allows you to isolate shell and julia history to each playground.
+isolated_shell_history: true
+isolated_julia_history: true</code></pre><h2><a class="nav-anchor" id="TODOs-1" href="#TODOs-1">TODOs</a></h2><ul><li><p>More thorough test coverage</p></li><li><p>Full windows support including <code>install</code></p></li><li><p><code>install build</code> support.</p></li></ul><footer><hr/><a class="next" href="binaries.html"><span class="direction">Next</span><span class="title">Binary Releases</span></a></footer></article></body></html>
