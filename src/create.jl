@@ -34,11 +34,20 @@ function create(env::Environment; kwargs...)
     symlink(julia_exec, julia(env), exist_ok=true, overwrite=true)
 
     withenv(env) do
-        if haskey(opts, :reqs_file) && !isempty(opts[:reqs_file]) && exists(opts[:reqs_file])
-            info(logger, "Installing packages from REQUIRE file $(opts[:reqs_file])...")
-            Playground.log_output(`$(julia(env)) -e 'Pkg.init()'`)
+        Playground.log_output(`$(julia(env)) -e 'Pkg.init()'`)
+
+        reqs_file = if haskey(opts, :reqs_file) && !isempty(opts[:reqs_file])
+            opts[:reqs_file]
+        else
+            join(env.config.root, "REQUIRE")
+        end
+
+        if exists(reqs_file)
+            info(logger, "Installing packages from REQUIRE file $reqs_file...")
+
             for v in readdir(pkg(env))
-                copy(opts[:reqs_file], join(pkg(env), v, "REQUIRE"); exist_ok=true, overwrite=true)
+                copy(reqs_file, join(pkg(env), v, "REQUIRE"); exist_ok=true, overwrite=true)
+
                 try
                     Playground.log_output(`$(julia(env)) -e 'Pkg.resolve()'`)
                 catch
@@ -48,8 +57,6 @@ function create(env::Environment; kwargs...)
                     ))
                 end
             end
-        else
-            Playground.log_output(`$(julia(env)) -e 'Pkg.init()'`)
         end
     end
 end

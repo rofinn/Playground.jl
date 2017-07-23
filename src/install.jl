@@ -182,8 +182,8 @@ elseif is_unix()
         bin_path = abs(join(config.bin, base_name))
 
         info(logger, "Installing $src ...")
-        if !ispath(src_path) || force
-            mkpath(src_path)
+        if !exists(src_path) || force
+            mkdir(src_path; recursive=true)
             try
                 debug(logger, "Extracting $src to $src_path")
                 run(`tar -xzf $src -C $src_path`)
