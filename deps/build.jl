@@ -56,6 +56,7 @@ install = haskey(ENV, "PLAYGROUND_INSTALL") ? parse(ENV["PLAYGROUND_INSTALL"]) :
 # Store our install paths
 install_dir = Playground.configpath()
 config_installed = join(install_dir, "config.yml")
+require_installed = join(install_dir, "REQUIRE")
 playground_installed = join(install_dir, "bin", p"playground")
 playground_compiled = join(build_dir, "playground")
 
@@ -83,6 +84,11 @@ if install
     end
 
     symlink(playground_compiled, playground_installed; exist_ok=true, overwrite=true)
+
+    if !exists(require_installed)
+        info("Creating an empty REQUIRE file at $require_installed.")
+        touch(require_installed)
+    end
 
     info(
         "Adding $(join(install_dir, "bin")) to your PATH " *
