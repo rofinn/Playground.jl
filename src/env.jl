@@ -32,7 +32,16 @@ function Environment(config::Config, dir::AbstractPath)
 end
 
 function Environment(config::Config, dir::AbstractPath, name::String)
-    Environment(config, name, envpath(config, dir))
+    p = if isempty(dir) && isempty(name)
+        envpath(config)
+    elseif isempty(dir) && !isempty(name)
+        envpath(config, name)
+    else
+        envpath(config, dir)
+    end
+    
+    debug(logger, "Environment: Name=$name, Path=$p")
+    return Environment(config, name, p)
 end
 
 function init(env::Environment)
