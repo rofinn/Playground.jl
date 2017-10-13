@@ -49,11 +49,18 @@ optional arguments:
 **Recommended:** Add the playground bin directory to your path
 by editing your ~/.bashrc, ~/.zshrc, ~/.tcshrc, etc.
 ```shell
-echo "PATH=~/.playground/bin/:$PATH" >> ~/.bashrc
+echo "PATH=$PATH:~/.playground/bin/" >> ~/.bashrc
 ```
 This will make the playground script and all managed julia versions easily accessible.
 
-**NOTE:** Currently, some of the dependencies in Playground.jl such as Options.jl and ArgParse.jl throw deprecation warnings. If you'd like to ignore these warnings until new versions of these packages are release just add `--depwarn=no` to the shebang in `~/.playground/bin/playground`. If you're running linux you'll need to change this line to `#!/usr/bin/julia --depwarn=no` as `env` in linux can only take 1 argument otherwise the process will stall.
+**NOTE:**
+You may want to modify the shebang (e.g., `#!/usr/bin/env julia`) in `~/.playground/bin/playground` to either ignore deprecation warnings or improve load times.
+
+- Add `--depwarn=no` to ignore deprecation warnings.
+- Add `--optimize=0` to speed up load times.
+
+If you're running linux you'll need to use the path to the julia executable directly (e.g. `#!/usr/bin/julia --depwarn=no --optimize=0`)
+as `env` in linux can only take 1 argument, otherwise the process will stall. You can get the path to your julia executable with `/usr/bin/env julia`.
 
 ## Overview
 
@@ -109,6 +116,5 @@ isolated_julia_history: true
 
 
 ## TODOs ##
-* More thorough test coverage
 * Full windows support including `install`
 * `install build` support.
