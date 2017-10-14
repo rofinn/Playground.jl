@@ -1,6 +1,12 @@
 const DECLARATIVE_PACKAGES_DIR = Pkg.dir("DeclarativePackages")
 const REPL_PROMPT = "playground>"
-const SHELL_PROMPT = is_windows() ? "playground>" : "\\e[0;35m\\u@\\h:\\W (playground)> \\e[m"
+const SHELL_PROMPT = if is_windows()
+    "playground>"
+elseif contains(get(ENV, "SHELL", ""), "zsh")
+    "%F{5}%n@%m:%~ (playground)> %f"
+else
+    "\\e[0;35m\\u@\\h:\\W (playground)> \\e[m"
+end
 const NIGHTLY = v"0.7-"
 const JULIA_BIN_MODE = Mode(user=(READ+WRITE+EXEC), group=(READ+EXEC), other=(READ+EXEC))
 const DEFAULT_CONFIG = """
