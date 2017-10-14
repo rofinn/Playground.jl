@@ -37,12 +37,12 @@ function create(env::Environment; kwargs...)
     symlink(julia_exec, julia(env), exist_ok=true, overwrite=true)
 
     withenv(env) do
-        metadata = if isempty(opts[:metadata])
+        metadata = if isempty(get(opts, :metadata, ""))
             env.config.default_julia_metadata
         else
             opts[:metadata]
         end
-        branch = if isempty(opts[:meta_branch])
+        branch = if isempty(get(opts, :meta_branch, ""))
             env.config.default_julia_meta_branch
         else
             opts[:meta_branch]

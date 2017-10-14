@@ -4,7 +4,9 @@
         join(TEST_TMP_DIR, "test-playground"),
         "myproject";
         reqs_file=join(TEST_DIR, "../REQUIRE"),
-        julia="julia-bin"
+        julia="julia-bin",
+        metadata="",
+        meta_branch="",
     )
     @test exists(join(TEST_TMP_DIR, "test-playground"))
     @test isdir(join(TEST_TMP_DIR, "test-playground"))

@@ -40,6 +40,8 @@
                     "requirements" => Path(),
                     "name" => "",
                     "julia-version" => "",
+                    "julia-metadata" => "",
+                    "julia-meta-branch" => "",
                 ),
                 "debug" => false
             )
@@ -51,6 +53,8 @@
                     "--name", "myplayground",
                     "--julia-version", "julia-0.3",
                     "--requirements", "/path/to/requirements",
+                    "--julia-metadata", "https://github.com/rofinn/Playground.jl",
+                    "--julia-meta-branch", "playground",
                 ]
             )
         end
