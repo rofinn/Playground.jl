@@ -12,6 +12,8 @@ You can optionally pass in an `Environment` instance of a `Config` and args to b
 # Keywords Arguments
 * `julia::AbstractString` - a julia binary to use in this playground environment.
 * `reqs_file::AbstractPath` - path to a REQUIRE file of packages to install in this environment.
+* `metadata::AbstractString` - url to the METADATA repo to be cloned.
+* `meta_branch::AbstractString` - METADATA branch to be checked out.
 """
 create(; kwargs...) = create(Environment(); kwargs...)
 create(config::Config, args...; kwargs...) = create(Environment(config, args...); kwargs...)
@@ -35,7 +37,18 @@ function create(env::Environment; kwargs...)
     symlink(julia_exec, julia(env), exist_ok=true, overwrite=true)
 
     withenv(env) do
-        Playground.log_output(`$(julia(env)) -e 'Pkg.init()'`)
+        metadata = if isempty(opts[:metadata])
+            env.config.default_julia_metadata
+        else
+            opts[:metadata]
+        end
+        branch = if isempty(opts[:meta_branch])
+            env.config.default_julia_meta_branch
+        else
+            opts[:meta_branch]
+        end
+        init_cmd = "Pkg.init(\"$metadata\", \"$branch\")"
+        Playground.log_output(`$(julia(env)) -e $init_cmd`)
 
         reqs_file = if haskey(opts, :reqs_file) && !isempty(opts[:reqs_file])
             opts[:reqs_file]

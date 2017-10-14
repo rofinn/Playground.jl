@@ -16,6 +16,8 @@ type Config
     repl_prompt::AbstractString
     shell_prompt::AbstractString
     default_shell::AbstractString
+    default_julia_metadata::AbstractString
+    default_julia_meta_branch::AbstractString
     default_git_address::AbstractString
     default_git_revision::AbstractString
     isolated_shell_history::Bool
@@ -34,7 +36,9 @@ type Config
             default_pg_path,
             kwargs["repl_prompt"],
             kwargs["shell_prompt"],
-            haskey(kwargs, "default_shell") ? kwargs["default_shell"] : "",
+            get(kwargs, "default_shell", ""),
+            get(kwargs, "default_julia_metadata", ""),
+            get(kwargs, "default_julia_meta_branch", ""),
             kwargs["default_git_address"],
             kwargs["default_git_revision"],
             kwargs["isolated_shell_history"],

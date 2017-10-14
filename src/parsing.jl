@@ -59,6 +59,13 @@ function argparse(cmd_args=ARGS)
         "--julia-version", "-j"
             help = "The version(s) of julia available to use. If multiple versions are provided the first entry will be the one used by `julia`. By default the user/system level version is used."
             default = ""
+        "--julia-metadata", "-m"
+            help = "The url of the METADATA repo to be cloned when initializing the package directory."
+            default = ""
+        "--julia-meta-branch", "-b"
+            help = "The branch of the METADATA repo check out."
+            default = ""
+
     end
 
     @add_arg_table parse_settings["activate"] begin
