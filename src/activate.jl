@@ -6,7 +6,7 @@
 Modifies the current environment to operate within a specific playground environment.
 When `shell=true` a new shell environment will be created.
 However, when `shell=false` the existing julia REPL will be modifed and
-`deactive(env::Enviornmentt)` must be called to restore the REPL state.
+`deactivate()` must be called to restore the REPL state.
 """
 activate(; shell=true) = activate(Environment(); shell=shell)
 

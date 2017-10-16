@@ -9,16 +9,29 @@ elseif is_unix()
             @mock run(`$(ENV["SHELL"]) -i`)
         elseif haskey(ENV, "SHELL")
             # Try and setup the new shell as close to the user's default shell as possible.
-            usr_rc = join(home(), "." * basename(ENV["SHELL"] * "rc"))
-            pg_rc = join(parent(Path(ENV["JULIA_PKGDIR"])), basename(ENV["SHELL"] * "rc"))
+            usr_rc, pg_rc = begin
+                if contains(ENV["SHELL"], "zsh")
+                    usr = join(Path(get(ENV, "ZDOTDIR", home())), ".zshrc")
+                    pg = join(parent(Path(ENV["JULIA_PKGDIR"])), ".zshrc")
+                else
+                    fname = basename(ENV["SHELL"]) * "rc"
+                    usr = join(home(), "." * fname)
+                    pg = join(parent(Path(ENV["JULIA_PKGDIR"])), fname)
+                end
+                usr, pg
+            end
 
             if !exists(pg_rc)
                 cp(usr_rc, pg_rc, follow_symlinks=true)
                 content = string(
                     "export PATH=", ENV["PATH"], "\n",
-                    "export PS1=\"$(prompt)\"\n",
+                    "export PS1=\"$prompt\"\n",
                     "export JULIA_PKGDIR=", ENV["JULIA_PKGDIR"], "\n",
                 )
+
+                if contains(ENV["SHELL"], "zsh")
+                    content = "unset PROMPT\n" * content  # Use the new PS1 instead.
+                end
 
                 if haskey(ENV, "HISTFILE")
                     content = string(content, "export HISTFILE=", ENV["HISTFILE"], "\n")
@@ -28,7 +41,8 @@ elseif is_unix()
             end
 
             if contains(ENV["SHELL"], "zsh")
-                @mock run(`$(ENV["SHELL"]) -c "source $pg_rc; $(ENV["SHELL"])"`)
+                ENV["ZDOTDIR"] = parent(pg_rc)
+                @mock run(`$(ENV["SHELL"])`)
             else
                 @mock run(`$(ENV["SHELL"]) --rcfile $pg_rc`)
             end
