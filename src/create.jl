@@ -17,6 +17,7 @@ create(; kwargs...) = create(Environment(); kwargs...)
 create(config::Config, args...; kwargs...) = create(Environment(config, args...); kwargs...)
 
 function create(env::Environment; kwargs...)
+    debug(logger, "Environment Config: $(env.config)")
     init(env)
     opts = Dict(kwargs)
 

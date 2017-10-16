@@ -61,9 +61,14 @@ end
 
 configpath() = join(home(), ".playground")
 
-envpath(config::Config) = abs(join(cwd(), config.default_playground_path))
+function envpath(config::Config)
+    p = abs(join(cwd(), config.default_playground_path))
+    debug(logger, "Using `default_playground_path`: $p")
+    return p
+end
+
 envpath(config::Config, name::AbstractString) = abs(join(config.share, name))
-envpath(config::Config, path::AbstractPath) = isempty(path) ? envpath(config) : abs(path)
+envpath(config::Config, path::AbstractPath) = abs(path)
 
 function envname(config::Config, path::AbstractPath)
     root_path = abs(path)

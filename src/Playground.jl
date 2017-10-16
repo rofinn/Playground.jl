@@ -55,6 +55,7 @@ function main(cmdargs, configargs...)
 
     config = Config(configargs...)
 
+    debug(logger, "Arguments: $args")
     if cmd == "install"
         install_cmd = args["%COMMAND%"]
         args = args[install_cmd]
