@@ -277,7 +277,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "Playground.activate",
     "category": "Function",
-    "text": "activate(; shell=true)\nactivate(config::Config, args...; shell=true)\nactivate(env::Environment; shell=true)\n\nModifies the current environment to operate within a specific playground environment. When shell=true a new shell environment will be created. However, when shell=false the existing julia REPL will be modifed and deactive(env::Enviornmentt) must be called to restore the REPL state.\n\n\n\n"
+    "text": "activate(; shell=true)\nactivate(config::Config, args...; shell=true)\nactivate(env::Environment; shell=true)\n\nModifies the current environment to operate within a specific playground environment. When shell=true a new shell environment will be created. However, when shell=false the existing julia REPL will be modifed and deactivate() must be called to restore the REPL state.\n\n\n\n"
 },
 
 {
