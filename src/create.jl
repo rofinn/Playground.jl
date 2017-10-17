@@ -12,8 +12,8 @@ You can optionally pass in an `Environment` instance of a `Config` and args to b
 # Keywords Arguments
 * `julia::AbstractString` - a julia binary to use in this playground environment.
 * `reqs_file::AbstractPath` - path to a REQUIRE file of packages to install in this environment.
-* `metadata::AbstractString` - url to the METADATA repo to be cloned.
-* `meta_branch::AbstractString` - METADATA branch to be checked out.
+* `registry::AbstractString` - url to the package registry to be cloned.
+* `branch::AbstractString` - registry branch to be checked out.
 """
 create(; kwargs...) = create(Environment(); kwargs...)
 create(config::Config, args...; kwargs...) = create(Environment(config, args...); kwargs...)
@@ -37,17 +37,17 @@ function create(env::Environment; kwargs...)
     symlink(julia_exec, julia(env), exist_ok=true, overwrite=true)
 
     withenv(env) do
-        metadata = if isempty(get(opts, :metadata, ""))
-            env.config.default_julia_metadata
+        registry = if isempty(get(opts, :registry, ""))
+            env.config.default_julia_registry
         else
-            opts[:metadata]
+            opts[:registry]
         end
-        branch = if isempty(get(opts, :meta_branch, ""))
-            env.config.default_julia_meta_branch
+        branch = if isempty(get(opts, :branch, ""))
+            env.config.default_julia_branch
         else
-            opts[:meta_branch]
+            opts[:branch]
         end
-        init_cmd = "Pkg.init(\"$metadata\", \"$branch\")"
+        init_cmd = "Pkg.init(\"$registry\", \"$branch\")"
         Playground.log_output(`$(julia(env)) -e $init_cmd`)
 
         reqs_file = if haskey(opts, :reqs_file) && !isempty(opts[:reqs_file])
