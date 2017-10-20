@@ -10,8 +10,8 @@ function Base.run(shell::KSH, env::Environment)
     prompt = getprompt(shell, env)
     ENV["PS1"] = prompt
 
-    usr_rc = join(Path(home()), ".zshrc")
-    pg_rc = join(parent(Path(ENV["JULIA_PKGDIR"])), ".zshrc")
+    usr_rc = join(Path(home()), ".kshrc")
+    pg_rc = join(parent(Path(ENV["JULIA_PKGDIR"])), ".kshrc")
 
     if !exists(pg_rc)
         exists(usr_rc) ? cp(usr_rc, pg_rc, follow_symlinks=true) : touch(pg_rc)
