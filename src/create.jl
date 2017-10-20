@@ -38,12 +38,12 @@ function create(env::Environment; kwargs...)
 
     withenv(env) do
         registry = if isempty(get(opts, :registry, ""))
-            env.config.default_julia_registry
+            env.config.default_registry
         else
             opts[:registry]
         end
         branch = if isempty(get(opts, :branch, ""))
-            env.config.default_julia_branch
+            env.config.default_branch
         else
             opts[:branch]
         end

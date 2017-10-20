@@ -16,8 +16,8 @@ type Config
     repl_prompt::AbstractString
     shell_prompt::AbstractString
     default_shell::AbstractString
-    default_julia_registry::AbstractString
-    default_julia_branch::AbstractString
+    default_registry::AbstractString
+    default_branch::AbstractString
     default_git_address::AbstractString
     default_git_revision::AbstractString
     isolated_shell_history::Bool
@@ -37,8 +37,8 @@ type Config
             kwargs["repl_prompt"],
             kwargs["shell_prompt"],
             get(kwargs, "default_shell", ""),
-            get(kwargs, "default_julia_registry", ""),
-            get(kwargs, "default_julia_branch", ""),
+            get(kwargs, "default_registry", ""),
+            get(kwargs, "default_branch", ""),
             kwargs["default_git_address"],
             kwargs["default_git_revision"],
             kwargs["isolated_shell_history"],
