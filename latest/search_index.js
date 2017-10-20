@@ -269,7 +269,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "Playground.create",
     "category": "Function",
-    "text": "create(; kwargs...)\ncreate(config::Config, args...; kwargs...)\ncreate(env::Environment; kwargs...)\n\nCreates a new playground Environment including initializing its package directory and installing any package in the REQUIRE file passed in.\n\nOptional Arguments\n\nYou can optionally pass in an Environment instance of a Config and args to build one.\n\nKeywords Arguments\n\njulia::AbstractString - a julia binary to use in this playground environment.\nreqs_file::AbstractPath - path to a REQUIRE file of packages to install in this environment.\n\n\n\n"
+    "text": "create(; kwargs...)\ncreate(config::Config, args...; kwargs...)\ncreate(env::Environment; kwargs...)\n\nCreates a new playground Environment including initializing its package directory and installing any package in the REQUIRE file passed in.\n\nOptional Arguments\n\nYou can optionally pass in an Environment instance of a Config and args to build one.\n\nKeywords Arguments\n\njulia::AbstractString - a julia binary to use in this playground environment.\nreqs_file::AbstractPath - path to a REQUIRE file of packages to install in this environment.\nregistry::AbstractString - url to the package registry to be cloned.\nbranch::AbstractString - registry branch to be checked out.\n\n\n\n"
 },
 
 {
