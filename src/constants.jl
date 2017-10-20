@@ -27,6 +27,10 @@ default_prompt: \"$(escape_string(SHELL_PROMPT))\"
 # Environment variable will be used.
 # default_shell: /usr/local/bin/fish
 
+# Default julia registry settings.
+default_registry: \"https://github.com/JuliaLang/METADATA.jl.git\"
+default_branch: \"metadata-v2\"
+
 # Default git settings when using install build
 default_git_address: \"https://github.com/JuliaLang/julia.git\"
 default_git_revision: master

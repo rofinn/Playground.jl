@@ -84,6 +84,8 @@ function main(cmdargs, configargs...)
             args["name"];
             julia=args["julia-version"],
             reqs_file=args["requirements"],
+            registry=args["registry"],
+            branch=args["branch"],
         )
     elseif cmd == "activate"
         activate(

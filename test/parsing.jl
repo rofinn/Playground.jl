@@ -40,6 +40,8 @@
                     "requirements" => Path(),
                     "name" => "",
                     "julia-version" => "",
+                    "registry" => "",
+                    "branch" => "",
                 ),
                 "debug" => false
             )
@@ -51,6 +53,8 @@
                     "--name", "myplayground",
                     "--julia-version", "julia-0.3",
                     "--requirements", "/path/to/requirements",
+                    "--registry", "https://github.com/JuliaLang/METADATA.jl",
+                    "--branch", "metadata-v2",
                 ]
             )
         end

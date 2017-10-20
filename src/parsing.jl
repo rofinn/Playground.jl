@@ -59,6 +59,13 @@ function argparse(cmd_args=ARGS)
         "--julia-version", "-j"
             help = "The version(s) of julia available to use. If multiple versions are provided the first entry will be the one used by `julia`. By default the user/system level version is used."
             default = ""
+        "--registry"
+            help = "The url of the packagee registry to be cloned when initializing the package directory."
+            default = ""
+        "--branch"
+            help = "The registry branch to check out."
+            default = ""
+
     end
 
     @add_arg_table parse_settings["activate"] begin
