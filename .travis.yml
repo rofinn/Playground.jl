@@ -20,6 +20,9 @@ matrix:
   fast_finish: true
   allow_failures:
   - julia: nightly
+  exclude:
+  - julia: nightly
+    os: osx
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     sudo add-apt-repository ppa:staticfloat/julia-deps -y;
