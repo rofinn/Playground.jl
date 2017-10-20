@@ -1,3 +1,15 @@
+abstract type AbstractREPL end
+
+function getprompt(repl::AbstractREPL, env::Environment)
+    isempty(name(env)) ? prompt : replace(repl.prompt, "playground", name(env))
+end
+
+struct Julia <: AbstractREPL
+    prompt::AbstractString
+end
+
+Julia() = Julia("playground>")
+
 # Copied from https://github.com/KristofferC/OhMyREPL.jl/blob/master/src/prompt.jl
 # as importing `input_prompt!` from OhMyREPL overwrites a bunch default repl behaviour.
 

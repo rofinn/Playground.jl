@@ -1,6 +1,6 @@
 language: julia
 os:
-- osx
+# - osx
 - linux
 julia:
 - 0.5
@@ -12,6 +12,9 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - gcc-5
+      - zsh
+      - ksh
+      - fish
 notifications:
   email: false
 matrix:

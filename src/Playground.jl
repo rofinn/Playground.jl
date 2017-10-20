@@ -9,10 +9,10 @@ using FilePaths
 using Memento
 
 include("constants.jl")
-include("repl.jl")
-include("shell.jl")
 include("config.jl")
 include("env.jl")
+include("repl.jl")
+include("shell.jl")
 include("utils.jl")
 include("parsing.jl")
 include("install.jl")

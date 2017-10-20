@@ -15,14 +15,16 @@ function activate(config::Config, args...; shell=true)
 end
 
 function activate(env::Environment; shell=true)
-    prompt = getprompt(env; shell=shell)
     debug(logger, "Activating playground $(name(env))...")
 
     if shell
         withenv(env) do
-            runshell(prompt)
+            run(getshell(), env)
         end
     else
+        repl = Julia()
+        prompt = getprompt(repl, env)
+
         old = Dict{Symbol, Any}()
         old[:ENV] = set!(env, getenvs(env)...)
         try
