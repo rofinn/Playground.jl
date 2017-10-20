@@ -24,6 +24,7 @@ matrix:
   - julia: nightly
     os: osx
 before_install:
+- "if [ ${TRAVIS_OS_NAME} = 'osx' ]; then brew install zsh ksh fish; fi"
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     sudo add-apt-repository ppa:staticfloat/julia-deps -y;
     sudo apt-get update -qq -y;
