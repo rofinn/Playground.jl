@@ -25,12 +25,12 @@ Playground.init(TEST_CONFIG)
 # Order matters.
 tests = [
     # "lint",
-    # "utils",
-    # "list",
-    # "parsing",
-    # "install",
-    # "create",
-    # "activate",
+    "utils",
+    "list",
+    "parsing",
+    "install",
+    "create",
+    "activate",
     "shell",
     "execute",
     "clean"
