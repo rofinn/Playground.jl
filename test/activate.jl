@@ -8,6 +8,6 @@
         activate(TEST_CONFIG)
     end
 
-    # activate(Environment("myproject"); shell=false)
-    # deactivate()
+    activate(Environment("myproject"); shell=false)
+    deactivate()
 end

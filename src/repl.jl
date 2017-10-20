@@ -1,7 +1,7 @@
 abstract type AbstractREPL end
 
 function getprompt(repl::AbstractREPL, env::Environment)
-    isempty(name(env)) ? prompt : replace(repl.prompt, "playground", name(env))
+    isempty(name(env)) ? repl.prompt : replace(repl.prompt, "playground", name(env))
 end
 
 struct Julia <: AbstractREPL
