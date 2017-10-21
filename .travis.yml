@@ -24,7 +24,7 @@ matrix:
   - julia: nightly
     os: osx
 before_install:
-- if [[ "$TRAVIS_OS_NAME == "osx" ]]; then
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew update;
     brew install zsh ksh fish;
   fi
