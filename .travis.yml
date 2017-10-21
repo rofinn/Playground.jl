@@ -3,7 +3,6 @@ os:
 - osx
 - linux
 julia:
-- 0.5
 - 0.6
 - nightly
 addons:
@@ -12,13 +11,23 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - gcc-5
+      - zsh
+      - ksh
+      - fish
 notifications:
   email: false
 matrix:
   fast_finish: true
   allow_failures:
   - julia: nightly
+  exclude:
+  - julia: nightly
+    os: osx
 before_install:
+- if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+    brew update;
+    brew install zsh ksh fish;
+  fi
 - if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
     sudo add-apt-repository ppa:staticfloat/julia-deps -y;
     sudo apt-get update -qq -y;

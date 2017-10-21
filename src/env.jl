@@ -39,7 +39,7 @@ function Environment(config::Config, dir::AbstractPath, name::String)
     else
         envpath(config, dir)
     end
-    
+
     debug(logger, "Environment: Name=$name, Path=$p")
     return Environment(config, name, p)
 end
@@ -74,15 +74,6 @@ function history(env::Environment, lang::Symbol)
     else
         error(logger, "Unsupported history language $lang")
     end
-end
-
-function defaultprompt(env::Environment, shell::Bool=true)
-    shell ? env.config.shell_prompt : env.config.repl_prompt
-end
-
-function getprompt(env::Environment; shell::Bool=true)
-    prompt = defaultprompt(env, shell)
-    isempty(name(env)) ? prompt : replace(prompt, "playground", name(env))
 end
 
 """

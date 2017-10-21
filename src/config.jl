@@ -13,8 +13,6 @@ type Config
     bin::AbstractPath
     share::AbstractPath
     default_playground_path::AbstractPath
-    repl_prompt::AbstractString
-    shell_prompt::AbstractString
     default_shell::AbstractString
     default_registry::AbstractString
     default_branch::AbstractString
@@ -34,8 +32,6 @@ type Config
             join(root, p"bin"),
             join(root, p"share"),
             default_pg_path,
-            kwargs["repl_prompt"],
-            kwargs["shell_prompt"],
             get(kwargs, "default_shell", ""),
             get(kwargs, "default_registry", ""),
             get(kwargs, "default_branch", ""),

@@ -31,6 +31,7 @@ tests = [
     "install",
     "create",
     "activate",
+    "shell",
     "execute",
     "clean"
 ]
