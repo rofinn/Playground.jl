@@ -10,11 +10,18 @@ end
 
 @testset "shell" begin
     @testset "$SH" for SH in ("bash", "zsh", "ksh", "fish")
-        path = readstring(`which $SH`)
-        withenv("SHELL" => path) do
-            sh = Playground.getshell()
-            t = typeof(sh)
-            @test endswith(lowercase("$t"), SH)
+        rc = spawn(`which $SH`).exitcode
+
+        if success(spawn(`which $SH`))
+            path = readstring(`which $SH`)
+
+            withenv("SHELL" => path) do
+                sh = Playground.getshell()
+                t = typeof(sh)
+                @test endswith(lowercase("$t"), SH)
+            end
+        else
+            warn("$SH not installed.")
         end
     end
 
@@ -25,9 +32,16 @@ end
 
         Mocking.apply(patch) do
             withenv(env) do
-                sh = SH()
-                resp = strip(run(sh, env))
-                @test resp == "Hello World!"
+                name = lowercase(string(SH.name))
+                rc = spawn(`which $name`).exitcode
+
+                if success(spawn(`which $SH`))
+                    sh = SH()
+                    resp = strip(run(sh, env))
+                    @test resp == "Hello World!"
+                else
+                    warn("$name not installed.")
+                end
             end
         end
     end
