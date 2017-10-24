@@ -54,7 +54,7 @@ copy(join(deps_dir, "..", "README.md"), join(build_dir, "README.md"); exist_ok=t
 install = haskey(ENV, "PLAYGROUND_INSTALL") ? parse(ENV["PLAYGROUND_INSTALL"]) : false
 
 # Store our install paths
-install_dir = Playground.configpath()
+install_dir = join(home(), ".playground")
 config_installed = join(install_dir, "config.yml")
 require_installed = join(install_dir, "REQUIRE")
 playground_installed = join(install_dir, "bin", p"playground")
