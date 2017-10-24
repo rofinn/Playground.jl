@@ -32,7 +32,7 @@ end
 
         Mocking.apply(patch) do
             withenv(env) do
-                name = lowercase(string(SH.name))
+                name = split(lowercase(string(SH.name)), '.')[end]
                 rc = spawn(`which $name`).exitcode
 
                 if success(spawn(`which $SH`))

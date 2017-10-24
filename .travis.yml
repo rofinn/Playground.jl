@@ -12,7 +12,7 @@ addons:
     packages:
       - gcc-5
       - zsh
-      # - ksh
+      - ksh
       - fish
 notifications:
   email: false
