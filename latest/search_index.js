@@ -245,7 +245,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "Playground.Config",
     "category": "Type",
-    "text": "Config(; file=p\"~/.playground/config.yml\", root=p\"~/.playground\")\n\nStores various default playground environment settings including paths for storing shared binaries and environments.\n\n\n\n"
+    "text": "Config(p\"~/.playground/config.yml\", root=p\"~/.playground\")\n\nStores various default playground environment settings including paths for storing shared binaries and environments.\n\n\n\n"
 },
 
 {
