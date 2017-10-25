@@ -10,9 +10,7 @@ end
 
 @testset "shell" begin
     @testset "$SH" for SH in ("bash", "zsh", "ksh", "fish")
-        rc = spawn(`which $SH`).exitcode
-
-        if success(spawn(`which $SH`))
+        if success(`which $SH`)
             path = readstring(`which $SH`)
 
             withenv("SHELL" => path) do
@@ -33,9 +31,8 @@ end
         Mocking.apply(patch) do
             withenv(env) do
                 name = split(lowercase(string(SH.name)), '.')[end]
-                rc = spawn(`which $name`).exitcode
 
-                if success(spawn(`which $SH`))
+                if success(`which $name`)
                     sh = SH()
                     resp = strip(run(sh, env))
                     @test resp == "Hello World!"
