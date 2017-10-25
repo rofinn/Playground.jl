@@ -1,7 +1,7 @@
 import YAML: load
 
 """
-    Config(; file=p"~/.playground/config.yml", root=p"~/.playground")
+    Config(p"~/.playground/config.yml", root=p"~/.playground")
 
 Stores various default playground environment settings including paths for
 storing shared binaries and environments.
@@ -49,8 +49,17 @@ function Config(config::AbstractString, root::AbstractPath)
     return Config(config_dict)
 end
 
-function Config{P<:AbstractPath}(; file::P=join(configpath(), "config.yml"), root::P=configpath())
+function Config{P<:AbstractPath}(file::P, root::P=configpath())
     Config(read(file), root)
+end
+
+function Config()
+    config_file = join(configpath(), "config.yml")
+    if exists(config_file)
+        return Config(config_file)
+    else
+        return Config(Playground.DEFAULT_CONFIG, configpath())
+    end
 end
 
 function init(config::Config)
@@ -59,7 +68,11 @@ function init(config::Config)
     end
 end
 
-configpath() = join(home(), ".playground")
+function configpath()
+    default_path = join(home(), ".playground")
+    alt_path = join(parent(parent(Path(@__FILE__))), p"deps", p"usr", p".playground")
+    exists(default_path) ? default_path : alt_path
+end
 
 function envpath(config::Config)
     p = abs(join(cwd(), config.default_playground_path))
