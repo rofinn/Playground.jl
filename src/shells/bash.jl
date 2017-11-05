@@ -7,10 +7,11 @@ BASH(path::AbstractString) = BASH(path, "\\e[0;35m\\u@\\h:\\W (playground)> \\e[
 BASH() = BASH(strip(readstring(`which bash`)))
 
 function Base.run(shell::BASH, env::Environment)
+    init(env)
     prompt = getprompt(shell, env)
     ENV["PS1"] = prompt
 
-    usr_rc = join(Path(get(ENV, "ZDOTDIR", home())), ".bashrc")
+    usr_rc = join(home(), ".bashrc")
     pg_rc = join(parent(Path(ENV["JULIA_PKGDIR"])), ".bashrc")
 
     if !exists(pg_rc)
@@ -29,5 +30,5 @@ function Base.run(shell::BASH, env::Environment)
         write(pg_rc, content, "a")
     end
 
-    @mock run(`$(shell.path) --rcfile $pg_rc -i`)
+    runsh(`$(shell.path) --rcfile $pg_rc -i`)
 end

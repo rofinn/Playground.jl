@@ -1,4 +1,4 @@
-#!/usr/bin/env julia
+#!/usr/bin/env julia --optimize=0
 
 import Playground
 Playground.main(ARGS)

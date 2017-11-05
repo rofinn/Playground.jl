@@ -7,6 +7,7 @@ ZSH(path::AbstractString) = ZSH(path, "%F{5}%n@%m:%~ (playground)> %f")
 ZSH() = ZSH(strip(readstring(`which zsh`)))
 
 function Base.run(shell::ZSH, env::Environment)
+    init(env)
     prompt = getprompt(shell, env)
     ENV["PS1"] = prompt
 
@@ -35,5 +36,5 @@ function Base.run(shell::ZSH, env::Environment)
     end
 
     ENV["ZDOTDIR"] = parent(pg_rc)
-    @mock run(`$(shell.path) -i`)
+    runsh(`$(shell.path) -i`)
 end
