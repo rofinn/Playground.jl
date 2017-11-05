@@ -49,10 +49,10 @@ script:
 - if [[ "$TEST_TYPE" == "full" ]]; then
     julia -e 'ENV["PLAYGROUND_INSTALL"] = true; Pkg.build("Playground")';
     julia --compilecache=no -e 'Pkg.test("Playground";  coverage=true)';
-    ~/.playground/bin/playground list
+    ~/.playground/bin/playground list;
   fi
 - if [[ "$TEST_TYPE" == "base"]]; then
-    julia -e 'Pkg.build("Playground"); Pkg.test("Playground"; coverage=true)'
+    julia -e 'Pkg.build("Playground"); Pkg.test("Playground"; coverage=true)';
   fi
 after_success:
 - julia -e 'cd(Pkg.dir("Playground")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
