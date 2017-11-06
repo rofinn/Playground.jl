@@ -5,6 +5,9 @@ os:
 julia:
 - 0.6
 - nightly
+env:
+  - TEST_TYPE=base
+  - TEST_TYPE=full
 addons:
   apt:
     sources:
@@ -23,6 +26,10 @@ matrix:
   exclude:
   - julia: nightly
     os: osx
+  - julia: nightly
+    env: TEST_TYPE=base
+  - os: osx
+    env: TEST_TYPE=base
 before_install:
 - if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
     brew update;
@@ -38,9 +45,16 @@ before_install:
   fi
 script:
 - if [[ -a .git/shallow ]]; then git fetch --unshallow; fi
-- julia -e 'ENV["PLAYGROUND_INSTALL"] = true; Pkg.clone(pwd()); Pkg.build("Playground")'
-- julia --compilecache=no -e 'Pkg.test("Playground";  coverage=true)'
-- ~/.playground/bin/playground list
+- julia -e 'Pkg.clone(pwd())';
+- if [[ "$TEST_TYPE" == "full" ]]; then
+    julia -e 'ENV["PLAYGROUND_INSTALL"] = true; Pkg.build("Playground")';
+    julia --compilecache=no -e 'Pkg.test("Playground";  coverage=true)';
+    ~/.playground/bin/playground list;
+  fi
+- if [[ "$TEST_TYPE" == "base" ]]; then
+    julia -e 'Pkg.build("Playground")';
+    julia -e 'Pkg.test("Playground"; coverage=true)';
+  fi
 after_success:
 - julia -e 'cd(Pkg.dir("Playground")); Pkg.add("Coverage"); using Coverage; Codecov.submit(process_folder())'
 - julia -e 'Pkg.add("Documenter"); cd(Pkg.dir("Playground")); include(joinpath("docs", "make.jl"))'

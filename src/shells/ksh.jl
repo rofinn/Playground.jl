@@ -7,6 +7,7 @@ KSH(path::AbstractString) = KSH(path, "(playground)> ")
 KSH() = KSH(strip(readstring(`which ksh`)))
 
 function Base.run(shell::KSH, env::Environment)
+    init(env)
     prompt = getprompt(shell, env)
     ENV["PS1"] = prompt
 
@@ -30,5 +31,5 @@ function Base.run(shell::KSH, env::Environment)
     end
 
     ENV["ENV"] = pg_rc
-    @mock run(`$(shell.path) -i`)
+    runsh(`$(shell.path) -i`)
 end

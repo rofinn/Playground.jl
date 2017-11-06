@@ -3,7 +3,6 @@ using Base.Test
 using Mocking
 Mocking.enable()
 
-include("../src/Playground.jl")
 using Playground
 using FilePaths
 using Memento

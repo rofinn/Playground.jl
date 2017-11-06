@@ -15,9 +15,9 @@ function julia_url(version::VersionNumber, os::Symbol, arch::Integer)
         ext = "linux-i686.tar.gz"
         nightly_ext = "linux32.tar.gz"
     elseif os === :Darwin && arch == 64
-        os_arch = "osx/x64"
-        ext = "osx10.7+.dmg"
-        nightly_ext = "osx.dmg"
+        os_arch = "mac/x64"
+        ext = "mac64.dmg"
+        nightly_ext = ext
     elseif os === :Windows && arch == 64
         os_arch = "winnt/x64"
         ext = "win64.exe"
