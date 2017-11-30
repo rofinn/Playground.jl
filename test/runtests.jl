@@ -1,7 +1,7 @@
 using Base.Test
 # using Lint
 using Mocking
-Mocking.enable()
+Mocking.enable(force=true)
 
 using Playground
 using FilePaths

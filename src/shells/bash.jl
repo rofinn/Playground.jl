@@ -30,5 +30,5 @@ function Base.run(shell::BASH, env::Environment)
         write(pg_rc, content, "a")
     end
 
-    runsh(`$(shell.path) --rcfile $pg_rc -i`)
+    @mock run(`$(shell.path) --rcfile $pg_rc -i`)
 end

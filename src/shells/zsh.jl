@@ -36,5 +36,5 @@ function Base.run(shell::ZSH, env::Environment)
     end
 
     ENV["ZDOTDIR"] = parent(pg_rc)
-    runsh(`$(shell.path) -i`)
+    @mock run(`$(shell.path) -i`)
 end

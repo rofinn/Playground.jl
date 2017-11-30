@@ -31,5 +31,5 @@ function Base.run(shell::KSH, env::Environment)
     end
 
     ENV["ENV"] = pg_rc
-    runsh(`$(shell.path) -i`)
+    @mock run(`$(shell.path) -i`)
 end

@@ -11,5 +11,5 @@ function Base.run(shell::FISH, env::Environment)
     # Currently can't support sourcing a custom fish prompt on startup until
     # 2.7.0 is released with the `-C` flag.
     # https://github.com/fish-shell/fish-shell/milestone/17
-    runsh(`$(shell.path) -i`)
+    @mock run(`$(shell.path) -i`)
 end
