@@ -40,8 +40,8 @@ function julia_url(version::VersionNumber, os::Symbol, arch::Integer)
     if version >= future_release
         throw(ArgumentError("The version $version exceeds the latest known nightly build $NIGHTLY"))
     elseif version >= NIGHTLY
-        # https://status.julialang.org/download/linux-x86_64
-        url = "s3.amazonaws.com/julianightlies/bin/$os_arch/julia-latest-$nightly_ext"
+        # https://julialangnightlies-s3.julialang.org/bin/linux/x64/julia-latest-linux64.tar.gz
+        url = "julialangnightlies-s3.julialang.org/bin/$os_arch/julia-latest-$nightly_ext"
     elseif version.patch == 0 && (version == Base.upperbound(version) || (length(pre) > 0 && pre[1] == "latest"))
         # https://julialang-s3.julialang.org/bin/linux/x64/0.6/julia-0.6-latest-linux-x86_64.tar.gz
         url = "julialang-s3.julialang.org/bin/$os_arch/$major_minor/julia-$major_minor-latest-$ext"
