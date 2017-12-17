@@ -26,11 +26,7 @@ function create(env::Environment; kwargs...)
     julia_exec = if haskey(opts, :julia) && !isempty(opts[:julia])
         join(env.config.bin, opts[:julia])
     else
-        out = readchomp(`which julia`)
-        debug(logger, out)
-        debug(logger, Path(out))
-        debug(logger, abs(Path(out)))
-        abs(Path(readchomp(`which julia`)))
+        join(Path(Base.JULIA_HOME), p"julia")
     end
 
     debug(logger, "$(julia(env)) -> $julia_exec")

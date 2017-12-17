@@ -1,5 +1,3 @@
-import YAML: load
-
 """
     Config(p"~/.playground/config.yml", root=p"~/.playground")
 
@@ -44,7 +42,7 @@ type Config
 end
 
 function Config(config::AbstractString, root::AbstractPath)
-    config_dict = load(config)
+    config_dict = configload(config)
     config_dict["root"] = root
     return Config(config_dict)
 end
@@ -66,6 +64,37 @@ function init(config::Config)
     for p in (config.root, config.tmp, config.src, config.bin, config.share)
         mkdir(p; recursive=true, exist_ok=true)
     end
+end
+
+function configload(content)
+    content_hash = hash(content)
+    config_cache_file = join(configpath(), ".config-$(Base.VERSION_STRING).cache")
+
+    if exists(config_cache_file)
+        try
+            cache = open(config_cache_file, "r") do f
+                deserialize(f)
+            end
+
+            saved_hash = cache["hash"]
+            debug(logger, "Checking hash: $content_hash == $saved_hash")
+            if content_hash == saved_hash
+                return cache
+            end
+        catch ex
+            warn(logger, ex)
+        end
+    end
+
+
+    new_cache = load(content)
+    new_cache["hash"] = content_hash
+
+    open(config_cache_file, "w") do f
+        serialize(f, new_cache)
+    end
+
+    return new_cache
 end
 
 function configpath()

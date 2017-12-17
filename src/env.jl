@@ -45,10 +45,13 @@ function Environment(config::Config, dir::AbstractPath, name::String)
 end
 
 function init(env::Environment)
-    info(logger, "Creating playground environment $(env.name)...")
-    for p in (root, bin, log, pkg)
-        mkdir(p(env); recursive=true, exist_ok=true)
-        debug(logger, "$(p(env)) created.")
+    for f in (root, bin, log, pkg)
+        p = f(env)
+
+        if !exists(p)
+            mkdir(p; recursive=true)
+            debug(logger, "$p created.")
+        end
     end
 
     # If the playground name is set and the root path isn't already in the

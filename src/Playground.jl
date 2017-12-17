@@ -7,6 +7,9 @@ using ArgParse
 using Mocking
 using FilePaths
 using Memento
+using YAML
+
+import YAML: load
 
 include("constants.jl")
 include("config.jl")

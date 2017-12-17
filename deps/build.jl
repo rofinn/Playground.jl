@@ -11,6 +11,15 @@ mkdir(build_dir; recursive=true, exist_ok=true)
 
 bin_exec = haskey(ENV, "PLAYGROUND_BIN_EXEC") ? parse(ENV["PLAYGROUND_BIN_EXEC"]) : false
 
+julia_bin = joinpath(Base.JULIA_HOME, "julia")
+script =
+    """
+    #!$julia_bin --optimize=0
+
+    import Playground
+    Playground.main(ARGS)
+    """
+
 if bin_exec
     # Actually build the playground executable
     info("Trying to build playground executable in $build_dir ...")
@@ -18,10 +27,9 @@ if bin_exec
     # We avoid passing a Path to build_executable as it can cause problems.
     build_executable("playground", "script.jl", String(build_dir), "generic"; force=true)
 else
-    info("Copying playground script to $build_dir")
-    PKG_PLAYGROUND_BIN = join(deps_dir, "usr", "bin", "playground")
-    copy(PKG_PLAYGROUND_BIN, join(build_dir, "playground"); exist_ok=true, overwrite=true)
-    chmod(join(build_dir, "playground"), mode(PKG_PLAYGROUND_BIN))
+    info("Writing a playground script to $build_dir:\n```\n$script```\n")
+    write(join(build_dir, "playground"), script)
+    chmod(join(build_dir, "playground"), "+x")
 end
 
 config_file = join(build_dir, "config.yml")
