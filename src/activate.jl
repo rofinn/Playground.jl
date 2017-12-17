@@ -19,7 +19,8 @@ function activate(env::Environment; shell=true)
 
     if shell
         withenv(env) do
-            run(getshell(), env)
+            sh = getshell(env.config.default_shell)
+            run(sh, env)
         end
     else
         repl = Julia()

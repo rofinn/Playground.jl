@@ -30,7 +30,7 @@ type Config
             join(root, p"bin"),
             join(root, p"share"),
             default_pg_path,
-            get(kwargs, "default_shell", ""),
+            get(kwargs, "default_shell", "/bin/bash"),
             get(kwargs, "default_registry", ""),
             get(kwargs, "default_branch", ""),
             kwargs["default_git_address"],
