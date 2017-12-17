@@ -68,7 +68,10 @@ end
 
 function configload(content)
     content_hash = hash(content)
-    config_cache_file = join(configpath(), ".config-$(Base.VERSION_STRING).cache")
+    config_path = configpath()
+
+    mkdir(config_path; recursive=true, exist_ok=true)
+    config_cache_file = join(config_path, ".config-$(Base.VERSION_STRING).cache")
 
     if exists(config_cache_file)
         try
