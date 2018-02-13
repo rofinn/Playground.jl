@@ -18,13 +18,13 @@ function Base.run(shell::BASH, env::Environment)
         exists(usr_rc) ? cp(usr_rc, pg_rc, follow_symlinks=true) : touch(pg_rc)
 
         content = string(
-            "\nexport PATH=", ENV["PATH"], "\n",
+            "\nexport PATH=\"", ENV["PATH"], "\"\n",
             "export PS1=\"$prompt\"\n",
-            "export JULIA_PKGDIR=", ENV["JULIA_PKGDIR"], "\n",
+            "export JULIA_PKGDIR=\"", ENV["JULIA_PKGDIR"], "\"\n",
         )
 
         if haskey(ENV, "HISTFILE")
-            content = string(content, "export HISTFILE=", ENV["HISTFILE"], "\n")
+            content = string(content, "export HISTFILE=\"", ENV["HISTFILE"], "\"\n")
         end
 
         write(pg_rc, content, "a")

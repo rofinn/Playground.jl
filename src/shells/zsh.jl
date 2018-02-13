@@ -22,13 +22,13 @@ function Base.run(shell::ZSH, env::Environment)
 
         content = string(
             "\nunset PROMPT\n",
-            "export PATH=", ENV["PATH"], "\n",
+            "export PATH=\"", ENV["PATH"], "\"\n",
             "export PS1=\"$prompt\"\n",
-            "export JULIA_PKGDIR=", ENV["JULIA_PKGDIR"], "\n",
+            "export JULIA_PKGDIR=\"", ENV["JULIA_PKGDIR"], "\"\n",
         )
 
         if haskey(ENV, "HISTFILE") && exists(Path(ENV["HISTFILE"]))
-            content = string(content, "export HISTFILE=", ENV["HISTFILE"], "\n")
+            content = string(content, "export HISTFILE=\"", ENV["HISTFILE"], "\"\n")
         end
 
         debug(logger, "Writing rc contents to file.")
