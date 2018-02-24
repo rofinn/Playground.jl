@@ -13,7 +13,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Playground.jl",
     "title": "Playground.jl",
     "category": "section",
-    "text": "(Image: Build Status) (Image: codecov.io) (Image: Project Status: Active - The project has reached a stable, usable state and is being actively developed.)A package for managing julia sandboxes like python's virtualenv (with a little influence from pyenv and virtualenvwrapper)Supports: (Image: StatsBase) (Image: StatsBase)"
+    "text": "(Image: Build Status) (Image: codecov.io) (Image: Project Status: Active - The project has reached a stable, usable state and is being actively developed.)A package for managing julia sandboxes like python\'s virtualenv (with a little influence from pyenv and virtualenvwrapper)Supports: (Image: StatsBase) (Image: StatsBase)"
 },
 
 {
@@ -21,7 +21,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Playground.jl",
     "title": "Installation",
     "category": "section",
-    "text": "You can install Playground.jl with Pkg.add.julia> Pkg.add(\"Playground\")If you'd like to install the playground script and config.yml file to the shared ~/.playground directory run:julia> ENV[\"PLAYGROUND_INSTALL\"] = true; Pkg.build(\"Playground\")The playground script is now ready to use.> ~/.playground/bin/playground -h\nusage: <PROGRAM> [-d] [-h]\n                 {install|create|activate|list|clean|rm|exec}\n\ncommands:\n  install      Installs julia version for you.\n  create       Builds the playground\n  activate     Activates the playground.\n  list         Lists available julia versions and playgrounds\n  clean        Deletes any dead julia-version or playground links, in\n               case you've deleted the original folders.\n  rm           Deletes the specifid julia-version or playground.\n  exec         Execute a cmd inside a playground and exit.\n\noptional arguments:\n  -d, --debug  Log debug message to STDOUT\n  -h, --help   show this help message and exitRecommended: Add the playground bin directory to your path by editing your ~/.bashrc, ~/.zshrc, ~/.tcshrc, etc.echo \"PATH=$PATH:~/.playground/bin/\" >> ~/.bashrcThis will make the playground script and all managed julia versions easily accessible.NOTE: You may want to modify the shebang (e.g., #!/usr/bin/env julia) in ~/.playground/bin/playground to either ignore deprecation warnings or improve load times.Add --depwarn=no to ignore deprecation warnings.\nAdd --optimize=0 to speed up load times.If you're running linux you'll need to use the path to the julia executable directly (e.g. #!/usr/bin/julia --depwarn=no --optimize=0) as env in linux can only take 1 argument, otherwise the process will stall. You can get the path to your julia executable with /usr/bin/env julia."
+    "text": "You can install Playground.jl with Pkg.add.julia> Pkg.add(\"Playground\")If you\'d like to install the playground script and config.yml file to the shared ~/.playground directory run:julia> ENV[\"PLAYGROUND_INSTALL\"] = true; Pkg.build(\"Playground\")The playground script is now ready to use.> ~/.playground/bin/playground -h\nusage: <PROGRAM> [-d] [-h]\n                 {install|create|activate|list|clean|rm|exec}\n\ncommands:\n  install      Installs julia version for you.\n  create       Builds the playground\n  activate     Activates the playground.\n  list         Lists available julia versions and playgrounds\n  clean        Deletes any dead julia-version or playground links, in\n               case you\'ve deleted the original folders.\n  rm           Deletes the specifid julia-version or playground.\n  exec         Execute a cmd inside a playground and exit.\n\noptional arguments:\n  -d, --debug  Log debug message to STDOUT\n  -h, --help   show this help message and exitRecommended: Add the playground bin directory to your path by editing your ~/.bashrc, ~/.zshrc, ~/.tcshrc, etc.echo \"PATH=$PATH:~/.playground/bin/\" >> ~/.bashrcThis will make the playground script and all managed julia versions easily accessible.NOTE: You may want to modify the shebang (e.g., #!/usr/bin/env julia) in ~/.playground/bin/playground to either ignore deprecation warnings or improve load times.Add --depwarn=no to ignore deprecation warnings.\nAdd --optimize=0 to speed up load times.If you\'re running linux you\'ll need to use the path to the julia executable directly (e.g. #!/usr/bin/julia --depwarn=no --optimize=0) as env in linux can only take 1 argument, otherwise the process will stall. You can get the path to your julia executable with /usr/bin/env julia."
 },
 
 {
@@ -77,7 +77,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Binary Releases",
     "title": "Installing",
     "category": "section",
-    "text": "Download the tar.gz file for your platform into your desired install location (ie: ~/bin)\nGo to that directory (cd ~/bin)\nExtract the build (tar -xvzf ~/bin/playground-osx.tar.gz)\ncd playground && ./INSTALL.sh\nCreate an alias that sets the LD_LIBRARY_PATH and calls the script. This should be placed in your shell rc file, so if your default shell is bash then you'd add alias playground=\"LD_LIBRARY_PATH=~/bin/playground ~/bin/playground/playground\" to your ~/.bashrc file.NOTE: This alias hack with LD_LIBRARY_PATH is only necessary due to an issue in the binaries created with BuildExecutable.jl. In future releases it should only be necessary for ~/bin/playground to be on your search path (ie: in your PATH variable)."
+    "text": "Download the tar.gz file for your platform into your desired install location (ie: ~/bin)\nGo to that directory (cd ~/bin)\nExtract the build (tar -xvzf ~/bin/playground-osx.tar.gz)\ncd playground && ./INSTALL.sh\nCreate an alias that sets the LD_LIBRARY_PATH and calls the script. This should be placed in your shell rc file, so if your default shell is bash then you\'d add alias playground=\"LD_LIBRARY_PATH=~/bin/playground ~/bin/playground/playground\" to your ~/.bashrc file.NOTE: This alias hack with LD_LIBRARY_PATH is only necessary due to an issue in the binaries created with BuildExecutable.jl. In future releases it should only be necessary for ~/bin/playground to be on your search path (ie: in your PATH variable)."
 },
 
 {
@@ -85,7 +85,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Binary Releases",
     "title": "Building",
     "category": "section",
-    "text": "If you'd like to build you own playground binary executables you'll have a few more steps. First, add BuildExecutable and checkout the current master.julia> Pkg.add(\"BuildExecutable\")\n\njulia> Pkg.checkout(\"BuildExecutable.jl\")In order to tell the Playground.jl build script to create a binary executable you'll need to runjulia> ENV[\"PLAYGROUND_BIN_EXEC\"] = trueprior to calling Pkg.build(\"Playground\")."
+    "text": "If you\'d like to build you own playground binary executables you\'ll have a few more steps. First, add BuildExecutable and checkout the current master.julia> Pkg.add(\"BuildExecutable\")\n\njulia> Pkg.checkout(\"BuildExecutable.jl\")In order to tell the Playground.jl build script to create a binary executable you\'ll need to runjulia> ENV[\"PLAYGROUND_BIN_EXEC\"] = trueprior to calling Pkg.build(\"Playground\")."
 },
 
 {
@@ -101,7 +101,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Executable",
     "title": "Executable",
     "category": "section",
-    "text": "The primary interface provided by Playground.jl is via the playground executable, which includes several subcommands for manipulating playground environments.> playground -h\nusage: <PROGRAM> [-d] [-h]\n                 {install|create|activate|list|clean|rm|exec}\n\ncommands:\n  install      Installs julia version for you.\n  create       Builds the playground\n  activate     Activates the playground.\n  list         Lists available julia versions and playgrounds\n  clean        Deletes any dead julia-version or playground links, in\n               case you've deleted the original folders.\n  rm           Deletes the specifid julia-version or playground.\n  exec         Execute a cmd inside a playground and exit.\n\noptional arguments:\n  -d, --debug  Log debug message to STDOUT\n  -h, --help   show this help message and exit"
+    "text": "The primary interface provided by Playground.jl is via the playground executable, which includes several subcommands for manipulating playground environments.> playground -h\nusage: <PROGRAM> [-d] [-h]\n                 {install|create|activate|list|clean|rm|exec}\n\ncommands:\n  install      Installs julia version for you.\n  create       Builds the playground\n  activate     Activates the playground.\n  list         Lists available julia versions and playgrounds\n  clean        Deletes any dead julia-version or playground links, in\n               case you\'ve deleted the original folders.\n  rm           Deletes the specifid julia-version or playground.\n  exec         Execute a cmd inside a playground and exit.\n\noptional arguments:\n  -d, --debug  Log debug message to STDOUT\n  -h, --help   show this help message and exit"
 },
 
 {
@@ -117,7 +117,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Executable",
     "title": "create",
     "category": "section",
-    "text": "To create a new playground using your existing julia install in your current working directory.playground createThis will automatically create a .playground folder (default specified in ~/.playground/config.yml)To create a new playground in a specific directory.playground create /path/of/new/playgroundAlternatively, you can name your playgrounds to make them available without remembering where they're stored.playground create --name research-playgroundNOTE: If both a directory and a --name are supplied the playground will be created in the provided directory and linked to ~/.playground/share/<name>. Otherwise, the playground will be created directly in ~/.playground/share/<name>.To create a playground with a default julia-version. The julia version supplied must already be installed with methods listed above.playground create /path/of/new/playground --name nightly-playground --julia-version julia-nightlyTo create a new playground with pre-existing requirements using REQUIRE or DECLARE files.playground create --requirements /path/to/REQUIRE/or/DECLARE/fileIf the basename of the file is not REQUIRE or DECLARE you can still specify the requirement type.playground create --requirements /path/to/requirements/file --req-type DECLAREIf using DECLARE files you should make sure that DeclarativePackages.jl is already installed."
+    "text": "To create a new playground using your existing julia install in your current working directory.playground createThis will automatically create a .playground folder (default specified in ~/.playground/config.yml)To create a new playground in a specific directory.playground create /path/of/new/playgroundAlternatively, you can name your playgrounds to make them available without remembering where they\'re stored.playground create --name research-playgroundNOTE: If both a directory and a --name are supplied the playground will be created in the provided directory and linked to ~/.playground/share/<name>. Otherwise, the playground will be created directly in ~/.playground/share/<name>.To create a playground with a default julia-version. The julia version supplied must already be installed with methods listed above.playground create /path/of/new/playground --name nightly-playground --julia-version julia-nightlyTo create a new playground with pre-existing requirements using REQUIRE or DECLARE files.playground create --requirements /path/to/REQUIRE/or/DECLARE/fileIf the basename of the file is not REQUIRE or DECLARE you can still specify the requirement type.playground create --requirements /path/to/requirements/file --req-type DECLAREIf using DECLARE files you should make sure that DeclarativePackages.jl is already installed."
 },
 
 {
@@ -141,7 +141,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Executable",
     "title": "clear",
     "category": "section",
-    "text": "If you've removed some a source julia-version or have deleted playground folders and would like playground to clean up any broken symlinks.playground clean"
+    "text": "If you\'ve removed some a source julia-version or have deleted playground folders and would like playground to clean up any broken symlinks.playground clean"
 },
 
 {
@@ -149,7 +149,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Executable",
     "title": "rm",
     "category": "section",
-    "text": "If you'd like to remove a julia-version or playground you can run.playground rm [playground-name|julia-version] --dir /path/to/playgroundswhich will delete the specified playground or julia-version and make sure that all related links have been cleaned up. Warning: Deleting julia versions may break playgrounds that depend on that version. If this occurs you can either manually recreate the julia symlink with ln -s ~/.playground/bin/<julia-version> /path/to/playground/bin/julia or better yet recreate the playground."
+    "text": "If you\'d like to remove a julia-version or playground you can run.playground rm [playground-name|julia-version] --dir /path/to/playgroundswhich will delete the specified playground or julia-version and make sure that all related links have been cleaned up. Warning: Deleting julia versions may break playgrounds that depend on that version. If this occurs you can either manually recreate the julia symlink with ln -s ~/.playground/bin/<julia-version> /path/to/playground/bin/julia or better yet recreate the playground."
 },
 
 {
@@ -197,7 +197,7 @@ var documenterSearchIndex = {"docs": [
     "page": "REPL",
     "title": "create",
     "category": "section",
-    "text": "To create a new playground using your existing julia install in your current working directory.julia> create()This will automatically create a .playground folder (default specified in ~/.playground/config.yml)To create a new playground in a specific directory.julia> create(config, p\"/path/of/new/playground\")To name your playgrounds and make them available without remembering where they're stored.julia> create(config, \"research-playground\")Create a playground with a default julia-version.julia> create(config, p\"/path/of/new/playground\", \"nightly-playground\"; julia=\"julia-nightly\")Create a new playground with pre-existing REQUIRE file.julia> create(; p\"/path/to/REQUIRE\")"
+    "text": "To create a new playground using your existing julia install in your current working directory.julia> create()This will automatically create a .playground folder (default specified in ~/.playground/config.yml)To create a new playground in a specific directory.julia> create(config, p\"/path/of/new/playground\")To name your playgrounds and make them available without remembering where they\'re stored.julia> create(config, \"research-playground\")Create a playground with a default julia-version.julia> create(config, p\"/path/of/new/playground\", \"nightly-playground\"; julia=\"julia-nightly\")Create a new playground with pre-existing REQUIRE file.julia> create(; p\"/path/to/REQUIRE\")"
 },
 
 {
@@ -205,7 +205,7 @@ var documenterSearchIndex = {"docs": [
     "page": "REPL",
     "title": "activate",
     "category": "section",
-    "text": "To activate a given playground simply run.julia> activate(config, p\"/path/to/your/playground\")orjulia> activate(config, \"myproject\")NOTE: On Unix systems, activate will by default try and open a new shell using you SHELL environment variable and a modified copy of your ~/.<shell>rc file. Otherwise, it will fall back to using sh -i.If you'd like to work within a playground environment from your current REPL just pass shell=false.julia> activate(config, \"myproject\"; shell=false)"
+    "text": "To activate a given playground simply run.julia> activate(config, p\"/path/to/your/playground\")orjulia> activate(config, \"myproject\")NOTE: On Unix systems, activate will by default try and open a new shell using you SHELL environment variable and a modified copy of your ~/.<shell>rc file. Otherwise, it will fall back to using sh -i.If you\'d like to work within a playground environment from your current REPL just pass shell=false.julia> activate(config, \"myproject\"; shell=false)"
 },
 
 {
@@ -221,7 +221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "REPL",
     "title": "clear",
     "category": "section",
-    "text": "If you've removed some a source julia-version or have deleted playground folders and would like playground to clean up any broken symlinks.julia> clean(config)"
+    "text": "If you\'ve removed some a source julia-version or have deleted playground folders and would like playground to clean up any broken symlinks.julia> clean(config)"
 },
 
 {
@@ -229,7 +229,7 @@ var documenterSearchIndex = {"docs": [
     "page": "REPL",
     "title": "rm",
     "category": "section",
-    "text": "If you'd like to remove a julia-version or playground you can run.julia> rm(config, \"myproject\")orjulia> rm(config, \"julia-0.7\")which will delete the specified playground or julia-version and make sure that all related links have been cleaned up.Reminder: Deleting julia versions may break playgrounds that depend on that version."
+    "text": "If you\'d like to remove a julia-version or playground you can run.julia> rm(config, \"myproject\")orjulia> rm(config, \"julia-0.7\")which will delete the specified playground or julia-version and make sure that all related links have been cleaned up.Reminder: Deleting julia versions may break playgrounds that depend on that version."
 },
 
 {
@@ -309,7 +309,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "Playground.clean",
     "category": "Function",
-    "text": "clean(config::Config)\n\nRemoves any deadlinks Playground's bin and share directories.\n\n\n\n"
+    "text": "clean(config::Config)\n\nRemoves any deadlinks Playground\'s bin and share directories.\n\n\n\n"
 },
 
 {
@@ -317,7 +317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "API",
     "title": "Base.Filesystem.rm",
     "category": "Method",
-    "text": "rm(config::Config; name::AbstractString=\"\", dir::AbstractPath=Path())\n\nRemoves a julia binary or playground from Playground's bin and share directories.\n\n\n\n"
+    "text": "rm(config::Config; name::AbstractString=\"\", dir::AbstractPath=Path())\n\nRemoves a julia binary or playground from Playground\'s bin and share directories.\n\n\n\n"
 },
 
 {
