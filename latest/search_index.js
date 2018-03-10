@@ -244,7 +244,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api.html#Playground.Config",
     "page": "API",
     "title": "Playground.Config",
-    "category": "Type",
+    "category": "type",
     "text": "Config(p\"~/.playground/config.yml\", root=p\"~/.playground\")\n\nStores various default playground environment settings including paths for storing shared binaries and environments.\n\n\n\n"
 },
 
@@ -252,7 +252,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api.html#Playground.Environment",
     "page": "API",
     "title": "Playground.Environment",
-    "category": "Type",
+    "category": "type",
     "text": "Environment([config::Config], [name::String], [root::AbstractPath])\n\nAn environment stores information about a playground environment and provides methods fro interacting with them.\n\nNOTE: In the future we might want to support different types of environments (e.g., DockerEnvironment).\n\n\n\n"
 },
 
@@ -260,7 +260,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api.html#Playground.install",
     "page": "API",
     "title": "Playground.install",
-    "category": "Function",
+    "category": "function",
     "text": "install{S<:AbstractString}(config::Config, version::VersionNummber; labels::Array{S}=String[])\n\nDownloads the latest binary version for your platform and symlinks the binary with the appropriate labels.\n\n\n\ninstall{S<:AbstractString}(config::Config, executable::AbstractPath; labels::Array{S}=String[])\n\nCreates symlinks from an existing julia install.\n\n\n\n"
 },
 
@@ -268,7 +268,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api.html#Playground.create",
     "page": "API",
     "title": "Playground.create",
-    "category": "Function",
+    "category": "function",
     "text": "create(; kwargs...)\ncreate(config::Config, args...; kwargs...)\ncreate(env::Environment; kwargs...)\n\nCreates a new playground Environment including initializing its package directory and installing any package in the REQUIRE file passed in.\n\nOptional Arguments\n\nYou can optionally pass in an Environment instance of a Config and args to build one.\n\nKeywords Arguments\n\njulia::AbstractString - a julia binary to use in this playground environment.\nreqs_file::AbstractPath - path to a REQUIRE file of packages to install in this environment.\nregistry::AbstractString - url to the package registry to be cloned.\nbranch::AbstractString - registry branch to be checked out.\n\n\n\n"
 },
 
@@ -276,7 +276,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api.html#Playground.activate",
     "page": "API",
     "title": "Playground.activate",
-    "category": "Function",
+    "category": "function",
     "text": "activate(; shell=true)\nactivate(config::Config, args...; shell=true)\nactivate(env::Environment; shell=true)\n\nModifies the current environment to operate within a specific playground environment. When shell=true a new shell environment will be created. However, when shell=false the existing julia REPL will be modifed and deactivate() must be called to restore the REPL state.\n\n\n\n"
 },
 
@@ -284,7 +284,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api.html#Playground.deactivate",
     "page": "API",
     "title": "Playground.deactivate",
-    "category": "Function",
+    "category": "function",
     "text": "deactivate()\n\nDeactivates the active environment and restores the original julia environment.\n\n\n\n"
 },
 
@@ -292,7 +292,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api.html#Base.withenv-Tuple{Function,Playground.Environment}",
     "page": "API",
     "title": "Base.withenv",
-    "category": "Method",
+    "category": "method",
     "text": "withenv(f::Function, env::Environment)\n\nWorks the same as withenv(f, keyvals...), but is specific to running f within a playground Environment.\n\n\n\n"
 },
 
@@ -300,7 +300,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api.html#Playground.list",
     "page": "API",
     "title": "Playground.list",
-    "category": "Function",
+    "category": "function",
     "text": "list(config::Config; show_links=false)\n\nPrints out all installed julia version and playgrounds.\n\n\n\n"
 },
 
@@ -308,7 +308,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api.html#Playground.clean",
     "page": "API",
     "title": "Playground.clean",
-    "category": "Function",
+    "category": "function",
     "text": "clean(config::Config)\n\nRemoves any deadlinks Playground\'s bin and share directories.\n\n\n\n"
 },
 
@@ -316,7 +316,7 @@ var documenterSearchIndex = {"docs": [
     "location": "api.html#Base.Filesystem.rm-Tuple{Playground.Config}",
     "page": "API",
     "title": "Base.Filesystem.rm",
-    "category": "Method",
+    "category": "method",
     "text": "rm(config::Config; name::AbstractString=\"\", dir::AbstractPath=Path())\n\nRemoves a julia binary or playground from Playground\'s bin and share directories.\n\n\n\n"
 },
 
