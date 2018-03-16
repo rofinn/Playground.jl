@@ -46,7 +46,7 @@ export
     Environment
 
 
-const logger = get_logger(current_module())
+const logger = getlogger(current_module())
 const cache = Vector{Dict{Symbol, Any}}()
 
 function main(cmdargs, configargs...)
