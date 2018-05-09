@@ -165,7 +165,7 @@ var documenterSearchIndex = {"docs": [
     "page": "REPL",
     "title": "REPL",
     "category": "section",
-    "text": "All of the functionality provided by the playground executable can be accessed with the exported API.NOTES:This API is still under development and while the functionality is largelystable the exactly interface is still subject to change.Playground differentiates Strings and Paths using the AbstractPath type providedby FilePaths.jl. A path type can be created with p\"/path/to/my/thing\".Memento logging can be configured for debugging purposes.julia> using Memento\n\njulia> Memento.config(\"debug\")"
+    "text": "All of the functionality provided by the playground executable can be accessed with the exported API.NOTES:This API is still under development and while the functionality is largelystable the exactly interface is still subject to change.Playground differentiates Strings and Paths using the AbstractPath type providedby FilePathsBase.jl. A path type can be created with p\"/path/to/my/thing\".Memento logging can be configured for debugging purposes.julia> using Memento\n\njulia> Memento.config(\"debug\")"
 },
 
 {
