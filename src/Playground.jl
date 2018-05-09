@@ -5,7 +5,7 @@ module Playground
 using Compat
 using ArgParse
 using Mocking
-using FilePaths
+using FilePathsBase
 using Memento
 using YAML
 

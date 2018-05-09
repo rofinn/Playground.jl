@@ -7,7 +7,7 @@ with the exported API.
 * This API is still under development and while the functionality is largely
 stable the exactly interface is still subject to change.
 *  Playground differentiates `String`s and `Path`s using the `AbstractPath` type provided
-by [FilePaths.jl](https://github.com/rofinn/FilePaths.jl). A path type can be created with `p"/path/to/my/thing"`.
+by [FilePathsBase.jl](https://github.com/rofinn/FilePathsBase.jl). A path type can be created with `p"/path/to/my/thing"`.
 * Memento logging can be configured for debugging purposes.
 ```julia
 julia> using Memento

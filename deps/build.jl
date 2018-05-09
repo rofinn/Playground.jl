@@ -1,5 +1,5 @@
 using Compat
-using FilePaths
+using FilePathsBase
 import Playground
 
 # Get our current working path

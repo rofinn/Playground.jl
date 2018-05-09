@@ -4,7 +4,7 @@ using Mocking
 Mocking.enable(force=true)
 
 using Playground
-using FilePaths
+using FilePathsBase
 using Memento
 
 Memento.config("debug"; fmt="[ {level} ] {msg}")
