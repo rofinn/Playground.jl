@@ -25,6 +25,7 @@ function Base.run(shell::ZSH, env::Environment)
             "export PATH=\"", ENV["PATH"], "\"\n",
             "export PS1=\"$prompt\"\n",
             "export JULIA_PKGDIR=\"", ENV["JULIA_PKGDIR"], "\"\n",
+            "export JULIA_DEPOT_PATH=\"", ENV["JULIA_DEPOT_PATH"], "\"\n",
         )
 
         if haskey(ENV, "HISTFILE") && exists(Path(ENV["HISTFILE"]))
