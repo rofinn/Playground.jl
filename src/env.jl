@@ -67,6 +67,7 @@ root(env::Environment) = env.root
 log(env::Environment) = join(env.root, p"log")
 bin(env::Environment) = join(env.root, p"bin")
 pkg(env::Environment) = join(env.root, p"packages")
+depot(env::Environment) = join(env.root, p"depot")
 julia(env::Environment) = join(env.root, p"bin", p"julia")
 shell(env::Environment) = env.config.default_shell
 function history(env::Environment, lang::Symbol)
@@ -89,7 +90,13 @@ function getenvs(env::Environment)
     envs = Pair[]
     path = "$(bin(env)):" * ENV["PATH"]
     envname = name(env) == "" ? basename(root(env)) : name(env)
-    push!(envs, "PATH" => path, "PLAYGROUND_ENV" => envname, "JULIA_PKGDIR" => pkg(env))
+    push!(
+        envs,
+        "PATH" => path,
+        "PLAYGROUND_ENV" => envname,
+        "JULIA_PKGDIR" => pkg(env),
+        "JULIA_DEPOT_PATH" => depot(env),     # For Pkg3 support
+    )
 
     if !isempty(shell(env))
         push!(envs, "SHELL" => shell(env))
