@@ -1,5 +1,5 @@
 const DECLARATIVE_PACKAGES_DIR = Pkg.dir("DeclarativePackages")
-const NIGHTLY = v"0.7-"
+const NIGHTLY = v"1.3.0-"
 const JULIA_BIN_MODE = Mode(user=(READ+WRITE+EXEC), group=(READ+EXEC), other=(READ+EXEC))
 const DEFAULT_CONFIG = """
 ---
